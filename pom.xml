@@ -1,17 +1,100 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>no.difi.asic</groupId>
-  <artifactId>asic</artifactId>
-  <packaging>jar</packaging>
-  <version>0.1-SNAPSHOT</version>
-  <name>asic</name>
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.12</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>no.difi.asic</groupId>
+    <artifactId>asic</artifactId>
+    <packaging>jar</packaging>
+    <version>0.1-SNAPSHOT</version>
+    <name>asic</name>
+    <description></description>
+
+    <scm>
+        <connection>scm:git:git@github.com:difi/asic.git</connection>
+        <url>scm:git:git@github.com:difi/asic.git</url>
+        <developerConnection>scm:git:git@github.com:difi/asic.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
+    <contributors>
+        <contributor>
+            <name>Steinar Overbeck Cook</name>
+            <organization>Difi</organization>
+            <roles>
+                <role>Principal author</role>
+            </roles>
+        </contributor>
+    </contributors>
+
+    <properties>
+        <testng.version>6.9.4</testng.version>
+        <logback.version>1.0.7</logback.version>
+        <jaxb.version>2.2.11</jaxb.version>
+    </properties>
+    <dependencies>
+
+        <!-- TestNG testing framework -->
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>${testng.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+
+        <!-- See http://stackoverflow.com/questions/26413431/which-artifacts-should-i-use-for-jaxb-ri-in-my-maven-project
+            For an explanation of the JAXB dependencies
+            -->
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+            <version>${jaxb.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.8</version>
+        </dependency>
+
+
+    </dependencies>
+
+    <build>
+        <defaultGoal>install</defaultGoal>
+        <plugins>
+            <plugin>
+                <!-- Explicitly declares which version of Java to use -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.3</version>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <!-- JAXB plugin generates Java classes corresponding to the XML Schema Definitions found in this project -->
+                <!-- See  https://github.com/highsource/maven-jaxb2-plugin -->
+                <!-- Documentation at https://github.com/highsource/maven-jaxb2-plugin/wiki -->
+                <groupId>org.jvnet.jaxb2.maven2</groupId>
+                <artifactId>maven-jaxb2-plugin</artifactId>
+                <version>0.12.3</version>
+                <executions>
+                    <execution>
+                        <id>xsd</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <schemaDirectory>src/main/resources/xsd</schemaDirectory>
+                            <!-- If you want to generate the classes into a different directory than the default, this is how you do it. -->
+                            <!-- <generateDirectory>${project.build.directory}/generated-sources/xjc-xsd</generateDirectory> -->
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

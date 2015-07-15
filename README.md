@@ -33,10 +33,16 @@ The `-noverify` option will allow self signed certificates, and should normally 
 This is how you create an ASiC container manually:
 
 1. Create empty directory named `asic-sample`
-1. Copy the files `bii-envelop.xml`and `bii-message.xml` into `asic-sample`
+1. Copy the files `bii-envelope.xml`and `bii-message.xml` into `asic-sample`
 1. Create the directory `META-INF`:
-  `mkdir META-INF`
-1. Create the file `asicmanifest.xml`, which should look like this:
+1. Compute the SHA-256 digest value for the files and save them:
+```
+openssl dgst -sha256 -binary bii-envelope |base64
+openssl dgst -sha256 -binary bii-message |base64
+
+```
+1. Create the file `META-INF/asicmanifest.xml`, add an entry for each file and
+paste the SHA-256 values computed in the previous step. The file should look something like this:
 ```xml
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ASiCManifest xmlns="http://uri.etsi.org/2918/v1.1.1#" xmlns:ns2="http://www.w3.org/2000/09/xmldsig#">
@@ -50,8 +56,12 @@ This is how you create an ASiC container manually:
     </DataObjectReference>
 </ASiCManifest>
 ```
-1. Create the signature, which should be placed into `signature.p7s`
+1. Create the signature, which should be placed into `signature.p7s`. The file `comodo.pem` should
+be replaced with the PEM-file holding your private key for the signature, and the certificate to prove it.
+```
+openssl cms -sign -in META-INF/asicmanifest.xml -binary -outform der -out META-INF/signature.p7s -signer comodo.pem
 ```
 
-```
+**Disclaimer:** The procedure liste above works on a Mac or Linux machine with the various tools pre-installed. If you are running on a windows machine
+you need to download and install the *openssl* and *base64* tool and adapt the procedure according to your liking.
 

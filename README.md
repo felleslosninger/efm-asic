@@ -62,6 +62,14 @@ be replaced with the PEM-file holding your private key for the signature, and th
 openssl cms -sign -in META-INF/asicmanifest.xml -binary -outform der -out META-INF/signature.p7s -signer comodo.pem
 ```
 
+1. Verify the signature:
+```
+openssl cms -verify -in META-INF/signature.p7s -inform der -content META-INF/asicmanifest.xml -noverify
+```
+Note! The `-noverify` option omits verifying the certificate chain of trust and should only be used to verify that the files were created properly
+
+1. Create the ZIP-archive using your favourite tool :-)
+
 **Disclaimer:** The procedure liste above works on a Mac or Linux machine with the various tools pre-installed. If you are running on a windows machine
 you need to download and install the *openssl* and *base64* tool and adapt the procedure according to your liking.
 

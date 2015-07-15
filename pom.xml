@@ -1,12 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <groupId>no.difi.asic</groupId>
     <artifactId>asic</artifactId>
     <packaging>jar</packaging>
     <version>0.1-SNAPSHOT</version>
     <name>asic</name>
-    <description></description>
 
     <scm>
         <connection>scm:git:git@github.com:difi/asic.git</connection>
@@ -30,6 +30,7 @@
         <logback.version>1.0.7</logback.version>
         <jaxb.version>2.2.11</jaxb.version>
     </properties>
+
     <dependencies>
 
         <!-- TestNG testing framework -->
@@ -37,6 +38,7 @@
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
             <version>${testng.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
@@ -71,11 +73,18 @@
             <version>1.1.1</version>
         </dependency>
 
-
     </dependencies>
 
     <build>
         <defaultGoal>install</defaultGoal>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <excludes>
+                    <exclude>**/*.pdf</exclude>
+                </excludes>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <!-- Explicitly declares which version of Java to use -->
@@ -85,6 +94,14 @@
                 <configuration>
                     <source>1.7</source>
                     <target>1.7</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.18.1</version>
+                <configuration>
+                    <failIfNoTests>true</failIfNoTests>
                 </configuration>
             </plugin>
             <plugin>
@@ -101,7 +118,7 @@
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <schemaDirectory>src/main/resources/xsd</schemaDirectory>
+                            <schemaDirectory>src/main/xsd</schemaDirectory>
                             <!-- If you want to generate the classes into a different directory than the default, this is how you do it. -->
                             <!-- <generateDirectory>${project.build.directory}/generated-sources/xjc-xsd</generateDirectory> -->
                         </configuration>
@@ -110,4 +127,5 @@
             </plugin>
         </plugins>
     </build>
+
 </project>

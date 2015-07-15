@@ -208,16 +208,39 @@ public class AsicBuilder {
      */
     public AsicContainer build() {
 
-        // Creates the messages digester for each file added to the container.
-        messageDigester = createMessageDigester();
-
-
         if (getOutputDir() == null) {
             throw new IllegalStateException("Output directory for the ASiC container not specified");
         }
         if (getArchiveName() == null) {
             throw new IllegalStateException("Name of archive not specified");
         }
+
+        File outputFile = computeFileName(getOutputDir(), getArchiveName());
+        FileOutputStream fileOutputStream = null;
+
+        try {
+            fileOutputStream = new FileOutputStream(outputFile);
+            build(fileOutputStream);
+        } catch (FileNotFoundException e) {
+            throw new IllegalStateException("Unable to create output file " + outputFile, e);
+        } finally {
+             if (fileOutputStream != null) {
+                try {
+                    fileOutputStream.close();
+                } catch (IOException e) {
+                    throw new IllegalStateException("Error occured while closing file  " + outputFile, e);
+                }
+             }
+        }
+
+        return new AsicContainer(outputFile);
+    }
+
+    /**
+     * Builds the ASiC container to outputStream.
+     */
+    public void build(OutputStream outputStream) {
+
         if (keyStoreFile == null) {
             throw new IllegalStateException("KeyStore file not specified");
         }
@@ -228,9 +251,10 @@ public class AsicBuilder {
             throw new IllegalStateException("Password for private key within keystore must be supplied");
         }
 
-        File outputFile = computeFileName(getOutputDir(), getArchiveName());
+        // Creates the messages digester for each file added to the container.
+        messageDigester = createMessageDigester();
 
-        ZipOutputStream zipOutputStream = createZipOutputStream(outputFile);
+        ZipOutputStream zipOutputStream = createZipOutputStream(outputStream);
 
         putMimeTypeAsFirstEntry(zipOutputStream);
 
@@ -260,8 +284,6 @@ public class AsicBuilder {
         } catch (IOException e) {
             throw new IllegalStateException("Unable to finish the container. " + e.getMessage(), e);
         }
-
-        return new AsicContainer(outputFile);
     }
 
     private void writeAsicManifest(ZipOutputStream zipOutputStream, byte[] manifestBytes) {
@@ -312,18 +334,12 @@ public class AsicBuilder {
         }
     }
 
-    static ZipOutputStream createZipOutputStream(File file) {
+    static ZipOutputStream createZipOutputStream(OutputStream outputStream) {
         ZipOutputStream zipOutputStream;
-        try {
-            zipOutputStream = new ZipOutputStream(new FileOutputStream(file));
-            zipOutputStream.setComment("mimetype=" + APPLICATION_VND_ETSI_ASIC_E_ZIP);
-
-        } catch (FileNotFoundException e) {
-            throw new IllegalStateException("Unable to create output file " + file, e);
-        }
+        zipOutputStream = new ZipOutputStream(outputStream);
+        zipOutputStream.setComment("mimetype=" + APPLICATION_VND_ETSI_ASIC_E_ZIP);
         return zipOutputStream;
     }
-
 
 
     /**

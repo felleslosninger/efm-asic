@@ -2,6 +2,8 @@ package no.difi.asic;
 
 import org.apache.commons.codec.binary.Base64;
 import org.testng.annotations.Test;
+
+/*
 import sun.security.pkcs.ContentInfo;
 import sun.security.pkcs.PKCS7;
 import sun.security.pkcs.SignerInfo;
@@ -10,6 +12,7 @@ import sun.security.util.DerValue;
 import sun.security.x509.AlgorithmId;
 import sun.security.x509.CertAndKeyGen;
 import sun.security.x509.X500Name;
+*/
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -58,7 +61,7 @@ public class SignatureTest {
      * Will not work with Java 1.8
      *
      * @throws Exception
-     */
+     *//*
     @Test
     public void createSignature() throws Exception {
         char[] password = "123".toCharArray();
@@ -98,7 +101,7 @@ public class SignatureTest {
 
         //Create PKCS7 Signed data
         PKCS7 p7 = new PKCS7(new AlgorithmId[] { digestAlgorithmId }, cInfo,
-                new java.security.cert.X509Certificate[] { /*cert,*/ },
+                new java.security.cert.X509Certificate[] { *//*cert,*//* },
                 new SignerInfo[] { sInfo });
 
         //Write PKCS7 to bYteArray
@@ -109,6 +112,7 @@ public class SignatureTest {
 
         byte[] bytes = Base64.encodeBase64(encoded);
         System.out.println(p7.toString());
+    }*/
 
-    }
+
 }

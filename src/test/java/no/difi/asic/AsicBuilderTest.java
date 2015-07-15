@@ -9,13 +9,11 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.net.URI;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
@@ -35,6 +33,7 @@ public class AsicBuilderTest {
     public static final String BII_MESSAGE_XML = "bii-message.xml";
     private URL envelopeUrl;
     private URL messageUrl;
+    private File keystoreFile;
 
     @BeforeMethod
     public void setUp() {
@@ -43,15 +42,27 @@ public class AsicBuilderTest {
 
         messageUrl = AsicBuilderTest.class.getClassLoader().getResource(BII_MESSAGE_XML);
         assertNotNull(messageUrl);
+
+        String homeDirName = System.getProperty("user.home");
+        File homeDir = new File(homeDirName);
+        assertTrue(homeDir.isDirectory() && homeDir.canRead(), homeDirName + " does not exist or is not readable");
+
+        String keyStoreFileName = ".ssh/comodo.jks";
+        keystoreFile = new File(homeDir, keyStoreFileName);
+        assertTrue(keystoreFile.canRead(), "Expected to find your private key and certificate in " + keystoreFile);
+
     }
 
 
     @Test
     public void createSampleEmptyContainer() throws Exception {
 
-        AsicBuilder asicBuilder = new AsicBuilder();
-        asicBuilder.archiveName("asic-test");
-        asicBuilder.outputDirectory(new File(System.getProperty("java.io.tmpdir")));
+        AsicBuilder asicBuilder = new AsicBuilder()
+                .archiveName("asic-test")
+                .outputDirectory(new File(System.getProperty("java.io.tmpdir")))
+                .keyStore(keystoreFile)
+                .keyStorePassword("ringo1")
+                .privateKeyPassword("ringo1");
 
         AsicContainer asicContainer = asicBuilder.build();
 
@@ -78,21 +89,29 @@ public class AsicBuilderTest {
 
     @Test
     public void createSampleContainer() throws Exception {
+
+
         AsicBuilder asicBuilder = new AsicBuilder();
 
+        // Creates the ASiC container in whatever is the temporary directory
         asicBuilder.outputDirectory(new File(System.getProperty("java.io.tmpdir")));
-        asicBuilder.archiveName("asic.zip");
-        URI uri = envelopeUrl.toURI();
-        File fileReference = new File(uri);
 
-        String entryName = fileReference.getName();
+        // TODO: Verify the various rules for the file name extension
+        // Name of file holding the ASiC container (the zip file)
+        asicBuilder.archiveName("asic-sample.zip"); // This will override the default extension of .asice or .sce
 
-        asicBuilder.addFile(fileReference, entryName);
-        asicBuilder.addFile(new File(messageUrl.toURI()));
+        File fileReference = new File(envelopeUrl.toURI());
 
+        asicBuilder.addFile(fileReference, fileReference.getName())
+                .addFile(new File(messageUrl.toURI()))
+                .keyStore(keystoreFile)
+                .keyStorePassword("ringo1")
+                .privateKeyPassword("ringo1");
+
+        // Verifies that both files have been added.
         {
             int matchCount = 0;
-            for (Map.Entry<String, File> entry : asicBuilder.getFiles().entrySet()) {
+            for (Map.Entry<String, AsicDataObjectEntry> entry : asicBuilder.getFiles().entrySet()) {
                 if (entry.getKey().equals(BII_ENVELOPE_XML)) {
                     matchCount++;
                 }
@@ -102,6 +121,7 @@ public class AsicBuilderTest {
             }
             assertEquals(matchCount, 2, "Entries were not added properly into list");
         }
+
         AsicContainer asicContainer = asicBuilder.build();
 
 
@@ -114,7 +134,7 @@ public class AsicBuilderTest {
         Enumeration<? extends ZipEntry> entries = zipFile.entries();
 
         {
-            int matchCount=0;
+            int matchCount = 0;
             while (entries.hasMoreElements()) {
                 ZipEntry entry = entries.nextElement();
                 String name = entry.getName();

@@ -1,3 +1,50 @@
-<bii-envelope>
-    <!-- placeholder for BII envelope -->
-</bii-envelope>
+<?xml version="1.0" encoding="UTF-8"?>
+<Envelope xmlns="http://docs.oasis-open.org/bdxr/ns/bde/1.0/Envelope" xmlns:ebc="http://docs.oasis-open.org/bdxr/ns/bde/1.0/BasicComponents" xmlns:eac="http://docs.oasis-open.org/bdxr/ns/bde/1.0/AggregateComponents" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://docs.oasis-open.org/bdxr/ns/bde/1.0/Envelope file:///C:/Users/Edmund/Dropbox/BII3%20-%20Development/Architecture%20and%20Methodology/Messaging%20Envelope/external%20documents/OASIS/bdx-bde-v1.0-csd02wd04-20150529-0210z/bdx-bde-v1.0-csd02wd04-20150529-0210z/xsdrt/BDE-Envelope-1.0.xsd">
+    <ebc:ID>1234567890</ebc:ID>
+    <ebc:CreationDateTime>2015-06-08T20:34:00-04:00</ebc:CreationDateTime>
+    <ebc:TestIndicator>1</ebc:TestIndicator>
+    <eac:FromParty>
+        <ebc:ID schemeID="0088">5412180000018</ebc:ID>
+    </eac:FromParty>
+    <eac:ToParty>
+        <ebc:ID schemeID="9902">987654321</ebc:ID>
+    </eac:ToParty>
+    <eac:Payload>
+        <ebc:ID>123456780</ebc:ID>
+        <ebc:DocumentTypeCode listID="UNCL1001">50</ebc:DocumentTypeCode>
+        <ebc:CustomizationID>urn:www.cenbii.eu:transaction:biitrns083:ver3.0</ebc:CustomizationID>
+        <ebc:ProfileID>urn:www.cenbii.eu:profile:bii47:ver3.0</ebc:ProfileID>
+        <ebc:HandlingServiceID>D123456</ebc:HandlingServiceID>
+        <ebc:InstanceSyntaxID>UBL2.1</ebc:InstanceSyntaxID>
+        <ebc:InstanceEncryptionIndicator>1</ebc:InstanceEncryptionIndicator>
+        <ebc:InstanceHashValue>HFHJJKJYGFHFFDGFH...</ebc:InstanceHashValue>
+        <ebc:InstanceHashAlgorithm>3DES</ebc:InstanceHashAlgorithm>
+        <eac:PayloadExternalReference>
+            <ebc:ID>asjkau72292</ebc:ID>
+        </eac:PayloadExternalReference>
+        <eac:PayloadContent>
+            <myDocumentHere>
+                <myElement>My Content</myElement>
+                <myElement>My Content</myElement>
+                <myElement>My Content</myElement>
+            </myDocumentHere>
+        </eac:PayloadContent>
+    </eac:Payload>
+    <eac:Payload>
+        <eac:PayloadContent>
+            Non-XML payload here, with sensitive characters
+            escaped such as &amp;, &lt; and ]]&gt;.
+
+            Any text, provided it has been escaped, can be included in a payload.
+        </eac:PayloadContent>
+    </eac:Payload>
+    <eac:Payload>
+        <eac:PayloadContent>
+            <myOtherDocumentHere>
+                <myOtherElement>My Content</myOtherElement>
+                <myOtherElement>My Content</myOtherElement>
+                <myOtherElement>My Content</myOtherElement>
+            </myOtherDocumentHere>
+        </eac:PayloadContent>
+    </eac:Payload>
+</Envelope>

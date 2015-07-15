@@ -2,13 +2,20 @@ package no.difi.asic;
 
 import org.etsi.uri._2918.v1_1.ASiCManifestType;
 import org.etsi.uri._2918.v1_1.DataObjectReferenceType;
+import org.etsi.uri._2918.v1_1.ObjectFactory;
 import org.w3._2000._09.xmldsig_.DigestMethodType;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import java.io.ByteArrayOutputStream;
+import java.util.Collection;
 
 /**
+ * Holds the object graph representing the ASiCManifest, i.e. the list of data objects (files)
+ * added, together with their associated attributes like checksums and URIs
+ *
  * @author steinar
  *         Date: 05.07.15
  *         Time: 17.21
@@ -16,69 +23,48 @@ import java.util.List;
 public class AsicManifestReference {
 
 
-    private final ASiCManifestType aSiCManifestType;
+    private final ASiCManifestType ASiCManifestType;
 
-    public AsicManifestReference(ASiCManifestType aSiCManifestType, Builder builder) {
-        this.aSiCManifestType = aSiCManifestType;
+    AsicManifestReference(ASiCManifestType ASiCManifestType) {
+        this.ASiCManifestType = ASiCManifestType;
     }
 
-    public ASiCManifestType getaSiCManifestType() {
-        return aSiCManifestType;
-    }
+    public AsicManifestReference(Collection<AsicDataObjectEntry> entries) {
 
-    public static class Builder {
+        ASiCManifestType = new ASiCManifestType();
 
-        List<DataObjectReference> dataObjects = new ArrayList<>();
+        for (AsicDataObjectEntry entry : entries) {
+            DataObjectReferenceType dataObjectReferenceType = new DataObjectReferenceType();
+            dataObjectReferenceType.setURI(entry.getUri().toASCIIString());
+            dataObjectReferenceType.setMimeType(entry.getMimeType().toString());
 
-        public void addDataObjectReference(URI uri, String mimeType, byte[] digestBytes) {
-            dataObjects.add(new DataObjectReference(uri, mimeType, digestBytes));
-        }
+            DigestMethodType digestMethodType = new DigestMethodType();
+            digestMethodType.setAlgorithm("http://www.w3.org/2000/09/xmldsig#sha256");
 
-        public AsicManifestReference build() {
+            dataObjectReferenceType.setDigestMethod(digestMethodType);
+            dataObjectReferenceType.setDigestValue(entry.getDigestBytes());
 
-            ASiCManifestType aSiCManifestType = new ASiCManifestType();
 
-            for (DataObjectReference dataObject : dataObjects) {
-                DataObjectReferenceType dataObjectReferenceType = new DataObjectReferenceType();
-                dataObjectReferenceType.setURI(dataObject.getUri().toASCIIString());
-                dataObjectReferenceType.setMimeType(dataObject.getMimeType());
-
-                DigestMethodType digestMethodType = new DigestMethodType();
-                digestMethodType.setAlgorithm("http://www.w3.org/2000/09/xmldsig#sha256");
-
-                dataObjectReferenceType.setDigestMethod(digestMethodType);
-                dataObjectReferenceType.setDigestValue(dataObject.getDigestBytes());
-                aSiCManifestType.getDataObjectReference().add(dataObjectReferenceType);
-            }
-
-            return new AsicManifestReference(aSiCManifestType, this);
+            ASiCManifestType.getDataObjectReference().add(dataObjectReferenceType);
         }
     }
 
-    static class DataObjectReference {
+    public byte[] toBytes(JAXBContext jaxbContext) {
 
-        private final URI uri;
-        private final String mimeType;
-        private final byte[] digestBytes;
+        try {
+            Marshaller marshaller = jaxbContext.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+            ObjectFactory objectFactory = new ObjectFactory();
 
-        public DataObjectReference(URI uri, String mimeType, byte[] digestBytes) {
+            JAXBElement<ASiCManifestType> jaxbRootElement = objectFactory.createASiCManifest(ASiCManifestType);
 
-            this.uri = uri;
-            this.mimeType = mimeType;
-            this.digestBytes = digestBytes;
-        }
 
-        public URI getUri() {
-            return uri;
-        }
-
-        public String getMimeType() {
-            return mimeType;
-        }
-
-        public byte[] getDigestBytes() {
-            return digestBytes;
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            marshaller.marshal(jaxbRootElement, baos);
+            byte[] bytes = baos.toByteArray();
+            return bytes;
+        } catch (JAXBException e) {
+            throw new IllegalStateException("Unable to marshall the ASiCManifest into string output", e);
         }
     }
-
 }

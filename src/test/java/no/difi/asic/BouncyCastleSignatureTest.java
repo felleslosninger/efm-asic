@@ -131,17 +131,17 @@ public class BouncyCastleSignatureTest {
     KeyPair getKeyPair() throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException, UnrecoverableKeyException {
         KeyStore keyStore = KeyStore.getInstance("JKS");
 
-        FileInputStream fileInputStream = new FileInputStream(new File("/Users/steinar/.ssh/comodo.jks"));
+        FileInputStream fileInputStream = new FileInputStream(new File("src/test/resources/kontaktinfo-client-test.jks"));
 
 
-        keyStore.load(fileInputStream, "ringo1".toCharArray());
+        keyStore.load(fileInputStream, "changeit".toCharArray());
 
         String alias = keyStore.aliases().nextElement();
         X509Certificate certificate = (X509Certificate) keyStore.getCertificate(alias);
 
         x509Certificate = certificate;
 
-        Key key = keyStore.getKey(alias, "ringo1".toCharArray());
+        Key key = keyStore.getKey(alias, "changeit".toCharArray());
         PrivateKey privateKey = (PrivateKey) key;
 
         return new KeyPair(certificate.getPublicKey(), privateKey);

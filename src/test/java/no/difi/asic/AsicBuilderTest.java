@@ -43,14 +43,8 @@ public class AsicBuilderTest {
         messageUrl = AsicBuilderTest.class.getClassLoader().getResource(BII_MESSAGE_XML);
         assertNotNull(messageUrl);
 
-        String homeDirName = System.getProperty("user.home");
-        File homeDir = new File(homeDirName);
-        assertTrue(homeDir.isDirectory() && homeDir.canRead(), homeDirName + " does not exist or is not readable");
-
-        String keyStoreFileName = ".ssh/comodo.jks";
-        keystoreFile = new File(homeDir, keyStoreFileName);
+        keystoreFile = new File("src/test/resources/kontaktinfo-client-test.jks");
         assertTrue(keystoreFile.canRead(), "Expected to find your private key and certificate in " + keystoreFile);
-
     }
 
 
@@ -61,8 +55,8 @@ public class AsicBuilderTest {
                 .archiveName("asic-test")
                 .outputDirectory(new File(System.getProperty("java.io.tmpdir")))
                 .keyStore(keystoreFile)
-                .keyStorePassword("ringo1")
-                .privateKeyPassword("ringo1");
+                .keyStorePassword("changeit")
+                .privateKeyPassword("changeit");
 
         AsicContainer asicContainer = asicBuilder.build();
 
@@ -105,8 +99,8 @@ public class AsicBuilderTest {
         asicBuilder.addFile(fileReference, fileReference.getName())
                 .addFile(new File(messageUrl.toURI()))
                 .keyStore(keystoreFile)
-                .keyStorePassword("ringo1")
-                .privateKeyPassword("ringo1");
+                .keyStorePassword("changeit")
+                .privateKeyPassword("changeit");
 
         // Verifies that both files have been added.
         {

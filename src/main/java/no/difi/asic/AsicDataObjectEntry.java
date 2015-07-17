@@ -1,5 +1,8 @@
 package no.difi.asic;
 
+import org.etsi.uri._2918.v1_1.DataObjectReferenceType;
+import org.w3._2000._09.xmldsig_.DigestMethodType;
+
 import javax.activation.MimeType;
 import java.io.File;
 import java.net.URI;
@@ -16,48 +19,34 @@ public class AsicDataObjectEntry {
 
     private String  name;
     private File    file;
-    private MimeType mimeType;
-    private URI     uri;
-    private byte[] digestBytes;
 
+    private DataObjectReferenceType dataObject = new DataObjectReferenceType();
 
     public AsicDataObjectEntry(String entryName, File fileReference, MimeType mimeType, URI uri) {
+        this.name = entryName;
+        this.file = fileReference;
 
-        name = entryName;
-        file = fileReference;
-        this.mimeType = mimeType;
-        this.uri = uri;
+        this.dataObject.setURI(uri.toASCIIString());
+        this.dataObject.setMimeType(mimeType.toString());
+
+        DigestMethodType digestMethodType = new DigestMethodType();
+        digestMethodType.setAlgorithm("http://www.w3.org/2000/09/xmldsig#sha256");
+        this.dataObject.setDigestMethod(digestMethodType);
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public File getFile() {
-        return file;
+        return this.file;
     }
 
-    public MimeType getMimeType() {
-        return mimeType;
+    void setDigestBytes(byte[] digestBytes) {
+        this.dataObject.setDigestValue(digestBytes);
     }
 
-    public void setMimeType(MimeType mimeType) {
-        this.mimeType = mimeType;
-    }
-
-    public URI getUri() {
-        return uri;
-    }
-
-    public void setUri(URI uri) {
-        this.uri = uri;
-    }
-
-    public byte[] getDigestBytes() {
-        return digestBytes;
-    }
-
-    public void setDigestBytes(byte[] digestBytes) {
-        this.digestBytes = digestBytes;
+    DataObjectReferenceType getDataObject() {
+        return this.dataObject;
     }
 }

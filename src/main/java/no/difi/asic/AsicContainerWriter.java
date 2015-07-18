@@ -183,15 +183,31 @@ public class AsicContainerWriter {
         return this;
     }
 
+    // Helper method
+    public AsicContainerWriter sign(File keyStoreResourceName, String keyStorePassword, String keyPassword) throws IOException {
+        return sign(keyStoreResourceName, keyStorePassword, null, keyPassword);
+    }
+
     /**
      * Sign and close container.
      *
      * @param keyStoreResourceName File reference for location of keystore.
      * @param keyStorePassword Password for keystore.
-     * @param privateKeyPassword Password for pricate key.
+     * @param  keyAlias Alias for private key.
+     * @param keyPassword Password for private key.
      * @return Return self to allow using builder pattern
      */
-    public AsicContainerWriter sign(File keyStoreResourceName, String keyStorePassword, String privateKeyPassword) {
+    public AsicContainerWriter sign(File keyStoreResourceName, String keyStorePassword, String keyAlias, String keyPassword) throws IOException {
+        return sign(new SignatureHelper(keyStoreResourceName, keyStorePassword, keyAlias, keyPassword));
+    }
+
+    /**
+     * Sign and close container.
+     * @param signatureHelper Loaded SignatureHelper.
+     * @return Return self to allow using builder pattern
+     * @throws IOException
+     */
+    public AsicContainerWriter sign(SignatureHelper signatureHelper) throws IOException {
         // Check status
         if (finished)
             throw new IllegalStateException("Adding content to container after signing container is not supported.");
@@ -207,7 +223,6 @@ public class AsicContainerWriter {
         writeZipEntry(new ZipEntry("META-INF/asicmanifest.xml"), manifestBytes);
 
         // Generate and write signature (META-INF/signature.p7s)
-        SignatureHelper signatureHelper = new SignatureHelper(keyStoreResourceName, keyStorePassword, privateKeyPassword);
         writeZipEntry(new ZipEntry("META-INF/signature.p7s"), signatureHelper.signData(manifestBytes));
 
         // Close container

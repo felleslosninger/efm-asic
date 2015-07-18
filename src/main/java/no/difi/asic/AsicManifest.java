@@ -18,20 +18,20 @@ class AsicManifest {
     private static ObjectFactory objectFactory = new ObjectFactory();
     private static JAXBContext jaxbContext; // Thread safe
 
+    static {
+        try {
+            jaxbContext = JAXBRIContext.newInstance(ASiCManifestType.class);
+        } catch (JAXBException e) {
+            throw new IllegalStateException(String.format("Unable to create JAXBContext: %s ", e.getMessage()), e);
+        }
+    }
+
     private MessageDigestAlgorithm messageDigestAlgorithm;
 
     private ASiCManifestType ASiCManifestType = new ASiCManifestType();
 
     public AsicManifest(MessageDigestAlgorithm messageDigestAlgorithm) {
         this.messageDigestAlgorithm = messageDigestAlgorithm;
-
-        try {
-            // Creating the JAXBContext is heavy lifting, so do it only once.
-            if (jaxbContext == null)
-                jaxbContext = JAXBRIContext.newInstance(ASiCManifestType.class);
-        } catch (JAXBException e) {
-            throw new IllegalStateException(String.format("Unable to create JAXBContext: %s ", e.getMessage()), e);
-        }
     }
 
     /**

@@ -7,7 +7,6 @@ import org.bouncycastle.cms.jcajce.JcaSignerInfoGeneratorBuilder;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.DigestCalculatorProvider;
-import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
 import org.bouncycastle.util.Store;
@@ -16,11 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.security.*;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,9 +58,8 @@ public class SignatureHelper {
         certList.add(x509Certificate);
         String keyAlgorithm = keyPair.getPrivate().getAlgorithm();
 
-        Store jcaCertStore = null;
         try {
-            jcaCertStore = new JcaCertStore(certList);
+            Store jcaCertStore = new JcaCertStore(certList);
             CMSSignedDataGenerator cmsSignedDataGenerator = new CMSSignedDataGenerator();
             String signatureAlgorithm = "SHA1with" + keyAlgorithm;
             ContentSigner sha1Signer = new JcaContentSignerBuilder(signatureAlgorithm).setProvider(BouncyCastleProvider.PROVIDER_NAME).build(keyPair.getPrivate());
@@ -84,13 +78,7 @@ public class SignatureHelper {
             log.debug(new String(bytes));
 
             return sigData.getEncoded();
-        } catch (CertificateEncodingException e) {
-            throw new IllegalStateException("Unable to sign " + e.getMessage(), e);
-        } catch (OperatorCreationException e) {
-            throw new IllegalStateException("Unable to sign " + e.getMessage(), e);
-        } catch (CMSException e) {
-            throw new IllegalStateException("Unable to sign " + e.getMessage(), e);
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new IllegalStateException("Unable to sign " + e.getMessage(), e);
         }
     }
@@ -132,13 +120,7 @@ public class SignatureHelper {
 
             keyStore = KeyStore.getInstance("JKS");
             keyStore.load(keyStoreInputStream, keyStorePassword.toCharArray()); // TODO: find password of keystore
-        } catch (KeyStoreException e) {
-            throw new IllegalStateException("Unable to load keystore from file " + keyStoreFile + "; " + e.getMessage(), e);
-        } catch (CertificateException e) {
-            throw new IllegalStateException("Unable to load keystore from file " + keyStoreFile + "; " + e.getMessage(), e);
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException("Unable to load keystore from file " + keyStoreFile + "; " + e.getMessage(), e);
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new IllegalStateException("Unable to load keystore from file " + keyStoreFile + "; " + e.getMessage(), e);
         }
     }

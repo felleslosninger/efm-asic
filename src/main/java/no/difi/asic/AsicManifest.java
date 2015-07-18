@@ -4,6 +4,7 @@ import com.sun.xml.bind.api.JAXBRIContext;
 import org.etsi.uri._2918.v1_1.ASiCManifestType;
 import org.etsi.uri._2918.v1_1.DataObjectReferenceType;
 import org.etsi.uri._2918.v1_1.ObjectFactory;
+import org.etsi.uri._2918.v1_1.SigReferenceType;
 import org.w3._2000._09.xmldsig_.DigestMethodType;
 
 import javax.xml.bind.JAXBContext;
@@ -25,10 +26,16 @@ class AsicManifest {
             if (jaxbContext == null)
                 jaxbContext = JAXBRIContext.newInstance(ASiCManifestType.class);
         } catch (JAXBException e) {
-            throw new IllegalStateException("Unable to create JAXBContext " +e.getMessage(), e);
+            throw new IllegalStateException(String.format("Unable to create JAXBContext: %s ", e.getMessage()), e);
         }
     }
 
+    /**
+     *
+     * @param filename Filename in container
+     * @param mimeType Content type of content
+     * @param digest Message digest for content
+     */
     public void add(String filename, String mimeType, byte[] digest) {
         DataObjectReferenceType dataObject = new DataObjectReferenceType();
         dataObject.setURI(filename);
@@ -40,6 +47,13 @@ class AsicManifest {
         dataObject.setDigestMethod(digestMethodType);
 
         ASiCManifestType.getDataObjectReference().add(dataObject);
+    }
+
+    public void setSignature(String filename, String mimeType) {
+        SigReferenceType sigReferenceType = new SigReferenceType();
+        sigReferenceType.setURI(filename);
+        sigReferenceType.setMimeType(mimeType);
+        ASiCManifestType.setSigReference(sigReferenceType);
     }
 
     public ASiCManifestType getASiCManifestType() {

@@ -1,5 +1,7 @@
 package no.difi.asic;
 
+import com.sun.xml.bind.api.JAXBRIContext;
+import org.apache.commons.io.IOUtils;
 import org.etsi.uri._2918.v1_1.ASiCManifestType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +16,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLConnection;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -32,17 +36,174 @@ import java.util.zip.ZipOutputStream;
  *         Date: 02.07.15
  *         Time: 12.09
  */
-public class AsicBuilder {
+public class AsicContainerWriter {
 
-    public static final Logger log = LoggerFactory.getLogger(AsicBuilder.class);
+    public static final Logger log = LoggerFactory.getLogger(AsicContainerWriter.class);
 
     /** The MIME type, which should be the very first entry in the container */
     public static final String APPLICATION_VND_ETSI_ASIC_E_ZIP = "application/vnd.etsi.asic-e+zip";
 
     public static final String MESSAGE_DIGEST_ALGORITHM = "SHA-256";
 
+    private ZipOutputStream zipOutputStream;
+    private MessageDigest messageDigest;
+    private AsicManifest asicManifest = new AsicManifest();
+    private boolean finished = false;
+
+    // Helper method
+    public AsicContainerWriter(File outputDir, String filename) throws IOException {
+        this(new File(outputDir, filename));
+    }
+
+    // Helper method
+    public AsicContainerWriter(File file) throws IOException {
+        this(file.toPath());
+    }
+
+    // Helper method
+    public AsicContainerWriter(Path path) throws IOException {
+        this(Files.newOutputStream(path));
+    }
+
+    /**
+     * Prepares creation of a new container.
+     * @param outputStream Stream used to write container.
+     */
+    public AsicContainerWriter(OutputStream outputStream) {
+        // Initiate zip container
+        zipOutputStream = new ZipOutputStream(outputStream);
+        zipOutputStream.setComment("mimetype=" + APPLICATION_VND_ETSI_ASIC_E_ZIP);
+
+        // Write mimetype file to container
+        putMimeTypeAsFirstEntry();
+
+        // Create message digester
+        createMessageDigester();
+    }
+
+    // Helper method
+    public AsicContainerWriter add(File file) throws IOException {
+        return add(file, file.getName());
+    }
+
+    // Helper method
+    public AsicContainerWriter add(File file, String filename) throws IOException {
+        return add(file.toPath(), filename);
+    }
+
+    // Helper method
+    public AsicContainerWriter add(File file, String filename, String mimeType) throws IOException {
+        return add(file.toPath(), filename, mimeType);
+    }
+
+    // Helper method
+    public AsicContainerWriter add(Path path) throws IOException {
+        return add(path, path.toFile().getName());
+    }
+
+    // Helper method
+    public AsicContainerWriter add(Path path, String filename) throws IOException {
+        return add(Files.newInputStream(path), filename);
+    }
+
+    // Helper method
+    public AsicContainerWriter add(Path path, String filename, String mimeType) throws IOException {
+        return add(Files.newInputStream(path), filename, mimeType);
+    }
+
+    /**
+     * Add content to container. Content type is detected using filename.
+     *
+     * @param inputStream Content to write to container
+     * @param filename Filename to use inside container
+     * @return Return self to allow using builder pattern
+     * @throws IOException
+     */
+    public AsicContainerWriter add(InputStream inputStream, String filename) throws IOException {
+        // Use Files to find content type
+        String mimeType = Files.probeContentType(Paths.get(filename));
+
+        // Use URLConnection to find content type
+        if (mimeType == null) {
+            log.info("Unable to determine MIME type using Files.probeContentType(), trying URLConnection.getFileNameMap()");
+            mimeType = URLConnection.getFileNameMap().getContentTypeFor(filename);
+        }
+
+        // Throw exception if content type is not detected
+        if (mimeType == null) {
+            throw new IllegalStateException(String.format("Unable to determine MIME type of %s", filename));
+        }
+
+        // Add file to container
+        return add(inputStream, filename, mimeType);
+    }
+
+    /**
+     * Add content to container.
+     *
+     * @param inputStream Content to write to container
+     * @param filename Filename to use inside container
+     * @param mimeType Content type of inputStream
+     * @return Return self to allow using builder pattern
+     * @throws IOException
+     */
+    public AsicContainerWriter add(InputStream inputStream, String filename, String mimeType) throws IOException {
+        if (finished)
+            throw new IllegalStateException("Adding content to container after signing container is not supported.");
+
+        // Creates new zip entry
+        zipOutputStream.putNextEntry(new ZipEntry(filename));
+
+        // Prepare for calculation of message digest
+        messageDigest.reset();
+        DigestOutputStream zipOutputStreamWithDigest = new DigestOutputStream(zipOutputStream, messageDigest);
+
+        // Copy inputStream to zip file
+        IOUtils.copy(inputStream, zipOutputStreamWithDigest);
+        zipOutputStreamWithDigest.flush();
+
+        // Close zip entry
+        zipOutputStream.closeEntry();
+
+        // Add file to manifest
+        asicManifest.add(filename, mimeType, messageDigest.digest());
+
+        return this;
+    }
+
+    /**
+     * Sign and close container.
+     *
+     * @param keyStoreResourceName File reference for location of keystore.
+     * @param keyStorePassword Password for keystore.
+     * @param privateKeyPassword Password for pricate key.
+     * @return Return self to allow using builder pattern
+     */
+    public AsicContainerWriter sign(File keyStoreResourceName, String keyStorePassword, String privateKeyPassword) {
+        finished = true;
+
+        byte[] manifestBytes = asicManifest.toBytes();
+        writeAsicManifest(manifestBytes);
+
+        SignatureHelper signatureHelper = new SignatureHelper(keyStoreResourceName, keyStorePassword, privateKeyPassword);
+        writeSignature(signatureHelper.signData(manifestBytes));
+
+        try {
+            zipOutputStream.finish();
+            zipOutputStream.close();
+        } catch (IOException e) {
+            throw new IllegalStateException("Unable to finish the container. " + e.getMessage(), e);
+        }
+
+        return this;
+    }
+
+    public AsicManifest getAsicManifest() {
+        return asicManifest;
+    }
+
     // Holds the list of entries to be added to the container
-    private Map<String, AsicDataObjectEntry> files = new HashMap<String, AsicDataObjectEntry>();
+    private Map<String, AsicDataObjectEntry> files = new HashMap<>();
 
     /**
      * Holds the archiveName of container, which may not contain special characters like for instance ':', '/', '\\'
@@ -52,18 +213,17 @@ public class AsicBuilder {
     /** Directory into which the ASiC container should be written */
     private File outputDir;
 
-    private MessageDigest messageDigester;
-    private final JAXBContext jaxbContext;
+    private JAXBContext jaxbContext;
 
     private File keyStoreFile;
     private String keyStorePassword;
     private String privateKeyPassword;
 
-    public AsicBuilder() {
+    public AsicContainerWriter() {
 
         try {
             // Creating the JAXBContext is heavy lifting, so do it only once.
-            jaxbContext = JAXBContext.newInstance(ASiCManifestType.class);
+            jaxbContext = JAXBRIContext.newInstance(ASiCManifestType.class);
         } catch (JAXBException e) {
             throw new IllegalStateException("Unable to create JAXBContext " +e.getMessage(), e);
         }
@@ -79,7 +239,7 @@ public class AsicBuilder {
      *
      * @see #addFile(File, String)
      */
-    public AsicBuilder addFile(File file) {
+    public AsicContainerWriter addFile(File file) {
         if (file.isAbsolute()) {
             // Absolute file name, so use the file name as the entry name
             addFile(file, file.getName());
@@ -96,11 +256,11 @@ public class AsicBuilder {
      * Adds another file with the given name to the set of data objects to be contained in the ASiC container.
      * The MIME type and URI is computed as part of the addition process.
      */
-    public AsicBuilder addFile(File fileReference, String entryName) {
+    public AsicContainerWriter addFile(File fileReference, String entryName) {
 
         String mimeTypeStr = null;
-        MimeType mimeType = null;
-        URI uri = null;
+        MimeType mimeType;
+        URI uri;
         try {
             // See if we can figure out the MIME type
             mimeTypeStr = Files.probeContentType(fileReference.toPath());
@@ -136,24 +296,23 @@ public class AsicBuilder {
     }
 
 
-    public AsicBuilder keyStore(File keyStoreResourceName) {
+    public AsicContainerWriter keyStore(File keyStoreResourceName) {
         this.keyStoreFile = keyStoreResourceName;
         return this;
     }
 
-    public AsicBuilder keyStorePassword(String keyStorePassword) {
+    public AsicContainerWriter keyStorePassword(String keyStorePassword) {
         this.keyStorePassword = keyStorePassword;
         return this;
     }
 
-    public AsicBuilder privateKeyPassword(String privateKeyPassword) {
+    public AsicContainerWriter privateKeyPassword(String privateKeyPassword) {
         this.privateKeyPassword = privateKeyPassword;
         return this;
     }
 
     /**
      * Provides a map with the details about each data object that has been added to the container.
-     * @return
      */
     public Map<String, AsicDataObjectEntry> getFiles() {
         return files;
@@ -161,8 +320,6 @@ public class AsicBuilder {
 
     /**
      * Property getter for the ASiC archive file name.
-     *
-     * @return
      */
     public String getArchiveName() {
         return archiveName;
@@ -170,8 +327,6 @@ public class AsicBuilder {
 
     /**
      * Property getter for directory into which the ASiC container will be written.
-     *
-     * @return
      */
     public File getOutputDir() {
         return outputDir;
@@ -182,7 +337,7 @@ public class AsicBuilder {
      * Identifies the output directory into which the archive will be created.
      *
      */
-    public AsicBuilder outputDirectory(File outputDir) {
+    public AsicContainerWriter outputDirectory(File outputDir) {
         this.outputDir = outputDir;
         return this;
     }
@@ -192,7 +347,7 @@ public class AsicBuilder {
      * the default extension of either <code>.asice</code> or <code>.sce</code>
      *
      */
-    public AsicBuilder archiveName(String name) {
+    public AsicContainerWriter archiveName(String name) {
         // TODO: check the extension of the name and add .asic or .sce if no extension has been provided.
         this.archiveName = name;
 
@@ -203,8 +358,6 @@ public class AsicBuilder {
 
     /**
      * Builds the ASiC container, i.e. creates the ZIP file.
-     *
-     * @return
      */
     public AsicContainer build() {
 
@@ -215,7 +368,7 @@ public class AsicBuilder {
             throw new IllegalStateException("Name of archive not specified");
         }
 
-        File outputFile = computeFileName(getOutputDir(), getArchiveName());
+        File outputFile = new File(getOutputDir(), getArchiveName());
         FileOutputStream fileOutputStream = null;
 
         try {
@@ -252,32 +405,25 @@ public class AsicBuilder {
         }
 
         // Creates the messages digester for each file added to the container.
-        messageDigester = createMessageDigester();
+        messageDigest = createMessageDigester();
 
-        ZipOutputStream zipOutputStream = createZipOutputStream(outputStream);
+        zipOutputStream = createZipOutputStream(outputStream);
 
-        putMimeTypeAsFirstEntry(zipOutputStream);
+        putMimeTypeAsFirstEntry();
 
         // Adds all the files, computing the digest values for each one as we iterate over them
-        transferFilesIntoArchive(zipOutputStream, getFiles(),messageDigester);
+        transferFilesIntoArchive(getFiles(), messageDigest);
 
         // Creates the ASicManiFest and shoves it into the ZipFile
         AsicManifestReference asicManifestReference = new AsicManifestReference(getFiles().values());
         byte[] manifestBytes = asicManifestReference.toBytes(jaxbContext);
 
-        writeAsicManifest(zipOutputStream, manifestBytes);
+        writeAsicManifest(manifestBytes);
 
         // Sign the manifest
         SignatureHelper signatureHelper = new SignatureHelper(keyStoreFile, keyStorePassword, privateKeyPassword);
-        byte[] signature = signatureHelper.signData(manifestBytes);
+        writeSignature(signatureHelper.signData(manifestBytes));
 
-        try {
-            zipOutputStream.putNextEntry(new ZipEntry("META-INF/signature.p7s"));
-            zipOutputStream.write(signature);
-            zipOutputStream.closeEntry();
-        } catch (IOException e) {
-            throw new IllegalStateException("Unable to create signature.p7s entry");
-        }
         try {
             zipOutputStream.finish();
             zipOutputStream.close();
@@ -286,10 +432,10 @@ public class AsicBuilder {
         }
     }
 
-    private void writeAsicManifest(ZipOutputStream zipOutputStream, byte[] manifestBytes) {
+    private void writeAsicManifest(byte[] manifestBytes) {
         try {
             zipOutputStream.putNextEntry(new ZipEntry("META-INF/asicmanifest.xml"));
-            zipOutputStream.write(manifestBytes, 0, manifestBytes.length);
+            zipOutputStream.write(manifestBytes);
             zipOutputStream.closeEntry();
 
         } catch (IOException e) {
@@ -297,8 +443,17 @@ public class AsicBuilder {
         }
     }
 
+    private void writeSignature(byte[] signature) {
+        try {
+            zipOutputStream.putNextEntry(new ZipEntry("META-INF/signature.p7s"));
+            zipOutputStream.write(signature);
+            zipOutputStream.closeEntry();
+        } catch (IOException e) {
+            throw new IllegalStateException("Unable to create signature.p7s entry");
+        }
+    }
+
     private MessageDigest createMessageDigester() {
-        MessageDigest messageDigest;
         try {
             messageDigest = MessageDigest.getInstance(MESSAGE_DIGEST_ALGORITHM);
             messageDigest.reset();
@@ -308,16 +463,10 @@ public class AsicBuilder {
         return messageDigest;
     }
 
-
-    static File computeFileName(File outputDirectory, String archiveName) {
-
-        return new File(outputDirectory, archiveName);
-    }
-
     /**
      * Adds the "mimetype" object to the archive
      */
-    static void putMimeTypeAsFirstEntry(ZipOutputStream zipOutputStream) {
+    void putMimeTypeAsFirstEntry() {
         ZipEntry mimetypeEntry = new ZipEntry("mimetype");
         mimetypeEntry.setComment("mimetype=" + APPLICATION_VND_ETSI_ASIC_E_ZIP);
         mimetypeEntry.setMethod(ZipEntry.STORED);
@@ -341,13 +490,7 @@ public class AsicBuilder {
         return zipOutputStream;
     }
 
-
-    /**
-     * @param zipOutputStream
-     * @param entries
-     * @return Map of zipEntryNames and their corresponding digest bytes
-     */
-    static void transferFilesIntoArchive(ZipOutputStream zipOutputStream, Map<String, AsicDataObjectEntry> entries, MessageDigest messageDigester) {
+    void transferFilesIntoArchive(Map<String, AsicDataObjectEntry> entries, MessageDigest messageDigester) {
 
         for (Map.Entry<String, AsicDataObjectEntry> entry : entries.entrySet()) {
 
@@ -358,7 +501,7 @@ public class AsicBuilder {
                 zipOutputStream.putNextEntry(zipEntry);     // shoves the zip entry into the stream
 
                 // Copies the entire contents of the file into the zip output stream
-                byte[] digestBytes = copyFileToOutputStream(entryInfo.getFile(), zipOutputStream, messageDigester);
+                byte[] digestBytes = copyFileToOutputStream(entryInfo.getFile(), messageDigester);
 
                 // saves the message digest bytes
                 entryInfo.setDigestBytes(digestBytes);
@@ -376,7 +519,7 @@ public class AsicBuilder {
      *
      * @return the message digest bytes calculated during the transfer from the input to the outputstream
      */
-    static byte[] copyFileToOutputStream(File file, ZipOutputStream zipOutputStream, MessageDigest messageDigester) {
+    byte[] copyFileToOutputStream(File file, MessageDigest messageDigester) {
 
         messageDigester.reset();
         DigestOutputStream zipOutputStreamWithDigest = new DigestOutputStream(zipOutputStream, messageDigester);

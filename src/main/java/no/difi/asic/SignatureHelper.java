@@ -30,21 +30,25 @@ import java.util.List;
  *         Date: 11.07.15
  *         Time: 22.53
  */
-public class SignatureHelper {
+class SignatureHelper {
 
     public static final Logger log = LoggerFactory.getLogger(SignatureHelper.class);
+
+    static {
+        Security.addProvider(new BouncyCastleProvider());
+    }
+
     private final File keyStoreFile;
     private final String keyStorePassword;
     private final String privateKeyPassword;
     private KeyStore keyStore;
 
-    X509Certificate x509Certificate;
+    private X509Certificate x509Certificate;
 
     public SignatureHelper(File keyStoreFile, String keyStorePassword, String privateKeyPassword) {
         this.keyStoreFile = keyStoreFile;
         this.keyStorePassword = keyStorePassword;
         this.privateKeyPassword = privateKeyPassword;
-        Security.addProvider(new BouncyCastleProvider());
     }
 
     public byte[] signData(byte[] dataToSign) {
@@ -86,9 +90,8 @@ public class SignatureHelper {
 
     KeyPair getKeyPair() {
         KeyStore keyStore = getKeyStore();
-        String alias = null;
         try {
-            alias = keyStore.aliases().nextElement();
+            String alias = keyStore.aliases().nextElement();
             x509Certificate = (X509Certificate) keyStore.getCertificate(alias);
 
             Key key = keyStore.getKey(alias, privateKeyPassword.toCharArray());

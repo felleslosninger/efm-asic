@@ -4,10 +4,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -35,12 +32,15 @@ public class AsicContainerWriter {
     /** The MIME type, which should be the very first entry in the container */
     public static final String APPLICATION_VND_ETSI_ASIC_E_ZIP = "application/vnd.etsi.asic-e+zip";
 
-    public static final String MESSAGE_DIGEST_ALGORITHM = "SHA-256";
+    private static MessageDigestAlgorithm messageDigestAlgorithm = MessageDigestAlgorithm.SHA256;
 
     private ZipOutputStream zipOutputStream;
     private MessageDigest messageDigest;
-    private AsicManifest asicManifest = new AsicManifest();
+    private AsicManifest asicManifest;
     private boolean finished = false;
+
+    private Path containerPath = null;
+    private OutputStream containerOutputStream = null;
 
     // Helper method
     public AsicContainerWriter(File outputDir, String filename) throws IOException {
@@ -55,6 +55,7 @@ public class AsicContainerWriter {
     // Helper method
     public AsicContainerWriter(Path path) throws IOException {
         this(Files.newOutputStream(path));
+        containerPath = path;
     }
 
     /**
@@ -62,6 +63,12 @@ public class AsicContainerWriter {
      * @param outputStream Stream used to write container.
      */
     public AsicContainerWriter(OutputStream outputStream) {
+        // Keep original output stream
+        containerOutputStream = outputStream;
+
+        // Initiate manifest
+        asicManifest = new AsicManifest(messageDigestAlgorithm);
+
         // Initiate zip container
         zipOutputStream = new ZipOutputStream(outputStream);
         zipOutputStream.setComment("mimetype=" + APPLICATION_VND_ETSI_ASIC_E_ZIP);
@@ -71,10 +78,10 @@ public class AsicContainerWriter {
 
         // Create message digester
         try {
-            messageDigest = MessageDigest.getInstance(MESSAGE_DIGEST_ALGORITHM);
+            messageDigest = MessageDigest.getInstance(messageDigestAlgorithm.getAlgorithm());
             messageDigest.reset();
         } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException(String.format("Algorithm %s not supported", MESSAGE_DIGEST_ALGORITHM));
+            throw new IllegalStateException(String.format("Algorithm %s not supported", messageDigestAlgorithm.getAlgorithm()));
         }
     }
 
@@ -211,7 +218,27 @@ public class AsicContainerWriter {
             throw new IllegalStateException(String.format("Unable to finish the container: %s", e.getMessage()), e);
         }
 
+        if (containerPath != null) {
+            try {
+                containerOutputStream.flush();
+                containerOutputStream.close();
+            } catch (IOException e) {
+                throw new IllegalStateException(String.format("Unable to close file: %s", e.getMessage()), e);
+            }
+        }
+
         return this;
+    }
+
+    public File getContainerFile() {
+        return getContainerPath().toFile();
+    }
+
+    public Path getContainerPath() {
+        if (containerPath == null)
+            throw new IllegalStateException("Output path is not known");
+
+        return containerPath;
     }
 
     public AsicManifest getAsicManifest() {

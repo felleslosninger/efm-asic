@@ -11,7 +11,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URL;
-import java.nio.file.Paths;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -73,12 +72,12 @@ public class AsicContainerWriterTest {
     @Test
     public void createSampleContainer() throws Exception {
 
-        File file = new File(System.getProperty("java.io.tmpdir"), "asic-sample.zip");
-
-        AsicContainerWriter asicContainerWriter = new AsicContainerWriter(file)
+        AsicContainerWriter asicContainerWriter = new AsicContainerWriter(new File(System.getProperty("java.io.tmpdir")), "asic-sample.zip")
                 .add(new File(envelopeUrl.toURI()))
                 .add(new File(messageUrl.toURI()), "bii-message.xml", "application/xml")
                 .sign(keystoreFile, "changeit", "changeit");
+
+        File file = asicContainerWriter.getContainerFile();
 
         // Verifies that both files have been added.
         {

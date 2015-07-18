@@ -18,9 +18,13 @@ class AsicManifest {
     private static ObjectFactory objectFactory = new ObjectFactory();
     private static JAXBContext jaxbContext; // Thread safe
 
+    private MessageDigestAlgorithm messageDigestAlgorithm;
+
     private ASiCManifestType ASiCManifestType = new ASiCManifestType();
 
-    public AsicManifest() {
+    public AsicManifest(MessageDigestAlgorithm messageDigestAlgorithm) {
+        this.messageDigestAlgorithm = messageDigestAlgorithm;
+
         try {
             // Creating the JAXBContext is heavy lifting, so do it only once.
             if (jaxbContext == null)
@@ -43,7 +47,7 @@ class AsicManifest {
         dataObject.setDigestValue(digest);
 
         DigestMethodType digestMethodType = new DigestMethodType();
-        digestMethodType.setAlgorithm("http://www.w3.org/2000/09/xmldsig#sha256");
+        digestMethodType.setAlgorithm(messageDigestAlgorithm.getUri());
         dataObject.setDigestMethod(digestMethodType);
 
         ASiCManifestType.getDataObjectReference().add(dataObject);

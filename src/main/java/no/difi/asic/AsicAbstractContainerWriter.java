@@ -17,7 +17,7 @@ import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-public abstract class AsicAbstractContainerWriter implements IAsicContainerWriter {
+abstract class AsicAbstractContainerWriter implements IAsicContainerWriter {
 
     public static final Logger log = LoggerFactory.getLogger(AsicAbstractContainerWriter.class);
 
@@ -35,9 +35,10 @@ public abstract class AsicAbstractContainerWriter implements IAsicContainerWrite
      * Prepares creation of a new container.
      * @param outputStream Stream used to write container.
      */
-    public AsicAbstractContainerWriter(OutputStream outputStream, IAsicManifest asicManifest) {
+    public AsicAbstractContainerWriter(OutputStream outputStream, Path containerPath, IAsicManifest asicManifest) {
         // Keep original output stream
-        containerOutputStream = outputStream;
+        this.containerOutputStream = outputStream;
+        this.containerPath = containerPath;
 
         // Initiate manifest
         this.asicManifest = asicManifest;

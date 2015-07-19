@@ -3,10 +3,8 @@ package no.difi.asic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
@@ -18,32 +16,16 @@ import java.nio.file.Path;
  *         Date: 02.07.15
  *         Time: 12.09
  */
-public class AsicCadesContainerWriter extends AsicAbstractContainerWriter {
+class AsicCadesContainerWriter extends AsicAbstractContainerWriter {
 
     public static final Logger log = LoggerFactory.getLogger(AsicCadesContainerWriter.class);
-
-    // Helper method
-    public AsicCadesContainerWriter(File outputDir, String filename) throws IOException {
-        this(new File(outputDir, filename));
-    }
-
-    // Helper method
-    public AsicCadesContainerWriter(File file) throws IOException {
-        this(file.toPath());
-    }
-
-    // Helper method
-    public AsicCadesContainerWriter(Path path) throws IOException {
-        this(Files.newOutputStream(path));
-        containerPath = path;
-    }
 
     /**
      * Prepares creation of a new container.
      * @param outputStream Stream used to write container.
      */
-    public AsicCadesContainerWriter(OutputStream outputStream) {
-        super(outputStream, new AsicCadesManifest());
+    public AsicCadesContainerWriter(OutputStream outputStream, Path containerPath) {
+        super(outputStream, containerPath, new AsicCadesManifest());
     }
 
     @Override

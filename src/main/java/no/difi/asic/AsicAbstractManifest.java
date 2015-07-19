@@ -3,7 +3,7 @@ package no.difi.asic;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-public abstract class AsicAbstractManifest implements IAsicManifest {
+abstract class AsicAbstractManifest implements IAsicManifest {
 
     protected MessageDigestAlgorithm messageDigestAlgorithm;
     protected MessageDigest messageDigest;

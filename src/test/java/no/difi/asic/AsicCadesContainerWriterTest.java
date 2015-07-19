@@ -33,6 +33,8 @@ public class AsicCadesContainerWriterTest {
     private URL messageUrl;
     private File keystoreFile;
 
+    private AsicContainerWriterFactory asicContainerWriterFactory;
+
     @BeforeMethod
     public void setUp() {
         envelopeUrl = AsicCadesContainerWriterTest.class.getClassLoader().getResource(BII_ENVELOPE_XML);
@@ -43,6 +45,8 @@ public class AsicCadesContainerWriterTest {
 
         keystoreFile = new File("src/test/resources/kontaktinfo-client-test.jks");
         assertTrue(keystoreFile.canRead(), "Expected to find your private key and certificate in " + keystoreFile);
+
+        asicContainerWriterFactory = new AsicContainerWriterFactory(SignatureMethod.CAdES);
     }
 
     @Test
@@ -50,7 +54,7 @@ public class AsicCadesContainerWriterTest {
 
         File file = new File(System.getProperty("java.io.tmpdir"), "asic-sample.zip");
 
-        new AsicCadesContainerWriter(file).sign(keystoreFile, "changeit", "changeit");
+        asicContainerWriterFactory.newInstance(file).sign(keystoreFile, "changeit", "changeit");
 
         assertTrue(file.exists() && file.isFile() && file.canRead(), file + " can not be read");
 
@@ -72,7 +76,7 @@ public class AsicCadesContainerWriterTest {
     @Test
     public void createSampleContainer() throws Exception {
 
-        IAsicContainerWriter asicContainerWriter = new AsicCadesContainerWriter(new File(System.getProperty("java.io.tmpdir")), "asic-sample.zip")
+        IAsicContainerWriter asicContainerWriter = asicContainerWriterFactory.newInstance(new File(System.getProperty("java.io.tmpdir")), "asic-sample.zip")
                 .add(new File(envelopeUrl.toURI()))
                 .add(new File(messageUrl.toURI()), "bii-message.xml", "application/xml")
                 .sign(keystoreFile, "changeit", "client_alias", "changeit");

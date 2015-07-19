@@ -3,7 +3,7 @@
 Provides a simple builder for an ASiC-E container.
 
 ```
-   +-- manifest
+   +-- mimetype
    |
    +-- bii-envelope.xml
    |

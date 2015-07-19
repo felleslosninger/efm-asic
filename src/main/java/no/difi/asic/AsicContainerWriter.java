@@ -4,14 +4,16 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.DigestOutputStream;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -32,10 +34,7 @@ public class AsicContainerWriter {
     /** The MIME type, which should be the very first entry in the container */
     public static final String APPLICATION_VND_ETSI_ASIC_E_ZIP = "application/vnd.etsi.asic-e+zip";
 
-    private static MessageDigestAlgorithm messageDigestAlgorithm = MessageDigestAlgorithm.SHA256;
-
     private ZipOutputStream zipOutputStream;
-    private MessageDigest messageDigest;
     private AsicManifest asicManifest;
     private boolean finished = false;
 
@@ -67,7 +66,7 @@ public class AsicContainerWriter {
         containerOutputStream = outputStream;
 
         // Initiate manifest
-        asicManifest = new AsicManifest(messageDigestAlgorithm);
+        asicManifest = new AsicManifest(MessageDigestAlgorithm.SHA256);
 
         // Initiate zip container
         zipOutputStream = new ZipOutputStream(outputStream);
@@ -75,14 +74,6 @@ public class AsicContainerWriter {
 
         // Write mimetype file to container
         putMimeTypeAsFirstEntry();
-
-        // Create message digester
-        try {
-            messageDigest = MessageDigest.getInstance(messageDigestAlgorithm.getAlgorithm());
-            messageDigest.reset();
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException(String.format("Algorithm %s not supported", messageDigestAlgorithm.getAlgorithm()));
-        }
     }
 
     // Helper method
@@ -167,8 +158,7 @@ public class AsicContainerWriter {
         zipOutputStream.putNextEntry(new ZipEntry(filename));
 
         // Prepare for calculation of message digest
-        messageDigest.reset();
-        DigestOutputStream zipOutputStreamWithDigest = new DigestOutputStream(zipOutputStream, messageDigest);
+        DigestOutputStream zipOutputStreamWithDigest = new DigestOutputStream(zipOutputStream, asicManifest.getMessageDigest());
 
         // Copy inputStream to zip file
         IOUtils.copy(inputStream, zipOutputStreamWithDigest);
@@ -178,7 +168,7 @@ public class AsicContainerWriter {
         zipOutputStream.closeEntry();
 
         // Add file to manifest
-        asicManifest.add(filename, mimeType, messageDigest.digest());
+        asicManifest.add(filename, mimeType);
 
         return this;
     }

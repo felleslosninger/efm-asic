@@ -3,7 +3,7 @@ package no.difi.asic;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-abstract class AsicAbstractManifest implements IAsicManifest {
+abstract class AsicAbstractManifest {
 
     protected MessageDigestAlgorithm messageDigestAlgorithm;
     protected MessageDigest messageDigest;
@@ -23,7 +23,6 @@ abstract class AsicAbstractManifest implements IAsicManifest {
     /**
      * @inheritDoc
      */
-    @Override
     public MessageDigest getMessageDigest() {
         messageDigest.reset();
         return messageDigest;
@@ -32,6 +31,5 @@ abstract class AsicAbstractManifest implements IAsicManifest {
     /**
      * @inheritDoc
      */
-    @Override
     public abstract void add(String filename, String mimeType);
 }

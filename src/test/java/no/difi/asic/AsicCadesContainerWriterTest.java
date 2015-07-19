@@ -76,7 +76,7 @@ public class AsicCadesContainerWriterTest {
     @Test
     public void createSampleContainer() throws Exception {
 
-        IAsicContainerWriter asicContainerWriter = asicContainerWriterFactory.newContainer(new File(System.getProperty("java.io.tmpdir")), "asic-sample.zip")
+        AsicContainerWriter asicContainerWriter = asicContainerWriterFactory.newContainer(new File(System.getProperty("java.io.tmpdir")), "asic-sample.zip")
                 .add(new File(envelopeUrl.toURI()))
                 .add(new File(messageUrl.toURI()), "bii-message.xml", "application/xml")
                 .sign(keystoreFile, "changeit", "client_alias", "changeit");

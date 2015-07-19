@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -34,6 +35,7 @@ public class AsicCadesContainerWriterTest {
     private File keystoreFile;
 
     private AsicContainerWriterFactory asicContainerWriterFactory;
+    private AsicContainerVerifierFactory asicContainerVerifierFactory;
 
     @BeforeMethod
     public void setUp() {
@@ -47,6 +49,7 @@ public class AsicCadesContainerWriterTest {
         assertTrue(keystoreFile.canRead(), "Expected to find your private key and certificate in " + keystoreFile);
 
         asicContainerWriterFactory = AsicContainerWriterFactory.newFactory(SignatureMethod.CAdES);
+        asicContainerVerifierFactory = AsicContainerVerifierFactory.newFactory(SignatureMethod.CAdES);
     }
 
     @Test
@@ -70,7 +73,6 @@ public class AsicCadesContainerWriterTest {
         assertEquals(buffer[8], 0, "'mimetype' file should not be compressed");
 
         assertTrue(buffer[0] == 0x50 && buffer[1] == 0x4B && buffer[2] == 0x03 && buffer[3] == 0x04, "First 4 octets should read 0x50 0x4B 0x03 0x04");
-
     }
 
     @Test
@@ -133,5 +135,8 @@ public class AsicCadesContainerWriterTest {
         } catch (Exception e) {
             assertTrue(e instanceof IllegalStateException);
         }
+
+        FileInputStream fileInputStream = new FileInputStream(file);
+        asicContainerVerifierFactory.verify(fileInputStream, new File(System.getProperty("java.io.tmpdir"), "asic-folder").toPath());
     }
 }

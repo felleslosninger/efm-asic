@@ -6,8 +6,8 @@ import java.nio.file.Path;
 
 class AsicXadesContainerWriter extends AsicAbstractContainerWriter {
 
-    public AsicXadesContainerWriter(OutputStream outputStream, Path containerPath) {
-        super(outputStream, containerPath, new AsicXadesManifest());
+    public AsicXadesContainerWriter(SignatureMethod signatureMethod, OutputStream outputStream, Path containerPath) {
+        super(outputStream, containerPath, new AsicXadesManifest(signatureMethod.getMessageDigestAlgorithm()));
     }
 
     @Override
@@ -16,6 +16,6 @@ class AsicXadesContainerWriter extends AsicAbstractContainerWriter {
         byte[] manifestBytes = ((AsicXadesManifest) asicManifest).toBytes(signatureHelper);
         writeZipEntry("META-INF/signatures.xml", manifestBytes);
 
-        System.out.println(new String(manifestBytes));
+        // System.out.println(new String(manifestBytes));
     }
 }

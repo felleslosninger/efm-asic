@@ -1,10 +1,13 @@
 package no.difi.asic;
 
 import com.sun.xml.bind.api.JAXBRIContext;
+import org.bouncycastle.util.encoders.Base64;
 import org.etsi.uri._2918.v1_1.ASiCManifestType;
 import org.etsi.uri._2918.v1_1.DataObjectReferenceType;
 import org.etsi.uri._2918.v1_1.ObjectFactory;
 import org.etsi.uri._2918.v1_1.SigReferenceType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3._2000._09.xmldsig_.DigestMethodType;
 
 import javax.xml.bind.JAXBContext;
@@ -14,6 +17,8 @@ import javax.xml.bind.Marshaller;
 import java.io.ByteArrayOutputStream;
 
 class AsicCadesManifest extends AsicAbstractManifest {
+
+    public static final Logger log = LoggerFactory.getLogger(AsicAbstractManifest.class);
 
     private static ObjectFactory objectFactory = new ObjectFactory();
     private static JAXBContext jaxbContext; // Thread safe
@@ -28,8 +33,8 @@ class AsicCadesManifest extends AsicAbstractManifest {
 
     private ASiCManifestType ASiCManifestType = new ASiCManifestType();
 
-    public AsicCadesManifest() {
-        super(MessageDigestAlgorithm.SHA256);
+    public AsicCadesManifest(MessageDigestAlgorithm messageDigestAlgorithm) {
+        super(messageDigestAlgorithm);
     }
 
     @Override
@@ -44,6 +49,7 @@ class AsicCadesManifest extends AsicAbstractManifest {
         dataObject.setDigestMethod(digestMethodType);
 
         ASiCManifestType.getDataObjectReference().add(dataObject);
+        log.debug(String.format("Digest: %s", new String(Base64.encode(dataObject.getDigestValue()))));
     }
 
     public void setSignature(String filename, String mimeType) {

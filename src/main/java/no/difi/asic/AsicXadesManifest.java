@@ -36,8 +36,8 @@ class AsicXadesManifest extends AsicAbstractManifest {
     // \XAdESSignature\Signature\Object\QualifyingProperties\SignedProperties\SignedDataObjectProperties
     private SignedDataObjectPropertiesType signedDataObjectProperties = new SignedDataObjectPropertiesType();
 
-    public AsicXadesManifest() {
-        super(MessageDigestAlgorithm.SHA256);
+    public AsicXadesManifest(MessageDigestAlgorithm messageDigestAlgorithm) {
+        super(messageDigestAlgorithm);
 
         // \XAdESSignature\Signature\SignedInfo
         signedInfo = new SignedInfoType();
@@ -110,7 +110,7 @@ class AsicXadesManifest extends AsicAbstractManifest {
             marshaller.marshal(jaxbRootElement, baos);
             return baos.toByteArray();
         } catch (JAXBException e) {
-            throw new IllegalStateException("Unable to marshall the ASiCManifest into string output", e);
+            throw new IllegalStateException("Unable to marshall the XAdESSignature into string output", e);
         }
 
     }

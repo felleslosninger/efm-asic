@@ -41,9 +41,11 @@ public class AsicContainerWriterFactory {
     protected AsicContainerWriter newContainer(OutputStream outputStream, Path file) {
         switch (signatureMethod) {
             case CAdES:
-                return new AsicCadesContainerWriter(outputStream, file);
+            case PEPPOL_V1:
+                return new AsicCadesContainerWriter(signatureMethod, outputStream, file);
+            case SDP:
             case XAdES:
-                return new AsicXadesContainerWriter(outputStream, file);
+                return new AsicXadesContainerWriter(signatureMethod, outputStream, file);
             default:
                 throw new IllegalStateException(String.format("Not implemented: %s", signatureMethod));
         }

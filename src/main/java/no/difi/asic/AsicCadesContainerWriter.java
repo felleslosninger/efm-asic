@@ -24,8 +24,8 @@ class AsicCadesContainerWriter extends AsicAbstractContainerWriter {
      * Prepares creation of a new container.
      * @param outputStream Stream used to write container.
      */
-    public AsicCadesContainerWriter(OutputStream outputStream, Path containerPath) {
-        super(outputStream, containerPath, new AsicCadesManifest());
+    public AsicCadesContainerWriter(SignatureMethod signatureMethod, OutputStream outputStream, Path containerPath) {
+        super(outputStream, containerPath, new AsicCadesManifest(signatureMethod.getMessageDigestAlgorithm()));
     }
 
     @Override

@@ -12,10 +12,8 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import java.io.ByteArrayOutputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
-class AsicManifest {
+class AsicCadesManifest extends AsicAbstractManifest {
 
     private static ObjectFactory objectFactory = new ObjectFactory();
     private static JAXBContext jaxbContext; // Thread safe
@@ -28,37 +26,13 @@ class AsicManifest {
         }
     }
 
-    private MessageDigestAlgorithm messageDigestAlgorithm;
-    private MessageDigest messageDigest;
-
     private ASiCManifestType ASiCManifestType = new ASiCManifestType();
 
-    public AsicManifest(MessageDigestAlgorithm messageDigestAlgorithm) {
-        this.messageDigestAlgorithm = messageDigestAlgorithm;
-
-        // Create message digester
-        try {
-            messageDigest = MessageDigest.getInstance(messageDigestAlgorithm.getAlgorithm());
-            messageDigest.reset();
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException(String.format("Algorithm %s not supported", messageDigestAlgorithm.getAlgorithm()));
-        }
+    public AsicCadesManifest() {
+        super(MessageDigestAlgorithm.SHA256);
     }
 
-    /**
-     * Fetch a reset message digest.
-     * @return Message digest ready for use.
-     */
-    MessageDigest getMessageDigest() {
-        messageDigest.reset();
-        return messageDigest;
-    }
-
-    /**
-     *
-     * @param filename Filename in container
-     * @param mimeType Content type of content
-     */
+    @Override
     public void add(String filename, String mimeType) {
         DataObjectReferenceType dataObject = new DataObjectReferenceType();
         dataObject.setURI(filename);

@@ -1,6 +1,6 @@
 package no.difi.asic;
 
-public enum MessageDigestAlgorithm {
+enum MessageDigestAlgorithm {
     SHA256("SHA-256", "http://www.w3.org/2000/09/xmldsig#sha256"),
     SHA384("SHA-384", "http://www.w3.org/2000/09/xmldsig#sha384"),
     SHA512("SHA-512", "http://www.w3.org/2000/09/xmldsig#sha512");

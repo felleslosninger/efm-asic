@@ -22,9 +22,9 @@ import static org.testng.Assert.*;
  *         Date: 02.07.15
  *         Time: 12.08
  */
-public class AsicContainerWriterTest {
+public class AsicCadesContainerWriterTest {
 
-    public static final Logger log = LoggerFactory.getLogger(AsicContainerWriterTest.class);
+    public static final Logger log = LoggerFactory.getLogger(AsicCadesContainerWriterTest.class);
 
     public static final int BYTES_TO_CHECK = 40;
     public static final String BII_ENVELOPE_XML = "bii-envelope.xml";
@@ -35,10 +35,10 @@ public class AsicContainerWriterTest {
 
     @BeforeMethod
     public void setUp() {
-        envelopeUrl = AsicContainerWriterTest.class.getClassLoader().getResource(BII_ENVELOPE_XML);
+        envelopeUrl = AsicCadesContainerWriterTest.class.getClassLoader().getResource(BII_ENVELOPE_XML);
         assertNotNull(envelopeUrl);
 
-        messageUrl = AsicContainerWriterTest.class.getClassLoader().getResource(BII_MESSAGE_XML);
+        messageUrl = AsicCadesContainerWriterTest.class.getClassLoader().getResource(BII_MESSAGE_XML);
         assertNotNull(messageUrl);
 
         keystoreFile = new File("src/test/resources/kontaktinfo-client-test.jks");
@@ -50,7 +50,7 @@ public class AsicContainerWriterTest {
 
         File file = new File(System.getProperty("java.io.tmpdir"), "asic-sample.zip");
 
-        new AsicContainerWriter(file).sign(keystoreFile, "changeit", "changeit");
+        new AsicCadesContainerWriter(file).sign(keystoreFile, "changeit", "changeit");
 
         assertTrue(file.exists() && file.isFile() && file.canRead(), file + " can not be read");
 
@@ -72,7 +72,7 @@ public class AsicContainerWriterTest {
     @Test
     public void createSampleContainer() throws Exception {
 
-        AsicContainerWriter asicContainerWriter = new AsicContainerWriter(new File(System.getProperty("java.io.tmpdir")), "asic-sample.zip")
+        IAsicContainerWriter asicContainerWriter = new AsicCadesContainerWriter(new File(System.getProperty("java.io.tmpdir")), "asic-sample.zip")
                 .add(new File(envelopeUrl.toURI()))
                 .add(new File(messageUrl.toURI()), "bii-message.xml", "application/xml")
                 .sign(keystoreFile, "changeit", "client_alias", "changeit");
@@ -82,7 +82,8 @@ public class AsicContainerWriterTest {
         // Verifies that both files have been added.
         {
             int matchCount = 0;
-            for (DataObjectReferenceType dataObject : asicContainerWriter.getAsicManifest().getASiCManifestType().getDataObjectReference()) {
+            AsicCadesManifest asicManifest = (AsicCadesManifest) ((AsicCadesContainerWriter) asicContainerWriter).getAsicManifest();
+            for (DataObjectReferenceType dataObject : asicManifest.getASiCManifestType().getDataObjectReference()) {
                 if (dataObject.getURI().equals(BII_ENVELOPE_XML))
                     matchCount++;
                 if (dataObject.getURI().equals(BII_MESSAGE_XML))

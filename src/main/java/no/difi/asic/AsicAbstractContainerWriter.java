@@ -13,86 +13,64 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.DigestOutputStream;
-import java.security.MessageDigest;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-/**
- * Builds an ASiC-E container using a variation of "builder pattern".
- *
- * This class is not thread safe, as it holds a MessageDigest object.
- *
- * @author steinar
- *         Date: 02.07.15
- *         Time: 12.09
- */
-public class AsicContainerWriter {
+public abstract class AsicAbstractContainerWriter implements IAsicContainerWriter {
 
-    public static final Logger log = LoggerFactory.getLogger(AsicContainerWriter.class);
+    public static final Logger log = LoggerFactory.getLogger(AsicAbstractContainerWriter.class);
 
     /** The MIME type, which should be the very first entry in the container */
     public static final String APPLICATION_VND_ETSI_ASIC_E_ZIP = "application/vnd.etsi.asic-e+zip";
 
-    private ZipOutputStream zipOutputStream;
-    private AsicManifest asicManifest;
-    private boolean finished = false;
+    protected ZipOutputStream zipOutputStream;
+    protected IAsicManifest asicManifest;
 
-    private Path containerPath = null;
-    private OutputStream containerOutputStream = null;
-
-    // Helper method
-    public AsicContainerWriter(File outputDir, String filename) throws IOException {
-        this(new File(outputDir, filename));
-    }
-
-    // Helper method
-    public AsicContainerWriter(File file) throws IOException {
-        this(file.toPath());
-    }
-
-    // Helper method
-    public AsicContainerWriter(Path path) throws IOException {
-        this(Files.newOutputStream(path));
-        containerPath = path;
-    }
+    protected boolean finished = false;
+    protected OutputStream containerOutputStream = null;
+    protected Path containerPath = null;
 
     /**
      * Prepares creation of a new container.
      * @param outputStream Stream used to write container.
      */
-    public AsicContainerWriter(OutputStream outputStream) {
+    public AsicAbstractContainerWriter(OutputStream outputStream, IAsicManifest asicManifest) {
         // Keep original output stream
         containerOutputStream = outputStream;
 
         // Initiate manifest
-        asicManifest = new AsicManifest(MessageDigestAlgorithm.SHA256);
+        this.asicManifest = asicManifest;
 
         // Initiate zip container
         zipOutputStream = new ZipOutputStream(outputStream);
         zipOutputStream.setComment("mimetype=" + APPLICATION_VND_ETSI_ASIC_E_ZIP);
 
         // Write mimetype file to container
-        putMimeTypeAsFirstEntry();
+        putMimeTypeAsFirstEntry(APPLICATION_VND_ETSI_ASIC_E_ZIP);
     }
 
     // Helper method
-    public AsicContainerWriter add(File file) throws IOException {
+    @Override
+    public IAsicContainerWriter add(File file) throws IOException {
         return add(file.toPath());
     }
 
     // Helper method
-    public AsicContainerWriter add(File file, String filename) throws IOException {
+    @Override
+    public IAsicContainerWriter add(File file, String filename) throws IOException {
         return add(file.toPath(), filename);
     }
 
     // Helper method
-    public AsicContainerWriter add(Path path) throws IOException {
+    @Override
+    public IAsicContainerWriter add(Path path) throws IOException {
         return add(path, path.toFile().getName());
     }
 
     // Helper method
-    public AsicContainerWriter add(Path path, String filename) throws IOException {
+    @Override
+    public IAsicContainerWriter add(Path path, String filename) throws IOException {
         InputStream inputStream = Files.newInputStream(path);
         add(inputStream, filename);
         inputStream.close();
@@ -107,13 +85,14 @@ public class AsicContainerWriter {
      * @return Return self to allow using builder pattern
      * @throws IOException
      */
-    public AsicContainerWriter add(InputStream inputStream, String filename) throws IOException {
+    @Override
+    public IAsicContainerWriter add(InputStream inputStream, String filename) throws IOException {
         // Use Files to find content type
         String mimeType = Files.probeContentType(Paths.get(filename));
 
         // Use URLConnection to find content type
         if (mimeType == null) {
-            log.info("Unable to determine MIME type using Files.probeContentType(), trying URLConnection.getFileNameMap()");
+            AsicCadesContainerWriter.log.info("Unable to determine MIME type using Files.probeContentType(), trying URLConnection.getFileNameMap()");
             mimeType = URLConnection.getFileNameMap().getContentTypeFor(filename);
         }
 
@@ -127,12 +106,14 @@ public class AsicContainerWriter {
     }
 
     // Helper method
-    public AsicContainerWriter add(File file, String filename, String mimeType) throws IOException {
+    @Override
+    public IAsicContainerWriter add(File file, String filename, String mimeType) throws IOException {
         return add(file.toPath(), filename, mimeType);
     }
 
     // Helper method
-    public AsicContainerWriter add(Path path, String filename, String mimeType) throws IOException {
+    @Override
+    public IAsicContainerWriter add(Path path, String filename, String mimeType) throws IOException {
         InputStream inputStream = Files.newInputStream(path);
         add(inputStream, filename, mimeType);
         inputStream.close();
@@ -148,7 +129,8 @@ public class AsicContainerWriter {
      * @return Return self to allow using builder pattern
      * @throws IOException
      */
-    public AsicContainerWriter add(InputStream inputStream, String filename, String mimeType) throws IOException {
+    @Override
+    public IAsicContainerWriter add(InputStream inputStream, String filename, String mimeType) throws IOException {
         // Check status
         if (finished)
             throw new IllegalStateException("Adding content to container after signing container is not supported.");
@@ -174,7 +156,8 @@ public class AsicContainerWriter {
     }
 
     // Helper method
-    public AsicContainerWriter sign(File keyStoreResourceName, String keyStorePassword, String keyPassword) throws IOException {
+    @Override
+    public IAsicContainerWriter sign(File keyStoreResourceName, String keyStorePassword, String keyPassword) throws IOException {
         return sign(keyStoreResourceName, keyStorePassword, null, keyPassword);
     }
 
@@ -187,7 +170,8 @@ public class AsicContainerWriter {
      * @param keyPassword Password for private key.
      * @return Return self to allow using builder pattern
      */
-    public AsicContainerWriter sign(File keyStoreResourceName, String keyStorePassword, String keyAlias, String keyPassword) throws IOException {
+    @Override
+    public AsicAbstractContainerWriter sign(File keyStoreResourceName, String keyStorePassword, String keyAlias, String keyPassword) throws IOException {
         return sign(new SignatureHelper(keyStoreResourceName, keyStorePassword, keyAlias, keyPassword));
     }
 
@@ -197,7 +181,8 @@ public class AsicContainerWriter {
      * @return Return self to allow using builder pattern
      * @throws IOException
      */
-    public AsicContainerWriter sign(SignatureHelper signatureHelper) throws IOException {
+    @Override
+    public AsicAbstractContainerWriter sign(SignatureHelper signatureHelper) throws IOException {
         // Check status
         if (finished)
             throw new IllegalStateException("Adding content to container after signing container is not supported.");
@@ -205,15 +190,7 @@ public class AsicContainerWriter {
         // Flip status
         finished = true;
 
-        // Adding signature file to manifest before signing
-        asicManifest.setSignature("META-INF/signature.p7s", "application/x-pkcs7-signature");
-
-        // Generate and write manifest (META-INF/asicmanifest.xml)
-        byte[] manifestBytes = asicManifest.toBytes();
-        writeZipEntry(new ZipEntry("META-INF/asicmanifest.xml"), manifestBytes);
-
-        // Generate and write signature (META-INF/signature.p7s)
-        writeZipEntry(new ZipEntry("META-INF/signature.p7s"), signatureHelper.signData(manifestBytes));
+        performSign(signatureHelper);
 
         // Close container
         try {
@@ -235,38 +212,29 @@ public class AsicContainerWriter {
         return this;
     }
 
-    public File getContainerFile() {
-        return getContainerPath().toFile();
-    }
-
-    public Path getContainerPath() {
-        if (containerPath == null)
-            throw new IllegalStateException("Output path is not known");
-
-        return containerPath;
-    }
-
-    public AsicManifest getAsicManifest() {
-        return asicManifest;
-    }
+    abstract void performSign(SignatureHelper signatureHelper) throws IOException;
 
     /**
      * Adds the "mimetype" object to the archive
      */
-    private void putMimeTypeAsFirstEntry() {
+    private void putMimeTypeAsFirstEntry(String mimeType) {
         ZipEntry mimetypeEntry = new ZipEntry("mimetype");
-        mimetypeEntry.setComment("mimetype=" + APPLICATION_VND_ETSI_ASIC_E_ZIP);
+        mimetypeEntry.setComment("mimetype=" + mimeType);
         mimetypeEntry.setMethod(ZipEntry.STORED);
-        mimetypeEntry.setSize(APPLICATION_VND_ETSI_ASIC_E_ZIP.getBytes().length);
+        mimetypeEntry.setSize(mimeType.getBytes().length);
 
         CRC32 crc32 = new CRC32();
-        crc32.update(APPLICATION_VND_ETSI_ASIC_E_ZIP.getBytes());
+        crc32.update(mimeType.getBytes());
         mimetypeEntry.setCrc(crc32.getValue());
 
-        writeZipEntry(mimetypeEntry, APPLICATION_VND_ETSI_ASIC_E_ZIP.getBytes());
+        writeZipEntry(mimetypeEntry, mimeType.getBytes());
     }
 
-    private void writeZipEntry(ZipEntry zipEntry, byte[] bytes) {
+    protected void writeZipEntry(String filename, byte[] bytes) {
+        writeZipEntry(new ZipEntry(filename), bytes);
+    }
+
+    protected void writeZipEntry(ZipEntry zipEntry, byte[] bytes) {
         try {
             log.debug(String.format("Writing file %s to container", zipEntry.getName()));
             zipOutputStream.putNextEntry(zipEntry);
@@ -275,5 +243,22 @@ public class AsicContainerWriter {
         } catch (IOException e) {
             throw new IllegalStateException(String.format("Unable to create new ZIP entry for %s: %s", zipEntry.getName(), e.getMessage()), e);
         }
+    }
+
+    @Override
+    public File getContainerFile() {
+        return getContainerPath().toFile();
+    }
+
+    @Override
+    public Path getContainerPath() {
+        if (containerPath == null)
+            throw new IllegalStateException("Output path is not known");
+
+        return containerPath;
+    }
+
+    public IAsicManifest getAsicManifest() {
+        return asicManifest;
     }
 }

@@ -39,11 +39,9 @@ public class AsicContainerWriterFactory {
     }
 
     protected AsicContainerWriter newContainer(OutputStream outputStream, Path file) {
-        switch (signatureMethod) {
+        switch (signatureMethod.getRealSignatureMethod()) {
             case CAdES:
-            case PEPPOL_V1:
                 return new AsicCadesContainerWriter(signatureMethod, outputStream, file);
-            case SDP:
             case XAdES:
                 return new AsicXadesContainerWriter(signatureMethod, outputStream, file);
             default:

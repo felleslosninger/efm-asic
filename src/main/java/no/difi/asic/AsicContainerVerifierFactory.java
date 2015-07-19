@@ -1,8 +1,10 @@
 package no.difi.asic;
 
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class AsicContainerVerifierFactory {
@@ -15,7 +17,7 @@ public class AsicContainerVerifierFactory {
         return newFactory(signatureMethod.getMessageDigestAlgorithm());
     }
 
-    public static AsicContainerVerifierFactory newFactory(MessageDigestAlgorithm messageDigestAlgorithm) {
+    protected static AsicContainerVerifierFactory newFactory(MessageDigestAlgorithm messageDigestAlgorithm) {
         return new AsicContainerVerifierFactory(messageDigestAlgorithm);
     }
 
@@ -25,11 +27,17 @@ public class AsicContainerVerifierFactory {
         this.messageDigestAlgorithm = messageDigestAlgorithm;
     }
 
-    public void verify(InputStream inputStream) throws IOException {
-        verify(inputStream, null);
+    public void verify(File file) throws IOException {
+        verify(file.toPath());
     }
 
-    public void verify(InputStream inputStream, Path outputFolder) throws IOException {
-        new AsicContainerVerifier(messageDigestAlgorithm, inputStream, outputFolder);
+    public void verify(Path file) throws IOException {
+        InputStream inputStream = Files.newInputStream(file);
+        verify(inputStream);
+        inputStream.close();
+    }
+
+    public void verify(InputStream inputStream) throws IOException {
+        new AsicContainerVerifier(messageDigestAlgorithm, inputStream);
     }
 }

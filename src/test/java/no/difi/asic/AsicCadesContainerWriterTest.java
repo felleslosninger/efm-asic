@@ -49,7 +49,7 @@ public class AsicCadesContainerWriterTest {
         assertTrue(keystoreFile.canRead(), "Expected to find your private key and certificate in " + keystoreFile);
 
         asicContainerWriterFactory = AsicContainerWriterFactory.newFactory(SignatureMethod.CAdES);
-        asicContainerVerifierFactory = AsicContainerVerifierFactory.newFactory(SignatureMethod.CAdES);
+        asicContainerVerifierFactory = AsicContainerVerifierFactory.newFactory();
     }
 
     @Test
@@ -136,7 +136,6 @@ public class AsicCadesContainerWriterTest {
             assertTrue(e instanceof IllegalStateException);
         }
 
-        FileInputStream fileInputStream = new FileInputStream(file);
-        asicContainerVerifierFactory.verify(fileInputStream, new File(System.getProperty("java.io.tmpdir"), "asic-folder").toPath());
+        asicContainerVerifierFactory.verify(file);
     }
 }

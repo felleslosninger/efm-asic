@@ -27,17 +27,15 @@ public class AsicContainerVerifierFactory {
         this.messageDigestAlgorithm = messageDigestAlgorithm;
     }
 
-    public void verify(File file) throws IOException {
-        verify(file.toPath());
+    public AsicContainerVerifier verify(File file) throws IOException {
+        return verify(file.toPath());
     }
 
-    public void verify(Path file) throws IOException {
-        InputStream inputStream = Files.newInputStream(file);
-        verify(inputStream);
-        inputStream.close();
+    public AsicContainerVerifier verify(Path file) throws IOException {
+        return verify(Files.newInputStream(file));
     }
 
-    public void verify(InputStream inputStream) throws IOException {
-        new AsicContainerVerifier(messageDigestAlgorithm, inputStream);
+    public AsicContainerVerifier verify(InputStream inputStream) throws IOException {
+        return new AsicContainerVerifier(messageDigestAlgorithm, inputStream);
     }
 }

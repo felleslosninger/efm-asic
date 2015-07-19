@@ -122,4 +122,7 @@ public class SignatureHelper {
         }
     }
 
+    public X509Certificate getX509Certificate() {
+        return x509Certificate;
+    }
 }

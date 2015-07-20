@@ -130,7 +130,7 @@ public class AsicCadesContainerWriterTest {
         }
 
         try {
-            asicContainerWriter.sign(keystoreFile, "changeit", "changeit");
+            asicContainerWriter.sign(new SignatureHelper(keystoreFile, "changeit", "changeit"));
             fail("Exception expected");
         } catch (Exception e) {
             assertTrue(e instanceof IllegalStateException);

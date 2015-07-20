@@ -13,6 +13,7 @@ public class AsicContainerReader extends AsicAbstractContainerReader {
         super(messageDigestAlgorithm, inputStream);
     }
 
+    @Override
     public String getNextFile() throws IOException {
         return super.getNextFile();
     }
@@ -29,10 +30,12 @@ public class AsicContainerReader extends AsicAbstractContainerReader {
         outputStream.close();
     }
 
+    @Override
     public void writeFile(OutputStream outputStream) throws IOException {
         super.writeFile(outputStream);
     }
 
+    @Override
     public void close() throws IOException {
         super.close();
     }

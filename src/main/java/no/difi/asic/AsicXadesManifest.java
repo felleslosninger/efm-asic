@@ -6,7 +6,6 @@ import org.etsi.uri._01903.v1_3.*;
 import org.etsi.uri._2918.v1_2.ObjectFactory;
 import org.etsi.uri._2918.v1_2.XAdESSignaturesType;
 import org.w3._2000._09.xmldsig_.*;
-import sun.security.x509.X509CertImpl;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -15,6 +14,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import java.io.ByteArrayOutputStream;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.util.GregorianCalendar;
 
@@ -57,25 +57,29 @@ class AsicXadesManifest extends AsicAbstractManifest {
     public void add(String filename, String mimeType) {
         String id = String.format("ID_%s", signedInfo.getReference().size());
 
-        // \XAdESSignature\Signature\SignedInfo\Reference
-        ReferenceType reference = new ReferenceType();
-        reference.setId(id);
-        reference.setURI(filename);
-        reference.setDigestValue(messageDigest.digest());
+        {
+            // \XAdESSignature\Signature\SignedInfo\Reference
+            ReferenceType reference = new ReferenceType();
+            reference.setId(id);
+            reference.setURI(filename);
+            reference.setDigestValue(messageDigest.digest());
 
-        // \XAdESSignature\Signature\SignedInfo\Reference\DigestMethod
-        DigestMethodType digestMethodType = new DigestMethodType();
-        digestMethodType.setAlgorithm(messageDigestAlgorithm.getUri());
-        reference.setDigestMethod(digestMethodType);
+            // \XAdESSignature\Signature\SignedInfo\Reference\DigestMethod
+            DigestMethodType digestMethodType = new DigestMethodType();
+            digestMethodType.setAlgorithm(messageDigestAlgorithm.getUri());
+            reference.setDigestMethod(digestMethodType);
 
-        signedInfo.getReference().add(reference);
+            signedInfo.getReference().add(reference);
+        }
 
-        // \XAdESSignature\Signature\Object\QualifyingProperties\SignedProperties\SignedDataObjectProperties\DataObjectFormat
-        DataObjectFormatType dataObjectFormatType = new DataObjectFormatType();
-        dataObjectFormatType.setObjectReference(String.format("#%s", id));
-        dataObjectFormatType.setMimeType(mimeType);
+        {
+            // \XAdESSignature\Signature\Object\QualifyingProperties\SignedProperties\SignedDataObjectProperties\DataObjectFormat
+            DataObjectFormatType dataObjectFormatType = new DataObjectFormatType();
+            dataObjectFormatType.setObjectReference(String.format("#%s", id));
+            dataObjectFormatType.setMimeType(mimeType);
 
-        signedDataObjectProperties.getDataObjectFormat().add(dataObjectFormatType);
+            signedDataObjectProperties.getDataObjectFormat().add(dataObjectFormatType);
+        }
     }
 
     public byte[] toBytes(SignatureHelper signatureHelper) {
@@ -98,7 +102,8 @@ class AsicXadesManifest extends AsicAbstractManifest {
         objectType.getContent().add(getQualifyingProperties(signatureHelper));
         signatureType.getObject().add(objectType);
 
-        // TODO Generere signatur og legge signatur i dokumentet
+        // \XAdESSignature\Signature\Object\SignatureValue
+        signatureType.setSignatureValue(getSignature());
 
         try {
             Marshaller marshaller = jaxbContext.createMarshaller();
@@ -116,19 +121,28 @@ class AsicXadesManifest extends AsicAbstractManifest {
     }
 
     private JAXBElement<X509DataType> getX509Data(SignatureHelper signatureHelper) {
+        org.w3._2000._09.xmldsig_.ObjectFactory objectFactory = new org.w3._2000._09.xmldsig_.ObjectFactory();
+
         // \XAdESSignature\Signature\KeyInfo\X509Data
         X509DataType x509DataType = new X509DataType();
-        // for (signatureHelper.getX509Certificate())
 
-        // TODO Legge inn sertifikatbane
+        for (Certificate certificate : signatureHelper.getCertificateChain()) {
+            try {
+                // \XAdESSignature\Signature\KeyInfo\X509Data\X509Certificate
+                x509DataType.getX509IssuerSerialOrX509SKIOrX509SubjectName().add(objectFactory.createX509DataTypeX509Certificate(certificate.getEncoded()));
+            } catch (CertificateEncodingException e) {
+                throw new IllegalStateException("Unable to insert certificate.");
+            }
+        }
 
-        return new org.w3._2000._09.xmldsig_.ObjectFactory().createX509Data(x509DataType);
+        return objectFactory.createX509Data(x509DataType);
     }
 
     private JAXBElement<QualifyingPropertiesType> getQualifyingProperties(SignatureHelper signatureHelper) {
         // \XAdESSignature\Signature\Object\QualifyingProperties\SignedProperties\SignedSignatureProperties
         SignedSignaturePropertiesType signedSignaturePropertiesType = new SignedSignaturePropertiesType();
         try {
+            // \XAdESSignature\Signature\Object\QualifyingProperties\SignedProperties\SignedSignatureProperties\SigningTime
             signedSignaturePropertiesType.setSigningTime(DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar()));
         } catch (DatatypeConfigurationException e) {
             throw new IllegalStateException("Unable to use current DatatypeFactory", e);
@@ -143,28 +157,24 @@ class AsicXadesManifest extends AsicAbstractManifest {
         signingCertificate.getCert().add(cert);
 
         try {
-            // Certificate
-            X509CertImpl x509Cert = (X509CertImpl) signatureHelper.getX509Certificate();
-
             // \XAdESSignature\Signature\Object\QualifyingProperties\SignedProperties\SignedSignatureProperties\SigningCertificate\Cert\CertDigest
             DigestAlgAndValueType certDigest = new DigestAlgAndValueType();
-            // certDigest.setDigestValue(x509Cert.getDig);
-            certDigest.setDigestValue(DigestUtils.sha1Hex(x509Cert.getEncoded()).getBytes()); // TODO Ser ut til å være feil pasert på eksempel
+            certDigest.setDigestValue(DigestUtils.sha1(signatureHelper.getX509Certificate().getEncoded()));
             cert.setCertDigest(certDigest);
 
             // \XAdESSignature\Signature\Object\QualifyingProperties\SignedProperties\SignedSignatureProperties\SigningCertificate\Cert\CertDigest\DigestMethod
             DigestMethodType digestMethodType = new DigestMethodType();
             digestMethodType.setAlgorithm("http://www.w3.org/2000/09/xmldsig#sha1");
             certDigest.setDigestMethod(digestMethodType);
-
-            // \XAdESSignature\Signature\Object\QualifyingProperties\SignedProperties\SignedSignatureProperties\SigningCertificate\Cert\IssuerSerial
-            X509IssuerSerialType issuerSerialType = new X509IssuerSerialType();
-            issuerSerialType.setX509IssuerName(x509Cert.getIssuerX500Principal().getName());
-            issuerSerialType.setX509SerialNumber(x509Cert.getSerialNumber());
-            cert.setIssuerSerial(issuerSerialType);
         } catch (CertificateEncodingException e) {
             throw new IllegalStateException("Unable to encode certificate.", e);
         }
+
+        // \XAdESSignature\Signature\Object\QualifyingProperties\SignedProperties\SignedSignatureProperties\SigningCertificate\Cert\IssuerSerial
+        X509IssuerSerialType issuerSerialType = new X509IssuerSerialType();
+        issuerSerialType.setX509IssuerName(signatureHelper.getX509Certificate().getIssuerX500Principal().getName());
+        issuerSerialType.setX509SerialNumber(signatureHelper.getX509Certificate().getSerialNumber());
+        cert.setIssuerSerial(issuerSerialType);
 
         // \XAdESSignature\Signature\Object\QualifyingProperties\SignedProperties
         SignedPropertiesType signedPropertiesType = new SignedPropertiesType();
@@ -175,9 +185,63 @@ class AsicXadesManifest extends AsicAbstractManifest {
         // \XAdESSignature\Signature\Object\QualifyingProperties
         QualifyingPropertiesType qualifyingPropertiesType = new QualifyingPropertiesType();
         qualifyingPropertiesType.setSignedProperties(signedPropertiesType);
+        qualifyingPropertiesType.setTarget("#Signature");
 
-        // TODO Legge digest av SignedProperties i SignedInfo
+        // Adding digest of SignedProperties into SignedInfo
+        {
+            // \XAdESSignature\Signature\SignedInfo\Reference
+            ReferenceType reference = new ReferenceType();
+            reference.setType("http://uri.etsi.org/01903#SignedProperties");
+            reference.setURI("#SignedProperties");
+            // TODO Generate digest
+
+            // \XAdESSignature\Signature\SignedInfo\Reference\Transforms
+            TransformsType transformsType = new TransformsType();
+            reference.setTransforms(transformsType);
+
+            // \XAdESSignature\Signature\SignedInfo\Reference\Transforms\Transform
+            TransformType transformType = new TransformType();
+            transformType.setAlgorithm("http://www.w3.org/TR/2001/REC-xml-c14n-20010315");
+            reference.getTransforms().getTransform().add(transformType);
+
+            // \XAdESSignature\Signature\SignedInfo\Reference\DigestMethod
+            DigestMethodType digestMethodType = new DigestMethodType();
+            digestMethodType.setAlgorithm(messageDigestAlgorithm.getUri());
+            reference.setDigestMethod(digestMethodType);
+
+            signedInfo.getReference().add(reference);
+        }
 
         return new org.etsi.uri._01903.v1_3.ObjectFactory().createQualifyingProperties(qualifyingPropertiesType);
+    }
+
+    protected SignatureValueType getSignature() {
+        // TODO Generate signature
+        // http://stackoverflow.com/questions/30596933/xades-bes-detached-signedproperties-reference-wrong-digestvalue-java
+
+        /*
+        DigestMethod dm = fac.newDigestMethod(DigestMethod.SHA1, null);
+        CanonicalizationMethod cn = fac.newCanonicalizationMethod(CanonicalizationMethod.INCLUSIVE_WITH_COMMENTS,(C14NMethodParameterSpec) null);
+
+        List<Reference> refs = new ArrayList<Reference>();
+        Reference ref1 = fac.newReference(pathName, dm,null,null,signedRefID,messageDigest2.digest(datax));
+        refs.add(ref1);
+
+        Canonicalizer cn14 = Canonicalizer.getInstance(Canonicalizer.ALGO_ID_C14N11_OMIT_COMMENTS);
+        byte[] canon;
+        canon = cn14.canonicalizeSubtree(SPElement);
+        Reference ref2 = fac.newReference("#"+signedPropID,dm, null , sigProp , signedPropRefID,messageDigest2.digest(canon));
+        refs.add(ref2);
+
+        SignatureMethod sm = fac.newSignatureMethod(SignatureMethod.RSA_SHA1, null);
+        SignedInfo si = fac.newSignedInfo(cn, sm, refs);
+
+        XMLSignature signature = fac.newXMLSignature(si, ki,objects,signatureID,null);
+
+        signature.sign(dsc);
+        */
+
+        SignatureValueType signatureValue = new SignatureValueType();
+        return signatureValue;
     }
 }

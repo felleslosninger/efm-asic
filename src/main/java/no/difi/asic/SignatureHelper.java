@@ -21,7 +21,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.security.*;
-import java.security.cert.X509Certificate;
+import java.security.cert.*;
+import java.security.cert.Certificate;
 import java.util.Arrays;
 
 
@@ -43,6 +44,7 @@ public class SignatureHelper {
     }
 
     private X509Certificate x509Certificate;
+    private java.security.cert.Certificate[] certificateChain;
     private KeyPair keyPair;
 
     // Helper method
@@ -72,6 +74,8 @@ public class SignatureHelper {
             if (keyAlias == null)
                 keyAlias = keyStore.aliases().nextElement();
             x509Certificate = (X509Certificate) keyStore.getCertificate(keyAlias);
+
+            certificateChain = keyStore.getCertificateChain(keyAlias);
 
             Key key = keyStore.getKey(keyAlias, keyPassword.toCharArray());
             PrivateKey privateKey = (PrivateKey) key;
@@ -124,5 +128,9 @@ public class SignatureHelper {
 
     public X509Certificate getX509Certificate() {
         return x509Certificate;
+    }
+
+    public Certificate[] getCertificateChain() {
+        return certificateChain;
     }
 }

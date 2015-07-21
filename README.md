@@ -1,14 +1,24 @@
 # ASiC - Associated Signature Container
 
-This component provides an easy-to-use factory for creating ASiC-E containers according to 
-[ETSI TS 102 918](http://webapp.etsi.org/workprogram/Report_WorkItem.asp?WKI_ID=42455)
-.
+An ASiC file is simply a ZIP archive created according to some rules set forth in the specifications. 
 
-## What is ASiC?
-An ASiC file is simply a ZIP archive created according to some rules. In general the archive looks something like depicted below 
+The benefits of using containers for message transfer are:
+* all files are kept together as a single collection.
+* very efficient with regards to space.
+* due to the compressed format, communication bandwith is utilized better
+* message integrity is provided, using message digests and signatures.
+
+This component provides an easy-to-use factory for creating ASiC-E containers according to 
+[ETSI TS 102 918](http://webapp.etsi.org/workprogram/Report_WorkItem.asp?WKI_ID=42455).
+
+This implementation uses CAdES (CMS Advanced Electronic Signature) 
+for signatures rather than XAdES, both of which are allowed according to the ASiC specification.
+
+## What does it look like?
+In general the archive looks something like depicted below 
 
 ```
-asic-container.sce:
+asic-container.sce:         <<< Suffix .sce indicates ASiC-e
    |
    +-- mimetype
    |
@@ -20,7 +30,7 @@ asic-container.sce:
           |
           + asicmanifest.xml
           |
-          + signature.p7s
+          + signature.p7s   
    
 ```
 

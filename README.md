@@ -27,6 +27,13 @@ openssl cms -verify -in META-INF/signature.p7s -inform der -content META-INF/asi
 ```
 
 The `-noverify` option will allow self signed certificates, and should normally be omitted :-).
+
+## Current status
+
+This is not currently implemented:
+
+* Verification of ASiC container.
+* Proper signing for XAdES container.
  
 ## Creating an ASiC-E container manually
 

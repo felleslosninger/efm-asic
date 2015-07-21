@@ -8,6 +8,10 @@ import java.nio.file.Path;
 
 public class AsicContainerWriterFactory {
 
+    public static AsicContainerWriterFactory newFactory() {
+        return newFactory(SignatureMethod.CAdES);
+    }
+
     public static AsicContainerWriterFactory newFactory(SignatureMethod signatureMethod) {
         return new AsicContainerWriterFactory(signatureMethod);
     }

@@ -1,8 +1,15 @@
-# asic
+# ASiC - Associated Signature Container
 
-Provides a simple builder for an ASiC-E container.
+This component provides an easy-to-use factory for creating ASiC-E containers according to 
+[ETSI TS 102 918](http://webapp.etsi.org/workprogram/Report_WorkItem.asp?WKI_ID=42455)
+.
+
+## What is ASiC?
+An ASiC file is simply a ZIP archive created according to some rules. In general the archive looks something like depicted below 
 
 ```
+asic-container.sce:
+   |
    +-- mimetype
    |
    +-- bii-envelope.xml
@@ -18,23 +25,19 @@ Provides a simple builder for an ASiC-E container.
 ```
 
 
-See AsicBuilderTest.java for sample usage.
+Consult the [AsicCadesContainerWriter](src/test/java/AsicCadesContainerWriter.java) for sample usage.
 
-Here is how to verify the signature using the *openssl(1)* command line tool:
-
-```
-openssl cms -verify -in META-INF/signature.p7s -inform der -content META-INF/asicmanifest.xml -noverify
-```
-
-The `-noverify` option will allow self signed certificates, and should normally be omitted :-).
 
 ## Current status
 
-This is not currently implemented:
+This component is currently work-in-progress.
+
+These features have not yet been implemented:
 
 * Verification of ASiC container.
-* Proper signing for XAdES container.
+* Proper signing when using XAdES format for signatures.
  
+
 ## Creating an ASiC-E container manually
 
 This is how you create an ASiC container manually:
@@ -80,3 +83,13 @@ Note! The `-noverify` option omits verifying the certificate chain of trust and 
 **Disclaimer:** The procedure liste above works on a Mac or Linux machine with the various tools pre-installed. If you are running on a windows machine
 you need to download and install the *openssl* and *base64* tool and adapt the procedure according to your liking.
 
+
+## Verifying the contents using *openssl*
+
+Here is how to verify the signature using the *openssl(1)* command line tool:
+
+```
+openssl cms -verify -in META-INF/signature.p7s -inform der -content META-INF/asicmanifest.xml -noverify
+```
+
+The `-noverify` option will allow self signed certificates, and should normally be omitted :-).

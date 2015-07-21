@@ -34,7 +34,7 @@ asic-container.asice:
    
 ```
 
-Consult the [AsicCadesContainerWriter](src/test/java/no/difi/asic/AsicCadesContainerWriterTest.java) for sample usage.
+Consult the [AsicCadesContainerWriterTest](src/test/java/no/difi/asic/AsicCadesContainerWriterTest.java) for sample usage.
 
 
 ## Current status

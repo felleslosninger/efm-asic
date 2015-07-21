@@ -39,7 +39,7 @@ public class AsicContainerWriterFactory {
     }
 
     protected AsicContainerWriter newContainer(OutputStream outputStream, Path file) {
-        switch (signatureMethod.getRealSignatureMethod()) {
+        switch (signatureMethod) {
             case CAdES:
                 return new AsicCadesContainerWriter(signatureMethod, outputStream, file);
             case XAdES:

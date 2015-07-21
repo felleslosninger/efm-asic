@@ -30,14 +30,14 @@ class AsicCadesContainerWriter extends AsicAbstractContainerWriter {
 
     @Override
     protected void performSign(SignatureHelper signatureHelper) throws IOException {
-        // Adding signature file to manifest before signing
+        // Adding signature file to asic manifest before actual signing
         ((AsicCadesManifest) asicManifest).setSignature("META-INF/signature.p7s", "application/x-pkcs7-signature");
 
-        // Generate and write manifest (META-INF/asicmanifest.xml)
+        // Generates and writes manifest (META-INF/asicmanifest.xml) to the zip archive
         byte[] manifestBytes = ((AsicCadesManifest) asicManifest).toBytes();
         writeZipEntry("META-INF/asicmanifest.xml", manifestBytes);
 
-        // Generate and write signature (META-INF/signature.p7s)
+        // Generates and writes signature (META-INF/signature.p7s) to the zip archive
         writeZipEntry("META-INF/signature.p7s", signatureHelper.signData(manifestBytes));
     }
 }

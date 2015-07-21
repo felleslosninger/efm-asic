@@ -59,8 +59,8 @@ abstract class AsicAbstractContainerWriter implements AsicContainerWriter {
 
     // Helper method
     @Override
-    public AsicContainerWriter add(File file, String filename) throws IOException {
-        return add(file.toPath(), filename);
+    public AsicContainerWriter add(File file, String entryName) throws IOException {
+        return add(file.toPath(), entryName);
     }
 
     // Helper method
@@ -71,9 +71,9 @@ abstract class AsicAbstractContainerWriter implements AsicContainerWriter {
 
     // Helper method
     @Override
-    public AsicContainerWriter add(Path path, String filename) throws IOException {
+    public AsicContainerWriter add(Path path, String entryName) throws IOException {
         InputStream inputStream = Files.newInputStream(path);
-        add(inputStream, filename);
+        add(inputStream, entryName);
         inputStream.close();
         return this;
     }
@@ -108,15 +108,15 @@ abstract class AsicAbstractContainerWriter implements AsicContainerWriter {
 
     // Helper method
     @Override
-    public AsicContainerWriter add(File file, String filename, String mimeType) throws IOException {
-        return add(file.toPath(), filename, mimeType);
+    public AsicContainerWriter add(File file, String entryName, String mimeType) throws IOException {
+        return add(file.toPath(), entryName, mimeType);
     }
 
     // Helper method
     @Override
-    public AsicContainerWriter add(Path path, String filename, String mimeType) throws IOException {
+    public AsicContainerWriter add(Path path, String entryName, String mimeType) throws IOException {
         InputStream inputStream = Files.newInputStream(path);
-        add(inputStream, filename, mimeType);
+        add(inputStream, entryName, mimeType);
         inputStream.close();
         return this;
     }
@@ -158,22 +158,22 @@ abstract class AsicAbstractContainerWriter implements AsicContainerWriter {
 
     // Helper method
     @Override
-    public AsicContainerWriter sign(File keyStoreResourceName, String keyStorePassword, String keyPassword) throws IOException {
-        return sign(keyStoreResourceName, keyStorePassword, null, keyPassword);
+    public AsicContainerWriter sign(File keyStoreFile, String keyStorePassword, String keyPassword) throws IOException {
+        return sign(keyStoreFile, keyStorePassword, null, keyPassword);
     }
 
     /**
      * Sign and close container.
      *
-     * @param keyStoreResourceName File reference for location of keystore.
+     * @param keyStoreFile File reference for location of keystore.
      * @param keyStorePassword Password for keystore.
      * @param  keyAlias Alias for private key.
      * @param keyPassword Password for private key.
      * @return Return self to allow using builder pattern
      */
     @Override
-    public AsicAbstractContainerWriter sign(File keyStoreResourceName, String keyStorePassword, String keyAlias, String keyPassword) throws IOException {
-        return sign(new SignatureHelper(keyStoreResourceName, keyStorePassword, keyAlias, keyPassword));
+    public AsicAbstractContainerWriter sign(File keyStoreFile, String keyStorePassword, String keyAlias, String keyPassword) throws IOException {
+        return sign(new SignatureHelper(keyStoreFile, keyStorePassword, keyAlias, keyPassword));
     }
 
     /**

@@ -47,12 +47,18 @@ public class SignatureHelper {
     private java.security.cert.Certificate[] certificateChain;
     private KeyPair keyPair;
 
-    // Helper method
+    /** Loads the keystore and obtains the private key, the public key and the associated certificate */
     public SignatureHelper(File keyStoreFile, String keyStorePassword, String keyPassword) throws IOException {
         this(keyStoreFile, keyStorePassword, null, keyPassword);
     }
 
-    // Helper method
+    /** Loads the keystore and obtains the private key, the public key and the associated certificate referenced by the alias.
+     * @param keyStoreFile file holding the JKS keystore.
+     * @param keyStorePassword password of the key store itself
+     * @param keyAlias the alias referencing the private and public key pair.
+     * @param keyPassword password protecting the private key
+     * @throws IOException
+     */
     public SignatureHelper(File keyStoreFile, String keyStorePassword, String keyAlias, String keyPassword) throws IOException {
         this(Files.newInputStream(keyStoreFile.toPath()), keyStorePassword, keyAlias, keyPassword);
     }

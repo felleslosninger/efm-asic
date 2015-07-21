@@ -2,10 +2,10 @@ package no.difi.asic;
 
 import com.sun.xml.bind.api.JAXBRIContext;
 import org.bouncycastle.util.encoders.Base64;
-import org.etsi.uri._2918.v1_1.ASiCManifestType;
-import org.etsi.uri._2918.v1_1.DataObjectReferenceType;
-import org.etsi.uri._2918.v1_1.ObjectFactory;
-import org.etsi.uri._2918.v1_1.SigReferenceType;
+import org.etsi.uri._2918.v1_2.ASiCManifestType;
+import org.etsi.uri._2918.v1_2.DataObjectReferenceType;
+import org.etsi.uri._2918.v1_2.ObjectFactory;
+import org.etsi.uri._2918.v1_2.SigReferenceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3._2000._09.xmldsig_.DigestMethodType;
@@ -31,6 +31,7 @@ class AsicCadesManifest extends AsicAbstractManifest {
         }
     }
 
+    // Automagically generated from XML Schema Definition files
     private ASiCManifestType ASiCManifestType = new ASiCManifestType();
 
     public AsicCadesManifest(MessageDigestAlgorithm messageDigestAlgorithm) {

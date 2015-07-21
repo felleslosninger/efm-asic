@@ -48,7 +48,7 @@ public class AsicCadesContainerWriterTest {
         keystoreFile = new File("src/test/resources/kontaktinfo-client-test.jks");
         assertTrue(keystoreFile.canRead(), "Expected to find your private key and certificate in " + keystoreFile);
 
-        asicContainerWriterFactory = AsicContainerWriterFactory.newFactory(SignatureMethod.CAdES);
+        asicContainerWriterFactory = AsicContainerWriterFactory.newFactory();
         asicContainerVerifierFactory = AsicContainerVerifierFactory.newFactory();
     }
 

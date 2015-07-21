@@ -18,7 +18,7 @@ for signatures rather than XAdES, both of which are allowed according to the ASi
 In general the archive looks something like depicted below 
 
 ```
-asic-container.sce:         <<< Suffix .sce indicates ASiC-e
+asic-container.asice: 
    |
    +-- mimetype
    |

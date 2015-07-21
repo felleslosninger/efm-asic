@@ -76,7 +76,7 @@ class AsicAbstractContainerReader {
             IOUtils.copy(zipInputStream, baos);
 
             log.info(String.format("Content of mimetype: %s", baos.toString()));
-            if (!AsicAbstractContainerWriter.APPLICATION_VND_ETSI_ASIC_E_ZIP.equals(baos.toString()))
+            if (!AsicAbstractWriter.APPLICATION_VND_ETSI_ASIC_E_ZIP.equals(baos.toString()))
                 throw new IllegalStateException("Content is not ASiC-E container.");
             return true;
         // } else if (zipEntry.getName().toLowerCase().contains("asicmanifest")) {

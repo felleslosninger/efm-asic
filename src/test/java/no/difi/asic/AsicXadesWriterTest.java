@@ -18,9 +18,9 @@ import static org.testng.Assert.*;
  *         Date: 02.07.15
  *         Time: 12.08
  */
-public class AsicXadesContainerWriterTest {
+public class AsicXadesWriterTest {
 
-    public static final Logger log = LoggerFactory.getLogger(AsicXadesContainerWriterTest.class);
+    public static final Logger log = LoggerFactory.getLogger(AsicXadesWriterTest.class);
 
     public static final String BII_ENVELOPE_XML = "bii-envelope.xml";
     public static final String BII_MESSAGE_XML = "bii-message.xml";
@@ -28,20 +28,20 @@ public class AsicXadesContainerWriterTest {
     private URL messageUrl;
     private File keystoreFile;
 
-    private AsicContainerWriterFactory asicContainerWriterFactory;
+    private AsicWriterFactory asicContainerWriterFactory;
 
     @BeforeMethod
     public void setUp() {
-        envelopeUrl = AsicXadesContainerWriterTest.class.getClassLoader().getResource(BII_ENVELOPE_XML);
+        envelopeUrl = AsicXadesWriterTest.class.getClassLoader().getResource(BII_ENVELOPE_XML);
         assertNotNull(envelopeUrl);
 
-        messageUrl = AsicXadesContainerWriterTest.class.getClassLoader().getResource(BII_MESSAGE_XML);
+        messageUrl = AsicXadesWriterTest.class.getClassLoader().getResource(BII_MESSAGE_XML);
         assertNotNull(messageUrl);
 
         keystoreFile = new File("src/test/resources/kontaktinfo-client-test.jks");
         assertTrue(keystoreFile.canRead(), "Expected to find your private key and certificate in " + keystoreFile);
 
-        asicContainerWriterFactory = AsicContainerWriterFactory.newFactory(SignatureMethod.XAdES);
+        asicContainerWriterFactory = AsicWriterFactory.newFactory(SignatureMethod.XAdES);
     }
 
     @Test
@@ -58,17 +58,17 @@ public class AsicXadesContainerWriterTest {
     @Test
     public void createSampleContainer() throws Exception {
 
-        AsicContainerWriter asicContainerWriter = asicContainerWriterFactory.newContainer(new File(System.getProperty("java.io.tmpdir")), "asic-sample-xades.zip")
+        AsicWriter asicWriter = asicContainerWriterFactory.newContainer(new File(System.getProperty("java.io.tmpdir")), "asic-sample-xades.zip")
                 .add(new File(envelopeUrl.toURI()))
                 .add(new File(messageUrl.toURI()), "bii-message.xml", "application/xml")
                 .sign(keystoreFile, "changeit", "client_alias", "changeit");
 
-        File file = asicContainerWriter.getContainerFile();
+        File file = asicWriter.getContainerFile();
 
         // Verifies that both files have been added.
         {
             int matchCount = 0;
-            AsicXadesManifest asicManifest = (AsicXadesManifest) ((AsicXadesContainerWriter) asicContainerWriter).getAsicManifest();
+            AsicXadesManifest asicManifest = (AsicXadesManifest) ((AsicXadesWriter) asicWriter).getAsicManifest();
             /*
             for (DataObjectReferenceType dataObject : asicManifest.getASiCManifestType().getDataObjectReference()) {
                 if (dataObject.getURI().equals(BII_ENVELOPE_XML))
@@ -105,14 +105,14 @@ public class AsicXadesContainerWriterTest {
         }
 
         try {
-            asicContainerWriter.add(new File(envelopeUrl.toURI()));
+            asicWriter.add(new File(envelopeUrl.toURI()));
             fail("Exception expected");
         } catch (Exception e) {
             assertTrue(e instanceof IllegalStateException);
         }
 
         try {
-            asicContainerWriter.sign(keystoreFile, "changeit", "changeit");
+            asicWriter.sign(keystoreFile, "changeit", "changeit");
             fail("Exception expected");
         } catch (Exception e) {
             assertTrue(e instanceof IllegalStateException);

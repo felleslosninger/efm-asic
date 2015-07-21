@@ -16,15 +16,15 @@ import java.nio.file.Path;
  *         Date: 02.07.15
  *         Time: 12.09
  */
-class AsicCadesContainerWriter extends AsicAbstractContainerWriter {
+class AsicCadesWriter extends AsicAbstractWriter {
 
-    public static final Logger log = LoggerFactory.getLogger(AsicCadesContainerWriter.class);
+    public static final Logger log = LoggerFactory.getLogger(AsicCadesWriter.class);
 
     /**
      * Prepares creation of a new container.
      * @param outputStream Stream used to write container.
      */
-    public AsicCadesContainerWriter(SignatureMethod signatureMethod, OutputStream outputStream, Path containerPath) {
+    public AsicCadesWriter(SignatureMethod signatureMethod, OutputStream outputStream, Path containerPath) {
         super(outputStream, containerPath, new AsicCadesManifest(signatureMethod.getMessageDigestAlgorithm()));
     }
 

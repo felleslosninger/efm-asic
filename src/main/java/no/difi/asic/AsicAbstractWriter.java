@@ -17,9 +17,9 @@ import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-abstract class AsicAbstractContainerWriter implements AsicContainerWriter {
+abstract class AsicAbstractWriter implements AsicWriter {
 
-    public static final Logger log = LoggerFactory.getLogger(AsicAbstractContainerWriter.class);
+    public static final Logger log = LoggerFactory.getLogger(AsicAbstractWriter.class);
 
     /** The MIME type, which should be the very first entry in the container */
     public static final String APPLICATION_VND_ETSI_ASIC_E_ZIP = "application/vnd.etsi.asic-e+zip";
@@ -35,7 +35,7 @@ abstract class AsicAbstractContainerWriter implements AsicContainerWriter {
      * Prepares creation of a new container.
      * @param outputStream Stream used to write container.
      */
-    public AsicAbstractContainerWriter(OutputStream outputStream, Path containerPath, AsicAbstractManifest asicManifest) {
+    public AsicAbstractWriter(OutputStream outputStream, Path containerPath, AsicAbstractManifest asicManifest) {
         // Keep original output stream
         this.containerOutputStream = outputStream;
         this.containerPath = containerPath;
@@ -53,25 +53,25 @@ abstract class AsicAbstractContainerWriter implements AsicContainerWriter {
 
     // Helper method
     @Override
-    public AsicContainerWriter add(File file) throws IOException {
+    public AsicWriter add(File file) throws IOException {
         return add(file.toPath());
     }
 
     // Helper method
     @Override
-    public AsicContainerWriter add(File file, String entryName) throws IOException {
+    public AsicWriter add(File file, String entryName) throws IOException {
         return add(file.toPath(), entryName);
     }
 
     // Helper method
     @Override
-    public AsicContainerWriter add(Path path) throws IOException {
+    public AsicWriter add(Path path) throws IOException {
         return add(path, path.toFile().getName());
     }
 
     // Helper method
     @Override
-    public AsicContainerWriter add(Path path, String entryName) throws IOException {
+    public AsicWriter add(Path path, String entryName) throws IOException {
         InputStream inputStream = Files.newInputStream(path);
         add(inputStream, entryName);
         inputStream.close();
@@ -87,13 +87,13 @@ abstract class AsicAbstractContainerWriter implements AsicContainerWriter {
      * @throws IOException
      */
     @Override
-    public AsicContainerWriter add(InputStream inputStream, String filename) throws IOException {
+    public AsicWriter add(InputStream inputStream, String filename) throws IOException {
         // Use Files to find content type
         String mimeType = Files.probeContentType(Paths.get(filename));
 
         // Use URLConnection to find content type
         if (mimeType == null) {
-            AsicCadesContainerWriter.log.info("Unable to determine MIME type using Files.probeContentType(), trying URLConnection.getFileNameMap()");
+            AsicCadesWriter.log.info("Unable to determine MIME type using Files.probeContentType(), trying URLConnection.getFileNameMap()");
             mimeType = URLConnection.getFileNameMap().getContentTypeFor(filename);
         }
 
@@ -108,13 +108,13 @@ abstract class AsicAbstractContainerWriter implements AsicContainerWriter {
 
     // Helper method
     @Override
-    public AsicContainerWriter add(File file, String entryName, String mimeType) throws IOException {
+    public AsicWriter add(File file, String entryName, String mimeType) throws IOException {
         return add(file.toPath(), entryName, mimeType);
     }
 
     // Helper method
     @Override
-    public AsicContainerWriter add(Path path, String entryName, String mimeType) throws IOException {
+    public AsicWriter add(Path path, String entryName, String mimeType) throws IOException {
         InputStream inputStream = Files.newInputStream(path);
         add(inputStream, entryName, mimeType);
         inputStream.close();
@@ -131,7 +131,7 @@ abstract class AsicAbstractContainerWriter implements AsicContainerWriter {
      * @throws IOException
      */
     @Override
-    public AsicContainerWriter add(InputStream inputStream, String filename, String mimeType) throws IOException {
+    public AsicWriter add(InputStream inputStream, String filename, String mimeType) throws IOException {
         // Check status
         if (finished)
             throw new IllegalStateException("Adding content to container after signing container is not supported.");
@@ -158,7 +158,7 @@ abstract class AsicAbstractContainerWriter implements AsicContainerWriter {
 
     // Helper method
     @Override
-    public AsicContainerWriter sign(File keyStoreFile, String keyStorePassword, String keyPassword) throws IOException {
+    public AsicWriter sign(File keyStoreFile, String keyStorePassword, String keyPassword) throws IOException {
         return sign(keyStoreFile, keyStorePassword, null, keyPassword);
     }
 
@@ -172,7 +172,7 @@ abstract class AsicAbstractContainerWriter implements AsicContainerWriter {
      * @return Return self to allow using builder pattern
      */
     @Override
-    public AsicAbstractContainerWriter sign(File keyStoreFile, String keyStorePassword, String keyAlias, String keyPassword) throws IOException {
+    public AsicAbstractWriter sign(File keyStoreFile, String keyStorePassword, String keyAlias, String keyPassword) throws IOException {
         return sign(new SignatureHelper(keyStoreFile, keyStorePassword, keyAlias, keyPassword));
     }
 
@@ -183,7 +183,7 @@ abstract class AsicAbstractContainerWriter implements AsicContainerWriter {
      * @throws IOException
      */
     @Override
-    public AsicAbstractContainerWriter sign(SignatureHelper signatureHelper) throws IOException {
+    public AsicAbstractWriter sign(SignatureHelper signatureHelper) throws IOException {
         // Check status
         if (finished)
             throw new IllegalStateException("Adding content to container after signing container is not supported.");

@@ -102,3 +102,18 @@ openssl cms -verify -in META-INF/signature.p7s -inform der -content META-INF/asi
 ```
 
 The `-noverify` option will allow self signed certificates, and should normally be omitted :-).
+
+
+## Programmers notes
+
+You might encounter memory problems when using Java 1.7. This is due to the memory consumption of JAXB.
+
+Try this before you run maven, you might need to increase this even further (your mileage may vary):
+```
+export MAVEN_OPTS="-Xmx1024m -XX:MaxPermSize=512m"
+```
+or on Windows:
+```
+set MAVEN_OPTS=-Xmx1024m -XX:MaxPermSize=512m
+```
+ 

@@ -7,9 +7,9 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class AsicContainerReader extends AsicAbstractContainerReader {
+public class AsicReader extends AsicAbstractContainerReader {
 
-    AsicContainerReader(MessageDigestAlgorithm messageDigestAlgorithm, InputStream inputStream) throws IOException {
+    AsicReader(MessageDigestAlgorithm messageDigestAlgorithm, InputStream inputStream) throws IOException {
         super(messageDigestAlgorithm, inputStream);
     }
 

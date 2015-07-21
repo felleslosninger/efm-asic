@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Path;
 
-class AsicXadesContainerWriter extends AsicAbstractContainerWriter {
+class AsicXadesWriter extends AsicAbstractWriter {
 
-    public AsicXadesContainerWriter(SignatureMethod signatureMethod, OutputStream outputStream, Path containerPath) {
+    public AsicXadesWriter(SignatureMethod signatureMethod, OutputStream outputStream, Path containerPath) {
         super(outputStream, containerPath, new AsicXadesManifest(signatureMethod.getMessageDigestAlgorithm()));
     }
 

@@ -22,9 +22,9 @@ import static org.testng.Assert.*;
  *         Date: 02.07.15
  *         Time: 12.08
  */
-public class AsicCadesContainerWriterTest {
+public class AsicCadesWriterTest {
 
-    public static final Logger log = LoggerFactory.getLogger(AsicCadesContainerWriterTest.class);
+    public static final Logger log = LoggerFactory.getLogger(AsicCadesWriterTest.class);
 
     public static final int BYTES_TO_CHECK = 40;
     public static final String BII_ENVELOPE_XML = "bii-envelope.xml";
@@ -33,22 +33,22 @@ public class AsicCadesContainerWriterTest {
     private URL messageUrl;
     private File keystoreFile;
 
-    private AsicContainerWriterFactory asicContainerWriterFactory;
-    private AsicContainerVerifierFactory asicContainerVerifierFactory;
+    private AsicWriterFactory asicWriterFactory;
+    private AsicVerifierFactory asicVerifierFactory;
 
     @BeforeMethod
     public void setUp() {
-        envelopeUrl = AsicCadesContainerWriterTest.class.getClassLoader().getResource(BII_ENVELOPE_XML);
+        envelopeUrl = AsicCadesWriterTest.class.getClassLoader().getResource(BII_ENVELOPE_XML);
         assertNotNull(envelopeUrl);
 
-        messageUrl = AsicCadesContainerWriterTest.class.getClassLoader().getResource(BII_MESSAGE_XML);
+        messageUrl = AsicCadesWriterTest.class.getClassLoader().getResource(BII_MESSAGE_XML);
         assertNotNull(messageUrl);
 
         keystoreFile = TestUtil.keyStoreFile();
         assertTrue(keystoreFile.canRead(), "Expected to find your private key and certificate in " + keystoreFile);
 
-        asicContainerWriterFactory = AsicContainerWriterFactory.newFactory();
-        asicContainerVerifierFactory = AsicContainerVerifierFactory.newFactory();
+        asicWriterFactory = AsicWriterFactory.newFactory();
+        asicVerifierFactory = AsicVerifierFactory.newFactory();
     }
 
     @Test
@@ -56,7 +56,7 @@ public class AsicCadesContainerWriterTest {
 
         File file = new File(System.getProperty("java.io.tmpdir"), "asic-empty-sample-cades.zip");
 
-        asicContainerWriterFactory.newContainer(file).sign(keystoreFile, TestUtil.keyStorePassword(), TestUtil.privateKeyPassword());
+        asicWriterFactory.newContainer(file).sign(keystoreFile, TestUtil.keyStorePassword(), TestUtil.privateKeyPassword());
 
         assertTrue(file.exists() && file.isFile() && file.canRead(), file + " can not be read");
 
@@ -77,17 +77,17 @@ public class AsicCadesContainerWriterTest {
     @Test
     public void createSampleContainer() throws Exception {
 
-        AsicContainerWriter asicContainerWriter = asicContainerWriterFactory.newContainer(new File(System.getProperty("java.io.tmpdir")), "asic-sample-cades.zip")
+        AsicWriter asicWriter = asicWriterFactory.newContainer(new File(System.getProperty("java.io.tmpdir")), "asic-sample-cades.zip")
                 .add(new File(envelopeUrl.toURI()))
                 .add(new File(messageUrl.toURI()), BII_MESSAGE_XML, "application/xml")
                 .sign(keystoreFile, TestUtil.keyStorePassword(), TestUtil.keyPairAlias(), TestUtil.privateKeyPassword());
 
-        File file = asicContainerWriter.getContainerFile();
+        File file = asicWriter.getContainerFile();
 
         // Verifies that both files have been added.
         {
             int matchCount = 0;
-            AsicCadesManifest asicManifest = (AsicCadesManifest) ((AsicCadesContainerWriter) asicContainerWriter).getAsicManifest();
+            AsicCadesManifest asicManifest = (AsicCadesManifest) ((AsicCadesWriter) asicWriter).getAsicManifest();
             for (DataObjectReferenceType dataObject : asicManifest.getASiCManifestType().getDataObjectReference()) {
                 if (dataObject.getURI().equals(BII_ENVELOPE_XML))
                     matchCount++;
@@ -122,19 +122,19 @@ public class AsicCadesContainerWriterTest {
         }
 
         try {
-            asicContainerWriter.add(new File(envelopeUrl.toURI()));
+            asicWriter.add(new File(envelopeUrl.toURI()));
             fail("Exception expected");
         } catch (Exception e) {
             assertTrue(e instanceof IllegalStateException);
         }
 
         try {
-            asicContainerWriter.sign(new SignatureHelper(keystoreFile, TestUtil.keyStorePassword(), TestUtil.privateKeyPassword()));
+            asicWriter.sign(new SignatureHelper(keystoreFile, TestUtil.keyStorePassword(), TestUtil.privateKeyPassword()));
             fail("Exception expected");
         } catch (Exception e) {
             assertTrue(e instanceof IllegalStateException);
         }
 
-        asicContainerVerifierFactory.verify(file);
+        asicVerifierFactory.verify(file);
     }
 }

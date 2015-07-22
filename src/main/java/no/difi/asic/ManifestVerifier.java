@@ -47,4 +47,14 @@ class ManifestVerifier {
             asicFile.setVerified(true);
         }
     }
+
+    public void verifyAllVerified() {
+        for (AsicFile asicFile : asicManifest.getFile())
+            if (!asicFile.isVerified())
+                throw new IllegalStateException(String.format("File not verified: %s", asicFile.getName()));
+    }
+
+    public AsicManifest getAsicManifest() {
+        return asicManifest;
+    }
 }

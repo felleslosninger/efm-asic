@@ -1,17 +1,11 @@
 package no.difi.asic;
 
-import com.sun.xml.bind.api.JAXBRIContext;
+import no.difi.xsd.asic.model._1.AsicManifest;
 import org.apache.commons.io.IOUtils;
 import org.bouncycastle.util.encoders.Base64;
-import org.etsi.uri._2918.v1_2.ASiCManifestType;
-import org.etsi.uri._2918.v1_2.DataObjectReferenceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import java.io.*;
 import java.security.DigestOutputStream;
 import java.security.MessageDigest;
@@ -21,16 +15,6 @@ import java.util.zip.ZipEntry;
 class AbstractAsicReader {
 
     private static final Logger log = LoggerFactory.getLogger(AbstractAsicReader.class);
-
-    private static JAXBContext jaxbContext; // Thread safe
-
-    static {
-        try {
-            jaxbContext = JAXBRIContext.newInstance(ASiCManifestType.class);
-        } catch (JAXBException e) {
-            throw new IllegalStateException(String.format("Unable to create JAXBContext: %s ", e.getMessage()), e);
-        }
-    }
 
     protected MessageDigestAlgorithm messageDigestAlgorithm;
     protected MessageDigest messageDigest;
@@ -86,6 +70,8 @@ class AbstractAsicReader {
     }
 
     protected void close() throws IOException {
+        manifestVerifier.verifyAllVerified();
+
         if (zipInputStream != null) {
             zipInputStream.close();
             zipInputStream = null;
@@ -104,17 +90,7 @@ class AbstractAsicReader {
             ByteArrayOutputStream manifestStream = new ByteArrayOutputStream();
             IOUtils.copy(zipInputStream, manifestStream);
 
-            try {
-                // Read XML
-                Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-                ASiCManifestType manifest = ((JAXBElement<ASiCManifestType>) unmarshaller.unmarshal(new ByteArrayInputStream(manifestStream.toByteArray()))).getValue();
-
-                // Run through recorded objects
-                for (DataObjectReferenceType referenceType : manifest.getDataObjectReference())
-                    manifestVerifier.update(referenceType.getURI(), referenceType.getMimeType(), referenceType.getDigestValue(), referenceType.getDigestMethod().getAlgorithm());
-            } catch (JAXBException e) {
-                log.error(String.format("Unable to read content in %s.", zipEntry.getName()));
-            }
+            CadesAsicManifest.extractAndVerify(new ByteArrayInputStream(manifestStream.toByteArray()), manifestVerifier);
             return true;
         }
 
@@ -122,6 +98,10 @@ class AbstractAsicReader {
             return true;
 
         return false;
+    }
+
+    public AsicManifest getAsicManifest() {
+        return manifestVerifier.getAsicManifest();
     }
 
 }

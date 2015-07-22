@@ -10,11 +10,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3._2000._09.xmldsig_.DigestMethodType;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
+import javax.xml.bind.*;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 
 class CadesAsicManifest extends AbstractAsicManifest {
 
@@ -76,6 +74,21 @@ class CadesAsicManifest extends AbstractAsicManifest {
             return baos.toByteArray();
         } catch (JAXBException e) {
             throw new IllegalStateException("Unable to marshall the ASiCManifest into string output", e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static void extractAndVerify(InputStream inputStream, ManifestVerifier manifestVerifier) {
+        try {
+            // Read XML
+            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+            ASiCManifestType manifest = ((JAXBElement<ASiCManifestType>) unmarshaller.unmarshal(inputStream)).getValue();
+
+            // Run through recorded objects
+            for (DataObjectReferenceType reference : manifest.getDataObjectReference())
+                manifestVerifier.update(reference.getURI(), reference.getMimeType(), reference.getDigestValue(), reference.getDigestMethod().getAlgorithm());
+        } catch (JAXBException e) {
+            log.error("Unable to read content as XML");
         }
     }
 

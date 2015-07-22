@@ -39,6 +39,9 @@ public class ManifestVerifierTest {
         ManifestVerifier manifestVerifier = new ManifestVerifier(MessageDigestAlgorithm.SHA256);
         manifestVerifier.update("file", new byte[]{'c', 'a', 'f', 'e'});
         manifestVerifier.update("file", "text/plain", new byte[]{'c', 'a', 'f', 'e'}, null);
+
+        // All files is verified
+        manifestVerifier.verifyAllVerified();
     }
 
     @Test
@@ -48,6 +51,13 @@ public class ManifestVerifierTest {
 
         try {
             manifestVerifier.update("file", null, new byte[]{'c', 'a', 'f', 'f'}, null);
+            fail("Exception expected.");
+        } catch (IllegalStateException e) {
+            log.info(e.getMessage());
+        }
+
+        try {
+            manifestVerifier.verifyAllVerified();
             fail("Exception expected.");
         } catch (IllegalStateException e) {
             log.info(e.getMessage());

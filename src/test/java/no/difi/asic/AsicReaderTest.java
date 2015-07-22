@@ -54,13 +54,22 @@ public class AsicReaderTest {
             assertEquals(fileContent2, fileStream.toString());
         }
 
-        // To be removed at a later state.
-        assertEquals("META-INF/asicmanifest.xml", asicReader.getNextFile());
-        asicReader.getNextFile(); // Signature file
-
         assertNull(asicReader.getNextFile());
 
+        try {
+            asicReader.writeFile(new ByteArrayOutputStream());
+            fail("Exception expected");
+        } catch (IllegalStateException e) {
+            log.info(e.getMessage());
+        }
+
         asicReader.close();
+
+        try {
+            asicReader.close();
+        } catch (IllegalStateException e) {
+            fail("No exception expected");
+        }
 
     }
 
@@ -108,13 +117,22 @@ public class AsicReaderTest {
             Files.delete(contentFile.toPath());
         }
 
-        // To be removed at a later state.
-        assertEquals("META-INF/asicmanifest.xml", asicReader.getNextFile());
-        asicReader.getNextFile(); // Signature file
-
         assertNull(asicReader.getNextFile());
 
+        try {
+            asicReader.writeFile(new ByteArrayOutputStream());
+            fail("Exception expected");
+        } catch (IllegalStateException e) {
+            log.info(e.getMessage());
+        }
+
         asicReader.close();
+
+        try {
+            asicReader.close();
+        } catch (IllegalStateException e) {
+            fail("No exception expected");
+        }
 
         Files.delete(file.toPath());
     }
@@ -131,5 +149,12 @@ public class AsicReaderTest {
         }
 
         asicReader.close();
+
+        try {
+            asicReader.close();
+        } catch (IllegalStateException e) {
+            fail("No exception expected");
+        }
+
     }
 }

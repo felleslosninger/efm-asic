@@ -69,10 +69,15 @@ class AbstractAsicReader {
     }
 
     protected boolean specialFile() throws IOException {
-        // } else if (zipEntry.getName().toLowerCase().contains("asicmanifest")) {
-            // TODO Utilize manifest for CAdES
-        // } else if (zipEntry.getName().toLowerCase().contains("signature.p7s")) {
-            // TODO Utilize signature for CAdES
+        if (!zipEntry.getName().startsWith("META-INF/"))
+            return false;
+
+        String filename = zipEntry.getName().substring(9).toLowerCase();
+
+        if (filename.startsWith("asicmanifest"))
+            return true;
+        if (filename.startsWith("signature"))
+            return true;
 
         return false;
     }

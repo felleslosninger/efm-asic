@@ -8,6 +8,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertNull;
 
 public class AsicUtilsTest {
@@ -30,6 +31,7 @@ public class AsicUtilsTest {
         // Create second container
         ByteArrayOutputStream source2 = new ByteArrayOutputStream();
         asicWriterFactory.newContainer(source2)
+                .add(new ByteArrayInputStream("manifest".getBytes()), "META-INF/manifest.xml", "application/xml")
                 .add(new ByteArrayInputStream(fileContent2.getBytes()), "content2.txt", "text/plain")
                 .sign(signatureHelper);
 
@@ -42,32 +44,37 @@ public class AsicUtilsTest {
 
         ByteArrayOutputStream fileStream;
         {
-            assertEquals("content1.txt", asicReader.getNextFile());
+            assertEquals(asicReader.getNextFile(), "content1.txt");
 
             fileStream = new ByteArrayOutputStream();
             asicReader.writeFile(fileStream);
-            assertEquals(fileContent1, fileStream.toString());
+            assertEquals(fileStream.toString(), fileContent1);
         }
-
-        // To be removed at a later state.
-        assertEquals("META-INF/asicmanifest1.xml", asicReader.getNextFile());
-        asicReader.getNextFile(); // Signature file
 
         {
-            assertEquals("content2.txt", asicReader.getNextFile());
+            assertEquals(asicReader.getNextFile(), "META-INF/manifest.xml");
 
             fileStream = new ByteArrayOutputStream();
             asicReader.writeFile(fileStream);
-            assertEquals(fileContent2, fileStream.toString());
+            assertEquals(fileStream.toString(), "manifest");
         }
 
-        // To be removed at a later state.
-        assertEquals("META-INF/asicmanifest2.xml", asicReader.getNextFile());
-        asicReader.getNextFile(); // Signature file
+        {
+            assertEquals(asicReader.getNextFile(), "content2.txt");
+
+            fileStream = new ByteArrayOutputStream();
+            asicReader.writeFile(fileStream);
+            assertEquals(fileStream.toString(), fileContent2);
+        }
 
         assertNull(asicReader.getNextFile());
 
         asicReader.close();
     }
 
+    // Making Cobertura happy!
+    @Test
+    public void constructor() {
+        assertNotNull(new AsicUtils());
+    }
 }

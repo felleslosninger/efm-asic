@@ -17,7 +17,7 @@ public class AsicReaderFactory {
         return newFactory(signatureMethod.getMessageDigestAlgorithm());
     }
 
-    protected static AsicReaderFactory newFactory(MessageDigestAlgorithm messageDigestAlgorithm) {
+    static AsicReaderFactory newFactory(MessageDigestAlgorithm messageDigestAlgorithm) {
         return new AsicReaderFactory(messageDigestAlgorithm);
     }
 

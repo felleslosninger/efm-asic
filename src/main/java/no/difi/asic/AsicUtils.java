@@ -9,6 +9,10 @@ import java.util.zip.ZipEntry;
 
 public class AsicUtils {
 
+    AsicUtils() {
+        // No action
+    }
+
     public static void combine(OutputStream outputStream, InputStream... inputStreams) throws IOException {
         AsicOutputStream target = new AsicOutputStream(outputStream);
         int counter = 0;

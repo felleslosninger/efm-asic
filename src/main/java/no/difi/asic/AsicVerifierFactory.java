@@ -17,7 +17,7 @@ public class AsicVerifierFactory {
         return newFactory(signatureMethod.getMessageDigestAlgorithm());
     }
 
-    protected static AsicVerifierFactory newFactory(MessageDigestAlgorithm messageDigestAlgorithm) {
+    static AsicVerifierFactory newFactory(MessageDigestAlgorithm messageDigestAlgorithm) {
         return new AsicVerifierFactory(messageDigestAlgorithm);
     }
 

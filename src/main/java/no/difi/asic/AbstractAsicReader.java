@@ -16,20 +16,18 @@ class AbstractAsicReader {
 
     private static final Logger log = LoggerFactory.getLogger(AbstractAsicReader.class);
 
-    protected MessageDigestAlgorithm messageDigestAlgorithm;
-    protected MessageDigest messageDigest;
+    private MessageDigest messageDigest;
 
-    protected AsicInputStream zipInputStream;
-    protected ZipEntry zipEntry;
+    private AsicInputStream zipInputStream;
+    private ZipEntry zipEntry;
 
-    protected ManifestVerifier manifestVerifier;
+    private ManifestVerifier manifestVerifier;
 
     AbstractAsicReader(MessageDigestAlgorithm messageDigestAlgorithm, InputStream inputStream) throws IOException {
-        this.messageDigestAlgorithm = messageDigestAlgorithm;
-        this.manifestVerifier = new ManifestVerifier(this.messageDigestAlgorithm);
+        this.manifestVerifier = new ManifestVerifier(messageDigestAlgorithm);
 
         try {
-            messageDigest = MessageDigest.getInstance(this.messageDigestAlgorithm.getAlgorithm());
+            messageDigest = MessageDigest.getInstance(messageDigestAlgorithm.getAlgorithm());
             messageDigest.reset();
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalStateException(String.format("Algorithm %s not supported", messageDigestAlgorithm.getAlgorithm()));
@@ -39,7 +37,7 @@ class AbstractAsicReader {
         // Comment in ZIP is stored in Central Directory in the end of the file.
     }
 
-    protected String getNextFile() throws IOException {
+    String getNextFile() throws IOException {
         while ((zipEntry = zipInputStream.getNextEntry()) != null) {
             log.info(String.format("Found file: %s", zipEntry.getName()));
 
@@ -51,7 +49,7 @@ class AbstractAsicReader {
         return null;
     }
 
-    protected void writeFile(OutputStream outputStream) throws IOException {
+    void writeFile(OutputStream outputStream) throws IOException {
         if (zipEntry == null)
             throw new IllegalStateException("No file to read.");
 
@@ -69,7 +67,7 @@ class AbstractAsicReader {
         manifestVerifier.update(zipEntry.getName(), digest);
     }
 
-    protected void close() throws IOException {
+    void close() throws IOException {
         manifestVerifier.verifyAllVerified();
 
         if (zipInputStream != null) {
@@ -78,7 +76,7 @@ class AbstractAsicReader {
         }
     }
 
-    protected boolean specialFile() throws IOException {
+    boolean specialFile() throws IOException {
         if (!zipEntry.getName().startsWith("META-INF/"))
             return false;
 

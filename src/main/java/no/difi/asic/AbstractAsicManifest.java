@@ -3,12 +3,12 @@ package no.difi.asic;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-abstract class AsicAbstractManifest {
+abstract class AbstractAsicManifest {
 
     protected MessageDigestAlgorithm messageDigestAlgorithm;
     protected MessageDigest messageDigest;
 
-    public AsicAbstractManifest(MessageDigestAlgorithm messageDigestAlgorithm) {
+    public AbstractAsicManifest(MessageDigestAlgorithm messageDigestAlgorithm) {
         this.messageDigestAlgorithm = messageDigestAlgorithm;
 
         // Create message digest

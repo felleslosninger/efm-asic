@@ -17,15 +17,15 @@ import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-abstract class AsicAbstractWriter implements AsicWriter {
+abstract class AbstractAsicWriter implements AsicWriter {
 
-    public static final Logger log = LoggerFactory.getLogger(AsicAbstractWriter.class);
+    public static final Logger log = LoggerFactory.getLogger(AbstractAsicWriter.class);
 
     /** The MIME type, which should be the very first entry in the container */
     public static final String APPLICATION_VND_ETSI_ASIC_E_ZIP = "application/vnd.etsi.asic-e+zip";
 
     protected ZipOutputStream zipOutputStream;
-    protected AsicAbstractManifest asicManifest;
+    protected AbstractAsicManifest asicManifest;
 
     protected boolean finished = false;
     protected OutputStream containerOutputStream = null;
@@ -35,7 +35,7 @@ abstract class AsicAbstractWriter implements AsicWriter {
      * Prepares creation of a new container.
      * @param outputStream Stream used to write container.
      */
-    public AsicAbstractWriter(OutputStream outputStream, Path containerPath, AsicAbstractManifest asicManifest) {
+    public AbstractAsicWriter(OutputStream outputStream, Path containerPath, AbstractAsicManifest asicManifest) {
         // Keep original output stream
         this.containerOutputStream = outputStream;
         this.containerPath = containerPath;
@@ -93,7 +93,7 @@ abstract class AsicAbstractWriter implements AsicWriter {
 
         // Use URLConnection to find content type
         if (mimeType == null) {
-            AsicCadesWriter.log.info("Unable to determine MIME type using Files.probeContentType(), trying URLConnection.getFileNameMap()");
+            CadesAsicWriter.log.info("Unable to determine MIME type using Files.probeContentType(), trying URLConnection.getFileNameMap()");
             mimeType = URLConnection.getFileNameMap().getContentTypeFor(filename);
         }
 
@@ -172,7 +172,7 @@ abstract class AsicAbstractWriter implements AsicWriter {
      * @return Return self to allow using builder pattern
      */
     @Override
-    public AsicAbstractWriter sign(File keyStoreFile, String keyStorePassword, String keyAlias, String keyPassword) throws IOException {
+    public AbstractAsicWriter sign(File keyStoreFile, String keyStorePassword, String keyAlias, String keyPassword) throws IOException {
         return sign(new SignatureHelper(keyStoreFile, keyStorePassword, keyAlias, keyPassword));
     }
 
@@ -183,7 +183,7 @@ abstract class AsicAbstractWriter implements AsicWriter {
      * @throws IOException
      */
     @Override
-    public AsicAbstractWriter sign(SignatureHelper signatureHelper) throws IOException {
+    public AbstractAsicWriter sign(SignatureHelper signatureHelper) throws IOException {
         // Check status
         if (finished)
             throw new IllegalStateException("Adding content to container after signing container is not supported.");
@@ -259,7 +259,7 @@ abstract class AsicAbstractWriter implements AsicWriter {
         return containerPath;
     }
 
-    public AsicAbstractManifest getAsicManifest() {
+    public AbstractAsicManifest getAsicManifest() {
         return asicManifest;
     }
 }

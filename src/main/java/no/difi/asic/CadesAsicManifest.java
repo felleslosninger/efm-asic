@@ -16,9 +16,9 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import java.io.ByteArrayOutputStream;
 
-class AsicCadesManifest extends AsicAbstractManifest {
+class CadesAsicManifest extends AbstractAsicManifest {
 
-    public static final Logger log = LoggerFactory.getLogger(AsicAbstractManifest.class);
+    public static final Logger log = LoggerFactory.getLogger(AbstractAsicManifest.class);
 
     private static ObjectFactory objectFactory = new ObjectFactory();
     private static JAXBContext jaxbContext; // Thread safe
@@ -34,7 +34,7 @@ class AsicCadesManifest extends AsicAbstractManifest {
     // Automagically generated from XML Schema Definition files
     private ASiCManifestType ASiCManifestType = new ASiCManifestType();
 
-    public AsicCadesManifest(MessageDigestAlgorithm messageDigestAlgorithm) {
+    public CadesAsicManifest(MessageDigestAlgorithm messageDigestAlgorithm) {
         super(messageDigestAlgorithm);
     }
 

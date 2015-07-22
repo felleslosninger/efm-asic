@@ -6,9 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Enumeration;
@@ -22,9 +20,9 @@ import static org.testng.Assert.*;
  *         Date: 02.07.15
  *         Time: 12.08
  */
-public class AsicCadesWriterTest {
+public class AsicWriterTest {
 
-    public static final Logger log = LoggerFactory.getLogger(AsicCadesWriterTest.class);
+    public static final Logger log = LoggerFactory.getLogger(AsicWriterTest.class);
 
     public static final int BYTES_TO_CHECK = 40;
     public static final String BII_ENVELOPE_XML = "bii-envelope.xml";
@@ -38,10 +36,10 @@ public class AsicCadesWriterTest {
 
     @BeforeMethod
     public void setUp() {
-        envelopeUrl = AsicCadesWriterTest.class.getClassLoader().getResource(BII_ENVELOPE_XML);
+        envelopeUrl = AsicWriterTest.class.getClassLoader().getResource(BII_ENVELOPE_XML);
         assertNotNull(envelopeUrl);
 
-        messageUrl = AsicCadesWriterTest.class.getClassLoader().getResource(BII_MESSAGE_XML);
+        messageUrl = AsicWriterTest.class.getClassLoader().getResource(BII_MESSAGE_XML);
         assertNotNull(messageUrl);
 
         keystoreFile = TestUtil.keyStoreFile();
@@ -51,28 +49,6 @@ public class AsicCadesWriterTest {
         asicVerifierFactory = AsicVerifierFactory.newFactory();
     }
 
-    @Test
-    public void createSampleEmptyContainer() throws Exception {
-
-        File file = new File(System.getProperty("java.io.tmpdir"), "asic-empty-sample-cades.zip");
-
-        asicWriterFactory.newContainer(file).sign(keystoreFile, TestUtil.keyStorePassword(), TestUtil.privateKeyPassword());
-
-        assertTrue(file.exists() && file.isFile() && file.canRead(), file + " can not be read");
-
-        FileInputStream fileInputStream = new FileInputStream(file);
-        BufferedInputStream is = new BufferedInputStream(fileInputStream);
-
-        byte[] buffer = new byte[BYTES_TO_CHECK];
-        int read = is.read(buffer, 0, BYTES_TO_CHECK);
-        assertEquals(read, BYTES_TO_CHECK);
-
-        assertEquals(buffer[28], (byte) 0, "Byte 28 should be 0");
-
-        assertEquals(buffer[8], 0, "'mimetype' file should not be compressed");
-
-        assertTrue(buffer[0] == 0x50 && buffer[1] == 0x4B && buffer[2] == 0x03 && buffer[3] == 0x04, "First 4 octets should read 0x50 0x4B 0x03 0x04");
-    }
 
     @Test
     public void createSampleContainer() throws Exception {

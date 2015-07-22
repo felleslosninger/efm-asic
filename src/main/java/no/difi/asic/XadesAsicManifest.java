@@ -18,7 +18,7 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.util.GregorianCalendar;
 
-class AsicXadesManifest extends AsicAbstractManifest {
+class XadesAsicManifest extends AbstractAsicManifest {
 
     private static ObjectFactory objectFactory = new ObjectFactory();
     private static JAXBContext jaxbContext; // Thread safe
@@ -36,7 +36,7 @@ class AsicXadesManifest extends AsicAbstractManifest {
     // \XAdESSignature\Signature\Object\QualifyingProperties\SignedProperties\SignedDataObjectProperties
     private SignedDataObjectPropertiesType signedDataObjectProperties = new SignedDataObjectPropertiesType();
 
-    public AsicXadesManifest(MessageDigestAlgorithm messageDigestAlgorithm) {
+    public XadesAsicManifest(MessageDigestAlgorithm messageDigestAlgorithm) {
         super(messageDigestAlgorithm);
 
         // \XAdESSignature\Signature\SignedInfo

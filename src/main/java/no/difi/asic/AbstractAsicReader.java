@@ -15,9 +15,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-class AsicAbstractContainerReader {
+class AbstractAsicReader {
 
-    private static final Logger log = LoggerFactory.getLogger(AsicAbstractContainerReader.class);
+    private static final Logger log = LoggerFactory.getLogger(AbstractAsicReader.class);
 
     protected MessageDigestAlgorithm messageDigestAlgorithm;
     protected MessageDigest messageDigest;
@@ -25,7 +25,7 @@ class AsicAbstractContainerReader {
     protected ZipInputStream zipInputStream;
     protected ZipEntry zipEntry;
 
-    AsicAbstractContainerReader(MessageDigestAlgorithm messageDigestAlgorithm, InputStream inputStream) throws IOException {
+    AbstractAsicReader(MessageDigestAlgorithm messageDigestAlgorithm, InputStream inputStream) throws IOException {
         this.messageDigestAlgorithm = messageDigestAlgorithm;
 
         try {
@@ -76,7 +76,7 @@ class AsicAbstractContainerReader {
             IOUtils.copy(zipInputStream, baos);
 
             log.info(String.format("Content of mimetype: %s", baos.toString()));
-            if (!AsicAbstractWriter.APPLICATION_VND_ETSI_ASIC_E_ZIP.equals(baos.toString()))
+            if (!AbstractAsicWriter.APPLICATION_VND_ETSI_ASIC_E_ZIP.equals(baos.toString()))
                 throw new IllegalStateException("Content is not ASiC-E container.");
             return true;
         // } else if (zipEntry.getName().toLowerCase().contains("asicmanifest")) {

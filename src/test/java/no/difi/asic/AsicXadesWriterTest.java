@@ -68,7 +68,7 @@ public class AsicXadesWriterTest {
         // Verifies that both files have been added.
         {
             int matchCount = 0;
-            AsicXadesManifest asicManifest = (AsicXadesManifest) ((AsicXadesWriter) asicWriter).getAsicManifest();
+            XadesAsicManifest asicManifest = (XadesAsicManifest) ((XadesAsicWriter) asicWriter).getAsicManifest();
             /*
             for (DataObjectReferenceType dataObject : asicManifest.getASiCManifestType().getDataObjectReference()) {
                 if (dataObject.getURI().equals(BII_ENVELOPE_XML))

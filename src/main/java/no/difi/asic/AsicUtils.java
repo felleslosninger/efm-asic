@@ -11,13 +11,16 @@ public class AsicUtils {
 
     public static void combine(OutputStream outputStream, InputStream... inputStreams) throws IOException {
         AsicOutputStream target = new AsicOutputStream(outputStream);
+        int counter = 0;
 
         for (InputStream inputStream : inputStreams) {
             AsicInputStream source = new AsicInputStream(inputStream);
 
             ZipEntry zipEntry;
             while ((zipEntry = source.getNextEntry()) != null) {
-                // TODO Interfere to make sure manifest filenames doesn't collide.
+                // TODO Better code to make sure manifest filenames doesn't collide.
+                if (zipEntry.getName().equals("META-INF/asicmanifest.xml"))
+                    zipEntry = new ZipEntry(String.format("META-INF/asicmanifest%s.xml", ++counter));
 
                 target.putNextEntry(zipEntry);
                 IOUtils.copy(source, target);

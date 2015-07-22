@@ -1,6 +1,8 @@
 package no.difi.asic;
 
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
 import java.io.ByteArrayInputStream;
@@ -11,8 +13,11 @@ import java.nio.file.Files;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNull;
+import static org.testng.Assert.fail;
 
 public class AsicReaderTest {
+
+    private static Logger log = LoggerFactory.getLogger(AsicReaderTest.class);
 
     private AsicReaderFactory asicReaderFactory = AsicReaderFactory.newFactory();
     private AsicWriterFactory asicWriterFactory = AsicWriterFactory.newFactory();
@@ -114,4 +119,17 @@ public class AsicReaderTest {
         Files.delete(file.toPath());
     }
 
+    @Test
+    public void exceptionOnInvalidMime() throws IOException {
+        AsicReader asicReader = asicReaderFactory.open(getClass().getResourceAsStream("/asic-invalid-mime.asice"));
+
+        try {
+            asicReader.getNextFile();
+            fail("Didn't throw exception on wrong mimetype.");
+        } catch (IllegalStateException e) {
+            log.info(e.getMessage());
+        }
+
+        asicReader.close();
+    }
 }

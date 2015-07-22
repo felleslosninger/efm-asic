@@ -1,8 +1,6 @@
 package no.difi.asic;
 
 import com.sun.xml.bind.api.JAXBRIContext;
-import no.difi.xsd.asic.model._1.AsicFile;
-import no.difi.xsd.asic.model._1.AsicManifest;
 import org.apache.commons.io.IOUtils;
 import org.bouncycastle.util.encoders.Base64;
 import org.etsi.uri._2918.v1_2.ASiCManifestType;
@@ -18,9 +16,6 @@ import java.io.*;
 import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.zip.ZipEntry;
 
 class AbstractAsicReader {
@@ -43,11 +38,11 @@ class AbstractAsicReader {
     protected AsicInputStream zipInputStream;
     protected ZipEntry zipEntry;
 
-    private AsicManifest asicManifest = new AsicManifest();
-    private Map<String, AsicFile> asicManifestMap = new HashMap<>();
+    protected ManifestVerifier manifestVerifier;
 
     AbstractAsicReader(MessageDigestAlgorithm messageDigestAlgorithm, InputStream inputStream) throws IOException {
         this.messageDigestAlgorithm = messageDigestAlgorithm;
+        this.manifestVerifier = new ManifestVerifier(this.messageDigestAlgorithm);
 
         try {
             messageDigest = MessageDigest.getInstance(this.messageDigestAlgorithm.getAlgorithm());
@@ -65,18 +60,8 @@ class AbstractAsicReader {
             log.info(String.format("Found file: %s", zipEntry.getName()));
 
             // Files used for validation is not exposed
-            if (!specialFile()) {
-                // Adding file to internal manifest if not there.
-                if (!asicManifestMap.containsKey(zipEntry.getName())) {
-                    AsicFile asicFile = new AsicFile();
-                    asicFile.setName(zipEntry.getName());
-
-                    asicManifest.getFile().add(asicFile);
-                    asicManifestMap.put(zipEntry.getName(), asicFile);
-                }
-
+            if (!specialFile())
                 return zipEntry.getName();
-            }
         }
 
         return null;
@@ -97,21 +82,7 @@ class AbstractAsicReader {
         byte[] digest = messageDigest.digest();
         log.debug(String.format("Digest: %s", new String(Base64.encode(digest))));
 
-        // Fetch new or old asicFile
-        AsicFile asicFile = asicManifestMap.get(zipEntry.getName());
-
-        // Check digest if asicFile has a digest
-        if (asicFile.getDigest() != null) {
-            // Throw exception if calculated digest doesn't match manifest
-            if (Arrays.equals(digest, asicFile.getDigest()))
-                throw new IllegalStateException(String.format("Mismatching digest for file %s", zipEntry.getName()));
-
-            // Passed test, mark file as verified
-            asicFile.setVerified(true);
-        }
-
-        // Attach digest
-        asicFile.setDigest(digest);
+        manifestVerifier.update(zipEntry.getName(), digest);
     }
 
     protected void close() throws IOException {
@@ -139,34 +110,8 @@ class AbstractAsicReader {
                 ASiCManifestType manifest = ((JAXBElement<ASiCManifestType>) unmarshaller.unmarshal(new ByteArrayInputStream(manifestStream.toByteArray()))).getValue();
 
                 // Run through recorded objects
-                for (DataObjectReferenceType referenceType : manifest.getDataObjectReference()) {
-                    // Make sure digest algorithm is correct
-                    if (!messageDigestAlgorithm.getUri().equals(referenceType.getDigestMethod().getAlgorithm()))
-                        throw new IllegalStateException(String.format("Wrong digest method for file %s: %s", referenceType.getURI(), referenceType.getDigestMethod().getAlgorithm()));
-
-                    // Fetch file from internal manifest
-                    AsicFile asicFile = asicManifestMap.get(referenceType.getURI());
-                    if (asicFile == null) {
-                        // Add file to internal manifest
-                        asicFile = new AsicFile();
-                        asicFile.setName(referenceType.getURI());
-                        asicFile.setDigest(referenceType.getDigestValue());
-                        asicFile.setMimetype(referenceType.getMimeType());
-
-                        asicManifest.getFile().add(asicFile);
-                        asicManifestMap.put(asicFile.getName(), asicFile);
-                    } else {
-                        // Add mimetype to file
-                        asicFile.setMimetype(referenceType.getMimeType());
-
-                        // Throw exception if calculated digest doesn't match manifest
-                        if (!Arrays.equals(asicFile.getDigest(), referenceType.getDigestValue()))
-                            throw new IllegalStateException(String.format("Mismatching digest for file %s", referenceType.getURI()));
-
-                        // Passed test, mark file as verified
-                        asicFile.setVerified(true);
-                    }
-                }
+                for (DataObjectReferenceType referenceType : manifest.getDataObjectReference())
+                    manifestVerifier.update(referenceType.getURI(), referenceType.getMimeType(), referenceType.getDigestValue(), referenceType.getDigestMethod().getAlgorithm());
             } catch (JAXBException e) {
                 log.error(String.format("Unable to read content in %s.", zipEntry.getName()));
             }

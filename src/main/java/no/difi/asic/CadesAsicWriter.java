@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Path;
+import java.util.UUID;
 
 /**
  * Builds an ASiC-E Cades container using a variation of "builder pattern".
@@ -30,14 +31,17 @@ class CadesAsicWriter extends AbstractAsicWriter {
 
     @Override
     protected void performSign(SignatureHelper signatureHelper) throws IOException {
+        // Define signature filename containing UUID
+        String signatureFilename = String.format("META-INF/signature-%s.p7s", UUID.randomUUID().toString());
+
         // Adding signature file to asic manifest before actual signing
-        ((CadesAsicManifest) asicManifest).setSignature("META-INF/signature.p7s", "application/x-pkcs7-signature");
+        ((CadesAsicManifest) asicManifest).setSignature(signatureFilename, "application/x-pkcs7-signature");
 
         // Generates and writes manifest (META-INF/asicmanifest.xml) to the zip archive
         byte[] manifestBytes = ((CadesAsicManifest) asicManifest).toBytes();
         writeZipEntry("META-INF/asicmanifest.xml", manifestBytes);
 
         // Generates and writes signature (META-INF/signature.p7s) to the zip archive
-        writeZipEntry("META-INF/signature.p7s", signatureHelper.signData(manifestBytes));
+        writeZipEntry(signatureFilename, signatureHelper.signData(manifestBytes));
     }
 }

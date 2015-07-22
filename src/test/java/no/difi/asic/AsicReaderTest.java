@@ -22,7 +22,7 @@ public class AsicReaderTest {
     private String fileContent2 = "Fusce eu risus ipsum. Sed mattis laoreet justo. Fusce nisi magna, posuere ac placerat tincidunt, dignissim non lacus.";
 
     @Test
-    public void WriteAndReadSimpleContainer() throws IOException {
+    public void writeAndReadSimpleContainer() throws IOException {
         ByteArrayOutputStream containerOutput = new ByteArrayOutputStream();
 
         asicWriterFactory.newContainer(containerOutput)
@@ -51,7 +51,7 @@ public class AsicReaderTest {
 
         // To be removed at a later state.
         assertEquals("META-INF/asicmanifest.xml", asicReader.getNextFile());
-        assertEquals("META-INF/signature.p7s", asicReader.getNextFile());
+        asicReader.getNextFile(); // Signature file
 
         assertNull(asicReader.getNextFile());
 
@@ -60,7 +60,7 @@ public class AsicReaderTest {
     }
 
     @Test
-    public void WriteAndReadSimpleFileContainer() throws IOException {
+    public void writeAndReadSimpleFileContainer() throws IOException {
         File tmpDir = new File(System.getProperty("java.io.tmpdir"));
 
         File file = new File(tmpDir, "asic-reader-sample.zip");
@@ -105,7 +105,7 @@ public class AsicReaderTest {
 
         // To be removed at a later state.
         assertEquals("META-INF/asicmanifest.xml", asicReader.getNextFile());
-        assertEquals("META-INF/signature.p7s", asicReader.getNextFile());
+        asicReader.getNextFile(); // Signature file
 
         assertNull(asicReader.getNextFile());
 

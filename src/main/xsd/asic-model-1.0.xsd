@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="http://difi.no/xsd/asic/model/1.0"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:m="http://difi.no/xsd/asic/model/1.0"
+        elementFormDefault="qualified">
+
+    <element name="asicManifest">
+        <complexType>
+            <sequence>
+                <element name="file" type="m:asicFile" maxOccurs="unbounded" />
+            </sequence>
+        </complexType>
+    </element>
+
+    <complexType name="asicFile">
+        <sequence>
+            <element name="name" type="string" />
+            <element name="mimetype" type="string" />
+            <element name="digest" type="base64Binary" />
+            <element name="manifest" type="string" maxOccurs="unbounded" />
+            <element name="verified" type="boolean" />
+        </sequence>
+    </complexType>
+
+</schema>

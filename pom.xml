@@ -160,6 +160,7 @@
                             <excludes>
                                 <exclude>org/etsi/**/*.class</exclude>
                                 <exclude>org/w3/**/*.class</exclude>
+                                <exclude>no/difi/xsd/**/*.class</exclude>
                             </excludes>
                         </instrumentation>
                     </configuration>

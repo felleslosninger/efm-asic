@@ -45,15 +45,15 @@ public class AsicWriterTest {
         keystoreFile = TestUtil.keyStoreFile();
         assertTrue(keystoreFile.canRead(), "Expected to find your private key and certificate in " + keystoreFile);
 
-        asicWriterFactory = AsicWriterFactory.newFactory();
-        asicVerifierFactory = AsicVerifierFactory.newFactory();
+        asicWriterFactory = AsicWriterFactory.newFactory();     // Provides the default signature method
+        asicVerifierFactory = AsicVerifierFactory.newFactory(); // Assumes default signature method
     }
 
 
     @Test
     public void createSampleContainer() throws Exception {
 
-        AsicWriter asicWriter = asicWriterFactory.newContainer(new File(System.getProperty("java.io.tmpdir")), "asic-sample-cades.zip")
+        AsicWriter asicWriter = asicWriterFactory.newContainer(new File(System.getProperty("java.io.tmpdir")), "asic-sample-default.zip")
                 .add(new File(envelopeUrl.toURI()))
                 .add(new File(messageUrl.toURI()), BII_MESSAGE_XML, "application/xml")
                 .sign(keystoreFile, TestUtil.keyStorePassword(), TestUtil.keyPairAlias(), TestUtil.privateKeyPassword());

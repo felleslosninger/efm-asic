@@ -6,7 +6,9 @@ import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Enumeration;
@@ -112,5 +114,19 @@ public class AsicWriterTest {
         }
 
         asicVerifierFactory.verify(file);
+    }
+
+    @Test
+    public void unknownMimetype() throws Exception {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+        try {
+            asicWriterFactory.newContainer(byteArrayOutputStream)
+                    .add(new File(envelopeUrl.toURI()), "envelope.aaz");
+            fail("Expected exception, is .aaz a known extension?");
+        } catch (IllegalStateException e) {
+            log.info(e.getMessage());
+        }
+
     }
 }

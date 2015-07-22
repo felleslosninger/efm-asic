@@ -25,7 +25,7 @@ class CadesAsicWriter extends AbstractAsicWriter {
      * Prepares creation of a new container.
      * @param outputStream Stream used to write container.
      */
-    public CadesAsicWriter(SignatureMethod signatureMethod, OutputStream outputStream, Path containerPath) {
+    public CadesAsicWriter(SignatureMethod signatureMethod, OutputStream outputStream, Path containerPath) throws IOException {
         super(outputStream, containerPath, new CadesAsicManifest(signatureMethod.getMessageDigestAlgorithm()));
     }
 
@@ -39,9 +39,9 @@ class CadesAsicWriter extends AbstractAsicWriter {
 
         // Generates and writes manifest (META-INF/asicmanifest.xml) to the zip archive
         byte[] manifestBytes = ((CadesAsicManifest) asicManifest).toBytes();
-        writeZipEntry("META-INF/asicmanifest.xml", manifestBytes);
+        asicOutputStream.writeZipEntry("META-INF/asicmanifest.xml", manifestBytes);
 
         // Generates and writes signature (META-INF/signature.p7s) to the zip archive
-        writeZipEntry(signatureFilename, signatureHelper.signData(manifestBytes));
+        asicOutputStream.writeZipEntry(signatureFilename, signatureHelper.signData(manifestBytes));
     }
 }

@@ -37,7 +37,7 @@ public class ZipFileCreatorTest {
         ZipOutputStream zipOutputStream = new ZipOutputStream(fileOutputStream);
 
 /*
-        zipOutputStream.putNextEntry(new ZipEntry("META-INF/"));
+        asicOutputStream.putNextEntry(new ZipEntry("META-INF/"));
 */
         zipOutputStream.putNextEntry(new ZipEntry("META-INF/manifest.xml"));
 

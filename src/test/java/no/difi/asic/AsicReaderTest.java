@@ -63,7 +63,7 @@ public class AsicReaderTest {
     public void writeAndReadSimpleFileContainer() throws IOException {
         File tmpDir = new File(System.getProperty("java.io.tmpdir"));
 
-        File file = new File(tmpDir, "asic-reader-sample.zip");
+        File file = new File(tmpDir, "asic-reader-sample.ip");
 
         asicWriterFactory.newContainer(file)
                 .add(new ByteArrayInputStream(fileContent1.getBytes()), "content1.txt", "text/plain")

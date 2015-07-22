@@ -76,7 +76,7 @@ public class AsicWriterFactory {
         return newContainer(outputStream, null);
     }
 
-    protected AsicWriter newContainer(OutputStream outputStream, Path file) {
+    protected AsicWriter newContainer(OutputStream outputStream, Path file) throws IOException {
         switch (signatureMethod) {
             case CAdES:
                 return new CadesAsicWriter(signatureMethod, outputStream, file);

@@ -13,9 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.DigestOutputStream;
-import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 abstract class AbstractAsicWriter implements AsicWriter {
 
@@ -24,7 +22,7 @@ abstract class AbstractAsicWriter implements AsicWriter {
     /** The MIME type, which should be the very first entry in the container */
     public static final String APPLICATION_VND_ETSI_ASIC_E_ZIP = "application/vnd.etsi.asic-e+zip";
 
-    protected ZipOutputStream zipOutputStream;
+    protected AsicOutputStream asicOutputStream;
     protected AbstractAsicManifest asicManifest;
 
     protected boolean finished = false;
@@ -35,7 +33,7 @@ abstract class AbstractAsicWriter implements AsicWriter {
      * Prepares creation of a new container.
      * @param outputStream Stream used to write container.
      */
-    public AbstractAsicWriter(OutputStream outputStream, Path containerPath, AbstractAsicManifest asicManifest) {
+    public AbstractAsicWriter(OutputStream outputStream, Path containerPath, AbstractAsicManifest asicManifest) throws IOException {
         // Keep original output stream
         this.containerOutputStream = outputStream;
         this.containerPath = containerPath;
@@ -44,11 +42,7 @@ abstract class AbstractAsicWriter implements AsicWriter {
         this.asicManifest = asicManifest;
 
         // Initiate zip container
-        zipOutputStream = new ZipOutputStream(outputStream);
-        zipOutputStream.setComment("mimetype=" + APPLICATION_VND_ETSI_ASIC_E_ZIP);
-
-        // Write mimetype file to container
-        putMimeTypeAsFirstEntry(APPLICATION_VND_ETSI_ASIC_E_ZIP);
+        asicOutputStream = new AsicOutputStream(outputStream);
     }
 
     // Helper method
@@ -138,17 +132,17 @@ abstract class AbstractAsicWriter implements AsicWriter {
 
         // Creates new zip entry
         log.debug(String.format("Writing file %s to container", filename));
-        zipOutputStream.putNextEntry(new ZipEntry(filename));
+        asicOutputStream.putNextEntry(new ZipEntry(filename));
 
         // Prepare for calculation of message digest
-        DigestOutputStream zipOutputStreamWithDigest = new DigestOutputStream(zipOutputStream, asicManifest.getMessageDigest());
+        DigestOutputStream zipOutputStreamWithDigest = new DigestOutputStream(asicOutputStream, asicManifest.getMessageDigest());
 
         // Copy inputStream to zip file
         IOUtils.copy(inputStream, zipOutputStreamWithDigest);
         zipOutputStreamWithDigest.flush();
 
         // Close zip entry
-        zipOutputStream.closeEntry();
+        asicOutputStream.closeEntry();
 
         // Add file to manifest
         asicManifest.add(filename, mimeType);
@@ -195,8 +189,8 @@ abstract class AbstractAsicWriter implements AsicWriter {
 
         // Close container
         try {
-            zipOutputStream.finish();
-            zipOutputStream.close();
+            asicOutputStream.finish();
+            asicOutputStream.close();
         } catch (IOException e) {
             throw new IllegalStateException(String.format("Unable to finish the container: %s", e.getMessage()), e);
         }
@@ -214,37 +208,6 @@ abstract class AbstractAsicWriter implements AsicWriter {
     }
 
     abstract void performSign(SignatureHelper signatureHelper) throws IOException;
-
-    /**
-     * Adds the "mimetype" object to the archive
-     */
-    private void putMimeTypeAsFirstEntry(String mimeType) {
-        ZipEntry mimetypeEntry = new ZipEntry("mimetype");
-        mimetypeEntry.setComment("mimetype=" + mimeType);
-        mimetypeEntry.setMethod(ZipEntry.STORED);
-        mimetypeEntry.setSize(mimeType.getBytes().length);
-
-        CRC32 crc32 = new CRC32();
-        crc32.update(mimeType.getBytes());
-        mimetypeEntry.setCrc(crc32.getValue());
-
-        writeZipEntry(mimetypeEntry, mimeType.getBytes());
-    }
-
-    protected void writeZipEntry(String filename, byte[] bytes) {
-        writeZipEntry(new ZipEntry(filename), bytes);
-    }
-
-    protected void writeZipEntry(ZipEntry zipEntry, byte[] bytes) {
-        try {
-            log.debug(String.format("Writing file %s to container", zipEntry.getName()));
-            zipOutputStream.putNextEntry(zipEntry);
-            zipOutputStream.write(bytes);
-            zipOutputStream.closeEntry();
-        } catch (IOException e) {
-            throw new IllegalStateException(String.format("Unable to create new ZIP entry for %s: %s", zipEntry.getName(), e.getMessage()), e);
-        }
-    }
 
     @Override
     public File getContainerFile() {

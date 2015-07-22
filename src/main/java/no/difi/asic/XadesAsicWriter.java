@@ -6,7 +6,7 @@ import java.nio.file.Path;
 
 class XadesAsicWriter extends AbstractAsicWriter {
 
-    public XadesAsicWriter(SignatureMethod signatureMethod, OutputStream outputStream, Path containerPath) {
+    public XadesAsicWriter(SignatureMethod signatureMethod, OutputStream outputStream, Path containerPath) throws IOException {
         super(outputStream, containerPath, new XadesAsicManifest(signatureMethod.getMessageDigestAlgorithm()));
     }
 
@@ -14,7 +14,7 @@ class XadesAsicWriter extends AbstractAsicWriter {
     void performSign(SignatureHelper signatureHelper) throws IOException {
         // Generate and write manifest (META-INF/signatures.xml)
         byte[] manifestBytes = ((XadesAsicManifest) asicManifest).toBytes(signatureHelper);
-        writeZipEntry("META-INF/signatures.xml", manifestBytes);
+        asicOutputStream.writeZipEntry("META-INF/signatures.xml", manifestBytes);
 
         // System.out.println(new String(manifestBytes));
     }

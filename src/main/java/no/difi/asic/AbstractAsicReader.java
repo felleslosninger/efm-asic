@@ -5,7 +5,6 @@ import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -13,7 +12,6 @@ import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 class AbstractAsicReader {
 
@@ -22,7 +20,7 @@ class AbstractAsicReader {
     protected MessageDigestAlgorithm messageDigestAlgorithm;
     protected MessageDigest messageDigest;
 
-    protected ZipInputStream zipInputStream;
+    protected AsicInputStream zipInputStream;
     protected ZipEntry zipEntry;
 
     AbstractAsicReader(MessageDigestAlgorithm messageDigestAlgorithm, InputStream inputStream) throws IOException {
@@ -35,7 +33,7 @@ class AbstractAsicReader {
             throw new IllegalStateException(String.format("Algorithm %s not supported", messageDigestAlgorithm.getAlgorithm()));
         }
 
-        zipInputStream = new ZipInputStream(inputStream);
+        zipInputStream = new AsicInputStream(inputStream);
         // Comment in ZIP is stored in Central Directory in the end of the file.
     }
 
@@ -71,19 +69,10 @@ class AbstractAsicReader {
     }
 
     protected boolean specialFile() throws IOException {
-        if ("mimetype".equals(zipEntry.getName())) {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            IOUtils.copy(zipInputStream, baos);
-
-            log.info(String.format("Content of mimetype: %s", baos.toString()));
-            if (!AbstractAsicWriter.APPLICATION_VND_ETSI_ASIC_E_ZIP.equals(baos.toString()))
-                throw new IllegalStateException("Content is not ASiC-E container.");
-            return true;
         // } else if (zipEntry.getName().toLowerCase().contains("asicmanifest")) {
             // TODO Utilize manifest for CAdES
         // } else if (zipEntry.getName().toLowerCase().contains("signature.p7s")) {
             // TODO Utilize signature for CAdES
-        }
 
         return false;
     }

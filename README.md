@@ -37,6 +37,8 @@ asic-container.asice:
 Consult the [AsicCadesContainerWriterTest](src/test/java/no/difi/asic/AsicWriterTest.java) for sample usage.
 Here is a rough sketch on how to do it:
 ```java
+// Creates an ASiC archive after which every entry is read back from the archive.
+
 // Name of the file to hold the the ASiC archive
 File archiveOutputFile = new File(System.getProperty("java.io.tmpdir"), "asic-sample-default.zip");
 

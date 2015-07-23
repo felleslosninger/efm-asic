@@ -144,6 +144,46 @@ public class AsicWriterTest {
     }
 
     @Test
+    public void writeAndRead() throws Exception {
+        // Name of the file to hold the the ASiC archive
+        File archiveOutputFile = new File(System.getProperty("java.io.tmpdir"), "asic-sample-default.zip");
+
+        // Creates an AsicWriterFactory with default signature method
+        AsicWriterFactory asicWriterFactory = AsicWriterFactory.newFactory();
+
+        // Creates the actual container with all the data objects (files) and signs it.
+        AsicWriter asicWriter = asicWriterFactory.newContainer(archiveOutputFile)
+                // Adds an ordinary file, using the file name as the entry name
+                .add(biiEnvelopeFile)
+                        // Adds another file, explicitly naming the entry and specifying the MIME type
+                .add(biiMessageFile, BII_MESSAGE_XML, MimeType.forString("application/xml"))
+                        // Signing the contents of the archive, closes it for further changes.
+                .sign(keystoreFile, TestUtil.keyStorePassword(), TestUtil.privateKeyPassword());
+
+        // Opens the generated archive and reads each entry
+        AsicReader asicReader = AsicReaderFactory.newFactory().open(archiveOutputFile);
+
+        String entryName;
+
+        // Iterates over each entry and writes the contents into a file having same name as the entry
+        while ((entryName = asicReader.getNextFile()) != null) {
+            log.debug("Read entry " + entryName);
+
+            // Creates file with same name as entry
+            File file = new File(entryName);
+            // Ensures we don't overwrite anything
+            if (file.exists()) {
+                throw new IllegalStateException("File already exists");
+            }
+            asicReader.writeFile(file);
+
+            // Removes file immediately, since this is just a test
+            file.delete();
+        }
+        asicReader.close();
+    }
+
+    @Test
     public void unknownMimetype() throws Exception {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 

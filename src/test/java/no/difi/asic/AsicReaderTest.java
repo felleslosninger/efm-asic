@@ -28,6 +28,8 @@ public class AsicReaderTest {
 
     @Test
     public void writeAndReadSimpleContainer() throws IOException {
+
+        // Step 1 - creates the ASiC archive
         ByteArrayOutputStream containerOutput = new ByteArrayOutputStream();
 
         asicWriterFactory.newContainer(containerOutput)
@@ -35,6 +37,7 @@ public class AsicReaderTest {
                 .add(new ByteArrayInputStream(fileContent2.getBytes()), "content2.txt", MimeType.forString("text/plain"))
                 .sign(signatureHelper);
 
+        // Step 2 - reads the contents of the ASiC archive
         AsicReader asicReader = asicReaderFactory.open(new ByteArrayInputStream(containerOutput.toByteArray()));
 
         ByteArrayOutputStream fileStream;
@@ -74,6 +77,7 @@ public class AsicReaderTest {
         assertEquals(asicReader.getAsicManifest().getFile().size(), 2);
 
     }
+
 
     @Test
     public void writeAndReadSimpleFileContainer() throws IOException {

@@ -95,11 +95,20 @@ class AbstractAsicReader {
         }
 
         if (filename.startsWith("signature")) {
-            if (manifestStream != null) {
-                ByteArrayOutputStream signatureStream = new ByteArrayOutputStream();
-                IOUtils.copy(zipInputStream, signatureStream);
+            if (filename.endsWith(".p7s")) {
+                if (manifestStream != null) {
+                    ByteArrayOutputStream signatureStream = new ByteArrayOutputStream();
+                    IOUtils.copy(zipInputStream, signatureStream);
 
-                SignatureHelper.validate(manifestStream.toByteArray(), signatureStream.toByteArray());
+                    SignatureHelper.validate(manifestStream.toByteArray(), signatureStream.toByteArray());
+                }
+            } else if (filename.endsWith(".xml")) {
+                log.info("Found for XAdES: " + filename);
+
+                // manifestStream = new ByteArrayOutputStream();
+                // IOUtils.copy(zipInputStream, manifestStream);
+
+                // XadesAsicManifest.extractAndVerify(new ByteArrayInputStream(manifestStream.toByteArray()), manifestVerifier);
             }
 
             return true;

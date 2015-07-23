@@ -36,10 +36,10 @@ class CadesAsicManifest extends AbstractAsicManifest {
     }
 
     @Override
-    public void add(String filename, String mimeType) {
+    public void add(String filename, MimeType mimeType) {
         DataObjectReferenceType dataObject = new DataObjectReferenceType();
         dataObject.setURI(filename);
-        dataObject.setMimeType(mimeType);
+        dataObject.setMimeType(mimeType.toString());
         dataObject.setDigestValue(messageDigest.digest());
 
         DigestMethodType digestMethodType = new DigestMethodType();

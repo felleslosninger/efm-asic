@@ -82,7 +82,7 @@ public class AsicCadesWriterTest {
         AsicWriter asicWriter = asicWriterFactory.newContainer(asicOutputFile)
                 .add(new File(envelopeUrl.toURI()))
                 // Specifies the file, the archive entry name and explicitly names the MIME type
-                .add(new File(messageUrl.toURI()), BII_MESSAGE_XML, "application/xml")
+                .add(new File(messageUrl.toURI()), BII_MESSAGE_XML, MimeType.forString("application/xml"))
                 .sign(keystoreFile, TestUtil.keyStorePassword(), TestUtil.keyPairAlias(), TestUtil.privateKeyPassword());
 
         File file = asicWriter.getContainerFile();

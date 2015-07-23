@@ -27,14 +27,14 @@ public class AsicUtilsTest {
         // Create first container
         ByteArrayOutputStream source1 = new ByteArrayOutputStream();
         asicWriterFactory.newContainer(source1)
-                .add(new ByteArrayInputStream(fileContent1.getBytes()), "content1.txt", "text/plain")
+                .add(new ByteArrayInputStream(fileContent1.getBytes()), "content1.txt", MimeType.forString("text/plain"))
                 .sign(signatureHelper);
 
         // Create second container
         ByteArrayOutputStream source2 = new ByteArrayOutputStream();
         AsicWriter asicWriter = asicWriterFactory.newContainer(source2)
-                .add(new ByteArrayInputStream("manifest".getBytes()), "META-INF/manifest.xml", "application/xml")
-                .add(new ByteArrayInputStream(fileContent2.getBytes()), "content2.txt", "text/plain")
+                .add(new ByteArrayInputStream("manifest".getBytes()), "META-INF/manifest.xml", MimeType.forString("application/xml"))
+                .add(new ByteArrayInputStream(fileContent2.getBytes()), "content2.txt", MimeType.forString("text/plain"))
                 .sign(signatureHelper);
 
         // Test to make sure exception is thrown.

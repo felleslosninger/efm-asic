@@ -97,16 +97,16 @@ abstract class AbstractAsicWriter implements AsicWriter {
         }
 
         // Add file to container
-        return add(inputStream, filename, mimeType);
+        return add(inputStream, filename, MimeType.forString(mimeType));
     }
 
     @Override
-    public AsicWriter add(File file, String entryName, String mimeType) throws IOException {
+    public AsicWriter add(File file, String entryName, MimeType mimeType) throws IOException {
         return add(file.toPath(), entryName, mimeType);
     }
 
     @Override
-    public AsicWriter add(Path path, String entryName, String mimeType) throws IOException {
+    public AsicWriter add(Path path, String entryName, MimeType mimeType) throws IOException {
         InputStream inputStream = Files.newInputStream(path);
         add(inputStream, entryName, mimeType);
         inputStream.close();
@@ -123,7 +123,7 @@ abstract class AbstractAsicWriter implements AsicWriter {
      * @throws IOException
      */
     @Override
-    public AsicWriter add(InputStream inputStream, String filename, String mimeType) throws IOException {
+    public AsicWriter add(InputStream inputStream, String filename, MimeType mimeType) throws IOException {
         // Check status
         if (finished)
             throw new IllegalStateException("Adding content to container after signing container is not supported.");

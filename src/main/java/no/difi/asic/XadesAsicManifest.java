@@ -13,6 +13,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.util.GregorianCalendar;
@@ -53,7 +54,7 @@ class XadesAsicManifest extends AbstractAsicManifest {
     }
 
     @Override
-    public void add(String filename, String mimeType) {
+    public void add(String filename, MimeType mimeType) {
         String id = String.format("ID_%s", signedInfo.getReference().size());
 
         {
@@ -75,7 +76,7 @@ class XadesAsicManifest extends AbstractAsicManifest {
             // \XAdESSignature\Signature\Object\QualifyingProperties\SignedProperties\SignedDataObjectProperties\DataObjectFormat
             DataObjectFormatType dataObjectFormatType = new DataObjectFormatType();
             dataObjectFormatType.setObjectReference(String.format("#%s", id));
-            dataObjectFormatType.setMimeType(mimeType);
+            dataObjectFormatType.setMimeType(mimeType.toString());
 
             signedDataObjectProperties.getDataObjectFormat().add(dataObjectFormatType);
         }
@@ -242,5 +243,40 @@ class XadesAsicManifest extends AbstractAsicManifest {
 
         SignatureValueType signatureValue = new SignatureValueType();
         return signatureValue;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static void extractAndVerify(InputStream inputStream, ManifestVerifier manifestVerifier) {
+        try {
+            // Read XML
+            // JAXBContext jaxbContext = JAXBContext.newInstance(XAdESSignaturesType.class);
+            // Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+
+            // SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
+            // saxParserFactory.setNamespaceAware(false);
+
+            // XMLReader reader = saxParserFactory.newSAXParser().getXMLReader();
+            // Source er = new SAXSource(reader, new InputSource(inputStream));
+
+
+            /*
+            Jaxb2Marshaller jaxb2Marshaller = new Jaxb2Marshaller();
+            jaxb2Marshaller.setClassesToBeBound(new ObjectFactory().createXAdESSignatures(null).getClass());
+
+            // XAdESSignaturesType manifest = ((JAXBElement<XAdESSignaturesType>) unmarshaller.unmarshal(er)).getValue();
+            XAdESSignaturesType manifest = (XAdESSignaturesType) jaxb2Marshaller.unmarshal(new StreamSource(inputStream));
+
+            for (SignatureType signatureType : manifest.getSignature()) {
+                SignedInfoType signedInfoType = signatureType.getSignedInfo();
+
+                for (ReferenceType referenceType : signedInfoType.getReference()) {
+                    if (!referenceType.getURI().startsWith("#"))
+                        manifestVerifier.update(referenceType.getURI(), null, referenceType.getDigestValue(), referenceType.getDigestMethod().getAlgorithm());
+                }
+            }
+            */
+        } catch (Exception e) {
+            throw new IllegalStateException("Unable to read content as XML", e);
+        }
     }
 }

@@ -78,7 +78,7 @@ public class AsicWriterTest {
                 // Adds an ordinary file, using the file name as the entry name
                 .add(biiEnvelopeFile)
                 // Adds another file, explicitly naming the entry and specifying the MIME type
-                .add(biiMessageFile, BII_MESSAGE_XML, "application/xml")
+                .add(biiMessageFile, BII_MESSAGE_XML, MimeType.forString("application/xml"))
                 // Signing the contents of the archive, closes it for further changes.
                 .sign(keystoreFile, TestUtil.keyStorePassword(), TestUtil.privateKeyPassword());
 

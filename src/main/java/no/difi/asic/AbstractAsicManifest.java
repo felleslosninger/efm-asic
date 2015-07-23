@@ -31,5 +31,5 @@ abstract class AbstractAsicManifest {
     /**
      * @inheritDoc
      */
-    public abstract void add(String filename, String mimeType);
+    public abstract void add(String filename, MimeType mimeType);
 }

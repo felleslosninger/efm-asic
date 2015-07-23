@@ -31,8 +31,8 @@ public class AsicReaderTest {
         ByteArrayOutputStream containerOutput = new ByteArrayOutputStream();
 
         asicWriterFactory.newContainer(containerOutput)
-                .add(new ByteArrayInputStream(fileContent1.getBytes()), "content1.txt", "text/plain")
-                .add(new ByteArrayInputStream(fileContent2.getBytes()), "content2.txt", "text/plain")
+                .add(new ByteArrayInputStream(fileContent1.getBytes()), "content1.txt", MimeType.forString("text/plain"))
+                .add(new ByteArrayInputStream(fileContent2.getBytes()), "content2.txt", MimeType.forString("text/plain"))
                 .sign(signatureHelper);
 
         AsicReader asicReader = asicReaderFactory.open(new ByteArrayInputStream(containerOutput.toByteArray()));
@@ -82,8 +82,8 @@ public class AsicReaderTest {
         File file = new File(tmpDir, "asic-reader-sample.ip");
 
         asicWriterFactory.newContainer(file)
-                .add(new ByteArrayInputStream(fileContent1.getBytes()), "content1.txt", "text/plain")
-                .add(new ByteArrayInputStream(fileContent2.getBytes()), "content2.txt", "text/plain")
+                .add(new ByteArrayInputStream(fileContent1.getBytes()), "content1.txt", MimeType.forString("text/plain"))
+                .add(new ByteArrayInputStream(fileContent2.getBytes()), "content2.txt", MimeType.forString("text/plain"))
                 .sign(signatureHelper);
 
         AsicReader asicReader = asicReaderFactory.open(file);

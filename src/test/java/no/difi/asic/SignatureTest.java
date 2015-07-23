@@ -3,6 +3,13 @@ package no.difi.asic;
 import org.apache.commons.codec.binary.Base64;
 import org.testng.annotations.Test;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.security.DigestOutputStream;
+import java.security.MessageDigest;
+
+import static org.testng.Assert.assertNotNull;
+
 /*
 import sun.security.pkcs.ContentInfo;
 import sun.security.pkcs.PKCS7;
@@ -13,18 +20,6 @@ import sun.security.x509.AlgorithmId;
 import sun.security.x509.CertAndKeyGen;
 import sun.security.x509.X500Name;
 */
-
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.math.BigInteger;
-import java.security.DigestOutputStream;
-import java.security.MessageDigest;
-import java.security.PrivateKey;
-import java.security.Signature;
-import java.security.cert.X509Certificate;
-import java.util.Date;
-
-import static org.testng.Assert.assertNotNull;
 
 /**
  * @author steinar

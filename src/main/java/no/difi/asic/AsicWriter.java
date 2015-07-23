@@ -67,18 +67,18 @@ public interface AsicWriter {
      * @return reference to this AsicWriter
      * @throws IOException
      */
-    AsicWriter add(File file, String entryName, String mimeType) throws IOException;
+    AsicWriter add(File file, String entryName, MimeType mimeType) throws IOException;
 
-    /** @see #add(File, String, String)  */
-    AsicWriter add(Path path, String entryName, String mimeType) throws IOException;
+    /** @see #add(File, String, MimeType)  */
+    AsicWriter add(Path path, String entryName, MimeType mimeType) throws IOException;
 
     /**
      *  Adds the contents of an input stream into the ASiC archive, under a given entry name and explicitly
      *  identifying the MIME type.
      *
-     * @see #add(Path, String, String)
+     * @see #add(Path, String, MimeType)
      */
-    AsicWriter add(InputStream inputStream, String filename, String mimeType) throws IOException;
+    AsicWriter add(InputStream inputStream, String filename, MimeType mimeType) throws IOException;
 
     /**
      * Signs and closes the ASiC archive. The private and public key is obtained from the supplied key store.

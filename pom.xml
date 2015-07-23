@@ -18,9 +18,17 @@
     <contributors>
         <contributor>
             <name>Steinar Overbeck Cook</name>
+            <email>soc@difi.no</email>
             <organization>Difi</organization>
             <roles>
-                <role>Principal author</role>
+                <role>Author</role>
+            </roles>
+        </contributor>
+        <contributor>
+            <organization>Difi</organization>
+            <email>erlend.klakegg.bergheim@difi.no</email>
+            <roles>
+                <role>Author</role>
             </roles>
         </contributor>
     </contributors>

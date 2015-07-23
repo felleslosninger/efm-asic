@@ -44,7 +44,7 @@ class AsicOutputStream extends ZipOutputStream {
 
     protected void writeZipEntry(ZipEntry zipEntry, byte[] bytes) throws IOException {
         try {
-            log.debug(String.format("Writing file %s to container", zipEntry.getName()));
+            log.debug(String.format("Writing entry %s to container", zipEntry.getName()));
             putNextEntry(zipEntry);
             write(bytes);
             closeEntry();

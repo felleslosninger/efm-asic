@@ -145,7 +145,7 @@ public class AsicReaderTest {
 
     @Test
     public void exceptionOnInvalidMime() throws IOException {
-        AsicReader asicReader = asicReaderFactory.open(getClass().getResourceAsStream("/asic-invalid-mime.asice"));
+        AsicReader asicReader = asicReaderFactory.open(getClass().getResourceAsStream("/asic-general-test-invalid-mime.asice"));
 
         try {
             asicReader.getNextFile();

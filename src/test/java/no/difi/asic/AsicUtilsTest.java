@@ -33,8 +33,8 @@ public class AsicUtilsTest {
         // Create second container
         ByteArrayOutputStream source2 = new ByteArrayOutputStream();
         AsicWriter asicWriter = asicWriterFactory.newContainer(source2)
-                .add(new ByteArrayInputStream("manifest".getBytes()), "META-INF/manifest.xml", MimeType.forString("application/xml"))
                 .add(new ByteArrayInputStream(fileContent2.getBytes()), "content2.txt", MimeType.forString("text/plain"))
+                // .add(new ByteArrayInputStream("manifest".getBytes()), "META-INF/manifest.xml", MimeType.forString("application/xml"))
                 .sign(signatureHelper);
 
         // Test to make sure exception is thrown.
@@ -59,14 +59,6 @@ public class AsicUtilsTest {
             fileStream = new ByteArrayOutputStream();
             asicReader.writeFile(fileStream);
             assertEquals(fileStream.toString(), fileContent1);
-        }
-
-        {
-            assertEquals(asicReader.getNextFile(), "META-INF/manifest.xml");
-
-            fileStream = new ByteArrayOutputStream();
-            asicReader.writeFile(fileStream);
-            assertEquals(fileStream.toString(), "manifest");
         }
 
         {

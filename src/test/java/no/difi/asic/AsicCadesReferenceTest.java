@@ -13,7 +13,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.security.Security;
 
 public class AsicCadesReferenceTest {
@@ -30,8 +29,8 @@ public class AsicCadesReferenceTest {
 
     @Test
     public void valid() throws IOException {
-        AsicVerifier asicVerifier = asicVerifierFactory.verify(getClass().getResourceAsStream("/asic-cades-valid.asice"));
-        assertEquals(2, asicVerifier.getAsicManifest().getFiles().size());
+        AsicVerifier asicVerifier = asicVerifierFactory.verify(getClass().getResourceAsStream("/asic-cades-test-valid.asice"));
+        assertEquals(asicVerifier.getAsicManifest().getFiles().size(), 2);
 
         // Printing internal manifest for reference.
         try {
@@ -51,13 +50,13 @@ public class AsicCadesReferenceTest {
     @Test
     public void invalidManifest() throws IOException {
         try {
-            asicVerifierFactory.verify(getClass().getResourceAsStream("/asic-cades-invalid-manifest.asice"));
+            asicVerifierFactory.verify(getClass().getResourceAsStream("/asic-cades-test-invalid-manifest.asice"));
             fail("Exception expected.");
         } catch (IllegalStateException e) {
             log.info(e.getMessage());
         }
 
-        AsicReader asicReader = asicRederFactory.open(getClass().getResourceAsStream("/asic-cades-invalid-manifest.asice"));
+        AsicReader asicReader = asicRederFactory.open(getClass().getResourceAsStream("/asic-cades-test-invalid-manifest.asice"));
 
         try {
             asicReader.getNextFile();
@@ -71,7 +70,7 @@ public class AsicCadesReferenceTest {
     @Test
     public void invalidSignature() throws IOException {
         try {
-            asicVerifierFactory.verify(getClass().getResourceAsStream("/asic-cades-invalid-signature.asice"));
+            asicVerifierFactory.verify(getClass().getResourceAsStream("/asic-cades-test-invalid-signature.asice"));
             fail("Exception expected.");
         } catch (IllegalStateException e) {
             log.info(e.getMessage());
@@ -81,7 +80,7 @@ public class AsicCadesReferenceTest {
     @Test(enabled = false)
     public void invalidSigReference() throws IOException {
         try {
-            asicVerifierFactory.verify(getClass().getResourceAsStream("/asic-cades-invalid-sigreference.asice"));
+            asicVerifierFactory.verify(getClass().getResourceAsStream("/asic-cades-test-invalid-sigreference.asice"));
             fail("Exception expected.");
         } catch (IllegalStateException e) {
             log.info(e.getMessage());

@@ -112,7 +112,16 @@ class AbstractAsicReader {
             manifestStream = new ByteArrayOutputStream();
             IOUtils.copy(zipInputStream, manifestStream);
 
-            CadesAsicManifest.extractAndVerify(new ByteArrayInputStream(manifestStream.toByteArray()), manifestVerifier);
+            // Updating namespace
+            String manifest = manifestStream.toString();
+            manifest = manifest.replace("http://uri.etsi.org/2918/v1.1.1#", "http://uri.etsi.org/2918/v1.2.1#");
+
+            CadesAsicManifest.extractAndVerify(new ByteArrayInputStream(manifest.getBytes()), manifestVerifier);
+            return true;
+        }
+
+        if (filename.equals("manifest.xml")) {
+            // No action
             return true;
         }
 
@@ -132,7 +141,11 @@ class AbstractAsicReader {
                 manifestStream = new ByteArrayOutputStream();
                 IOUtils.copy(zipInputStream, manifestStream);
 
-                XadesAsicManifest.extractAndVerify(new ByteArrayInputStream(manifestStream.toByteArray()), manifestVerifier);
+                // Updating namespace
+                String manifest = manifestStream.toString();
+                manifest = manifest.replace("http://uri.etsi.org/02918/v1.2.1#", "http://uri.etsi.org/2918/v1.2.1#");
+
+                XadesAsicManifest.extractAndVerify(new ByteArrayInputStream(manifest.getBytes()), manifestVerifier);
             }
 
             return true;

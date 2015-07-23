@@ -16,17 +16,25 @@ public class AsicXadesReferenceTest {
     private AsicVerifierFactory asicVerifierFactory = AsicVerifierFactory.newFactory(SignatureMethod.XAdES);
     private AsicReaderFactory asicRederFactory = AsicReaderFactory.newFactory(SignatureMethod.XAdES);
 
+    // Fetched from http://begrep.difi.no/SikkerDigitalPost/1.2.0/eksempler/post.asice.zip
     @Test
-    public void valid() throws IOException {
-        AsicVerifier asicVerifier = asicVerifierFactory.verify(getClass().getResourceAsStream("/asic-xades-valid.asice"));
-        assertEquals(6, asicVerifier.getAsicManifest().getFiles().size());
+    public void validSdp() throws IOException {
+        AsicVerifier asicVerifier = asicVerifierFactory.verify(getClass().getResourceAsStream("/asic-xades-external-sdp.asice"));
+        assertEquals(asicVerifier.getAsicManifest().getFiles().size(), 6);
     }
 
-    // Uses slightly different namespace in root element.
-    @Test(enabled = false)
+    // Fetched from https://github.com/open-eid/digidoc4j/blob/master/testFiles/test.asice
+    @Test
     public void validDigidoc4j() throws IOException {
-        AsicVerifier asicVerifier = asicVerifierFactory.verify(getClass().getResourceAsStream("/asic-xades-digidoc4j.asice"));
-        assertEquals(3, asicVerifier.getAsicManifest().getFiles().size());
+        AsicVerifier asicVerifier = asicVerifierFactory.verify(getClass().getResourceAsStream("/asic-xades-external-digidoc4j.asice"));
+        assertEquals(asicVerifier.getAsicManifest().getFiles().size(), 2);
+    }
+
+    // Fetched from https://github.com/esig/dss/blob/master/dss-asic/src/test/resources/plugtest/esig2014/ESIG-ASiC/EE_AS/Signature-A-EE_AS-1.asice
+    @Test
+    public void validDss() throws IOException {
+        AsicVerifier asicVerifier = asicVerifierFactory.verify(getClass().getResourceAsStream("/asic-xades-external-dss.asice"));
+        assertEquals(asicVerifier.getAsicManifest().getFiles().size(), 1);
     }
 
     @Test(enabled = false)

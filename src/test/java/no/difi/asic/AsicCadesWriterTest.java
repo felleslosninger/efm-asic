@@ -6,10 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
@@ -139,5 +136,17 @@ public class AsicCadesWriterTest {
         }
 
         asicVerifierFactory.verify(file);
+    }
+
+    @Test
+    public void writingToMetaInf() throws IOException {
+        AsicWriter asicWriter = asicWriterFactory.newContainer(new ByteArrayOutputStream());
+
+        try {
+            asicWriter.add(new ByteArrayInputStream("Demo".getBytes()), "META-INF/demo.xml");
+            fail("Exception expected.");
+        } catch (IllegalStateException e) {
+            log.debug(e.getMessage());
+        }
     }
 }

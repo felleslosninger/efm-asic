@@ -60,11 +60,11 @@
         <!-- See http://stackoverflow.com/questions/26413431/which-artifacts-should-i-use-for-jaxb-ri-in-my-maven-project
             For an explanation of the JAXB dependencies
             -->
-        <dependency>
+        <!-- <dependency>
             <groupId>org.glassfish.jaxb</groupId>
             <artifactId>jaxb-runtime</artifactId>
             <version>${jaxb.version}</version>
-        </dependency>
+        </dependency> -->
 
         <!-- Commons -->
         <dependency>

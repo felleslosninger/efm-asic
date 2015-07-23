@@ -1,6 +1,5 @@
 package no.difi.asic;
 
-import com.sun.xml.bind.api.JAXBRIContext;
 import org.bouncycastle.util.encoders.Base64;
 import org.etsi.uri._2918.v1_2.ASiCManifestType;
 import org.etsi.uri._2918.v1_2.DataObjectReferenceType;
@@ -23,7 +22,7 @@ class CadesAsicManifest extends AbstractAsicManifest {
 
     static {
         try {
-            jaxbContext = JAXBRIContext.newInstance(ASiCManifestType.class);
+            jaxbContext = JAXBContext.newInstance(ASiCManifestType.class);
         } catch (JAXBException e) {
             throw new IllegalStateException(String.format("Unable to create JAXBContext: %s ", e.getMessage()), e);
         }
@@ -88,7 +87,7 @@ class CadesAsicManifest extends AbstractAsicManifest {
             for (DataObjectReferenceType reference : manifest.getDataObjectReference())
                 manifestVerifier.update(reference.getURI(), reference.getMimeType(), reference.getDigestValue(), reference.getDigestMethod().getAlgorithm());
         } catch (JAXBException e) {
-            log.error("Unable to read content as XML");
+            throw new IllegalStateException("Unable to read content as XML");
         }
     }
 

@@ -1,6 +1,5 @@
 package no.difi.asic;
 
-import com.sun.xml.bind.api.JAXBRIContext;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.etsi.uri._01903.v1_3.*;
 import org.etsi.uri._2918.v1_2.ObjectFactory;
@@ -25,7 +24,7 @@ class XadesAsicManifest extends AbstractAsicManifest {
 
     static {
         try {
-            jaxbContext = JAXBRIContext.newInstance(XAdESSignaturesType.class, X509DataType.class, QualifyingPropertiesType.class);
+            jaxbContext = JAXBContext.newInstance(XAdESSignaturesType.class, X509DataType.class, QualifyingPropertiesType.class);
         } catch (JAXBException e) {
             throw new IllegalStateException(String.format("Unable to create JAXBContext: %s ", e.getMessage()), e);
         }

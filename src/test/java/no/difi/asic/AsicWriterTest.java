@@ -113,7 +113,8 @@ public class AsicWriterTest {
             assertTrue(e instanceof IllegalStateException);
         }
 
-        asicVerifierFactory.verify(file);
+        AsicVerifier asicVerifier = asicVerifierFactory.verify(file);
+        assertEquals(asicVerifier.getAsicManifest().getFile().size(), 2);
     }
 
     @Test

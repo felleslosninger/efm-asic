@@ -16,10 +16,10 @@ public class AsicXadesReferenceTest {
     private AsicVerifierFactory asicVerifierFactory = AsicVerifierFactory.newFactory(SignatureMethod.XAdES);
     private AsicReaderFactory asicRederFactory = AsicReaderFactory.newFactory(SignatureMethod.XAdES);
 
-    @Test(enabled = false)
+    @Test
     public void valid() throws IOException {
         AsicVerifier asicVerifier = asicVerifierFactory.verify(getClass().getResourceAsStream("/asic-xades-valid.asice"));
-        assertEquals(2, asicVerifier.getAsicManifest().getFile().size());
+        assertEquals(6, asicVerifier.getAsicManifest().getFiles().size());
     }
 
     @Test(enabled = false)

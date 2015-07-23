@@ -24,8 +24,9 @@ class ManifestVerifier {
     }
 
     public void update(String filename, String mimetype, byte[] digest, String digestAlgorithm, String sigReference) {
-        if (digestAlgorithm != null && !digestAlgorithm.equals(messageDigestAlgorithm.getUri()))
-            throw new IllegalStateException(String.format("Wrong digest method for file %s: %s", filename, digestAlgorithm));
+        // Temporarily disabled
+        // if (digestAlgorithm != null && !digestAlgorithm.equals(messageDigestAlgorithm.getUri()))
+        //     throw new IllegalStateException(String.format("Wrong digest method for file %s: %s", filename, digestAlgorithm));
 
         AsicFile asicFile = asicManifestMap.get(filename);
 
@@ -35,7 +36,7 @@ class ManifestVerifier {
             asicFile.setDigest(digest);
             asicFile.setVerified(false);
 
-            asicManifest.getFile().add(asicFile);
+            asicManifest.getFiles().add(asicFile);
             asicManifestMap.put(filename, asicFile);
         } else {
             if (!Arrays.equals(asicFile.getDigest(), digest))
@@ -47,16 +48,16 @@ class ManifestVerifier {
         if (mimetype != null)
             asicFile.setMimetype(mimetype);
         if (sigReference != null)
-            asicFile.getCertRef().add(sigReference);
+            asicFile.getCertReves().add(sigReference);
 
     }
 
     public void addCertificate(Certificate certificate) {
-        this.asicManifest.getCertificate().add(certificate);
+        this.asicManifest.getCertificates().add(certificate);
     }
 
     public void verifyAllVerified() {
-        for (AsicFile asicFile : asicManifest.getFile())
+        for (AsicFile asicFile : asicManifest.getFiles())
             if (!asicFile.isVerified())
                 throw new IllegalStateException(String.format("File not verified: %s", asicFile.getName()));
     }

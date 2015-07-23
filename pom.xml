@@ -153,6 +153,7 @@
                         </goals>
                         <configuration>
                             <schemaDirectory>src/main/xsd</schemaDirectory>
+                            <bindingDirectory>src/main/xjb</bindingDirectory>
                             <!-- If you want to generate the classes into a different directory than the default, this is how you do it. -->
                             <!-- <generateDirectory>${project.build.directory}/generated-sources/xjc-xsd</generateDirectory> -->
                         </configuration>

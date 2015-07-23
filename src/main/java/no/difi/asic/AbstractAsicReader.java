@@ -129,10 +129,10 @@ class AbstractAsicReader {
             } else if (filename.endsWith(".xml")) {
                 log.info("Found for XAdES: " + filename);
 
-                // manifestStream = new ByteArrayOutputStream();
-                // IOUtils.copy(zipInputStream, manifestStream);
+                manifestStream = new ByteArrayOutputStream();
+                IOUtils.copy(zipInputStream, manifestStream);
 
-                // XadesAsicManifest.extractAndVerify(new ByteArrayInputStream(manifestStream.toByteArray()), manifestVerifier);
+                XadesAsicManifest.extractAndVerify(new ByteArrayInputStream(manifestStream.toByteArray()), manifestVerifier);
             }
 
             return true;

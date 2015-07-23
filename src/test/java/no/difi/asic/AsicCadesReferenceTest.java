@@ -31,7 +31,7 @@ public class AsicCadesReferenceTest {
     @Test
     public void valid() throws IOException {
         AsicVerifier asicVerifier = asicVerifierFactory.verify(getClass().getResourceAsStream("/asic-cades-valid.asice"));
-        assertEquals(2, asicVerifier.getAsicManifest().getFile().size());
+        assertEquals(2, asicVerifier.getAsicManifest().getFiles().size());
 
         // Printing internal manifest for reference.
         try {

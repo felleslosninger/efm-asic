@@ -74,7 +74,7 @@ public class AsicReaderTest {
             fail("No exception expected");
         }
 
-        assertEquals(asicReader.getAsicManifest().getFile().size(), 2);
+        assertEquals(asicReader.getAsicManifest().getFiles().size(), 2);
 
     }
 

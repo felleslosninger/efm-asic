@@ -34,7 +34,25 @@ asic-container.asice:
    
 ```
 
-Consult the [AsicCadesContainerWriterTest](src/test/java/no/difi/asic/AsicCadesContainerWriterTest.java) for sample usage.
+Consult the [AsicCadesContainerWriterTest](src/test/java/no/difi/asic/AsicWriterTest.java) for sample usage.
+Here is a rough sketch on how to do it:
+```java
+        // Name of the file to hold the the ASiC archive
+        File archiveOutputFile = new File(System.getProperty("java.io.tmpdir"), "asic-sample-default.zip");
+
+        // Creates an AsicWriterFactory with default signature method
+        AsicWriterFactory asicWriterFactory = AsicWriterFactory.newFactory();
+
+        // Creates the actual container with all the data objects (files) and signs it.
+        AsicWriter asicWriter = asicWriterFactory.newContainer(archiveOutputFile)
+                // Adds an ordinary file, using the file name as the entry name
+                .add(biiEnvelopeFile)
+                // Adds another file, explicitly naming the entry and specifying the MIME type
+                .add(biiMessageFile, BII_MESSAGE_XML, "application/xml")
+                // Signing the contents of the archive, closes it for further changes.
+                .sign(keystoreFile, TestUtil.keyStorePassword(), TestUtil.privateKeyPassword());
+
+```
 
 
 ## Current status

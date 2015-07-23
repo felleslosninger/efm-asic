@@ -100,13 +100,11 @@ abstract class AbstractAsicWriter implements AsicWriter {
         return add(inputStream, filename, mimeType);
     }
 
-    // Helper method
     @Override
     public AsicWriter add(File file, String entryName, String mimeType) throws IOException {
         return add(file.toPath(), entryName, mimeType);
     }
 
-    // Helper method
     @Override
     public AsicWriter add(Path path, String entryName, String mimeType) throws IOException {
         InputStream inputStream = Files.newInputStream(path);
@@ -137,27 +135,26 @@ abstract class AbstractAsicWriter implements AsicWriter {
         // Prepare for calculation of message digest
         DigestOutputStream zipOutputStreamWithDigest = new DigestOutputStream(asicOutputStream, asicManifest.getMessageDigest());
 
-        // Copy inputStream to zip file
+        // Copy inputStream to zip output stream
         IOUtils.copy(inputStream, zipOutputStreamWithDigest);
         zipOutputStreamWithDigest.flush();
 
-        // Close zip entry
+        // Closes the zip entry
         asicOutputStream.closeEntry();
 
-        // Add file to manifest
+        // Adds contents of input stream to manifest which will be signed and written once all data objects have been added
         asicManifest.add(filename, mimeType);
 
         return this;
     }
 
-    // Helper method
     @Override
     public AsicWriter sign(File keyStoreFile, String keyStorePassword, String keyPassword) throws IOException {
         return sign(keyStoreFile, keyStorePassword, null, keyPassword);
     }
 
     /**
-     * Sign and close container.
+     * Signs and closes ASiC container.
      *
      * @param keyStoreFile File reference for location of keystore.
      * @param keyStorePassword Password for keystore.
@@ -171,20 +168,21 @@ abstract class AbstractAsicWriter implements AsicWriter {
     }
 
     /**
-     * Sign and close container.
+     * Signs and closes ASiC container.
      * @param signatureHelper Loaded SignatureHelper.
      * @return Return self to allow using builder pattern
      * @throws IOException
      */
     @Override
     public AbstractAsicWriter sign(SignatureHelper signatureHelper) throws IOException {
-        // Check status
+        // You may only sign once
         if (finished)
             throw new IllegalStateException("Adding content to container after signing container is not supported.");
 
-        // Flip status
+        // Flip status to ensure nobody is allowed to sign more than once.
         finished = true;
 
+        // Delegates the actual signature creation to the signature helper
         performSign(signatureHelper);
 
         // Close container
@@ -207,6 +205,7 @@ abstract class AbstractAsicWriter implements AsicWriter {
         return this;
     }
 
+    /** Creating the signature and writing it into the archive is delegated to the actual implementation */
     abstract void performSign(SignatureHelper signatureHelper) throws IOException;
 
     @Override

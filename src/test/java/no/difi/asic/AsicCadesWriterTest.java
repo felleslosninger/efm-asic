@@ -77,8 +77,11 @@ public class AsicCadesWriterTest {
     @Test
     public void createSampleContainer() throws Exception {
 
-        AsicWriter asicWriter = asicWriterFactory.newContainer(new File(System.getProperty("java.io.tmpdir")), "asic-sample-cades.zip")
+        File asicOutputFile = new File(System.getProperty("java.io.tmpdir"), "asic-sample-cades.zip");
+
+        AsicWriter asicWriter = asicWriterFactory.newContainer(asicOutputFile)
                 .add(new File(envelopeUrl.toURI()))
+                // Specifies the file, the archive entry name and explicitly names the MIME type
                 .add(new File(messageUrl.toURI()), BII_MESSAGE_XML, "application/xml")
                 .sign(keystoreFile, TestUtil.keyStorePassword(), TestUtil.keyPairAlias(), TestUtil.privateKeyPassword());
 

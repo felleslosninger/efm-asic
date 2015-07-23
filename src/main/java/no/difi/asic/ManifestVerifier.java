@@ -47,7 +47,7 @@ class ManifestVerifier {
         if (mimetype != null)
             asicFile.setMimetype(mimetype);
         if (sigReference != null)
-            asicFile.getManifest().add(sigReference);
+            asicFile.getCertRef().add(sigReference);
 
     }
 

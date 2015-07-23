@@ -57,15 +57,6 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- See http://stackoverflow.com/questions/26413431/which-artifacts-should-i-use-for-jaxb-ri-in-my-maven-project
-            For an explanation of the JAXB dependencies
-            -->
-        <!-- <dependency>
-            <groupId>org.glassfish.jaxb</groupId>
-            <artifactId>jaxb-runtime</artifactId>
-            <version>${jaxb.version}</version>
-        </dependency> -->
-
         <!-- Commons -->
         <dependency>
             <groupId>commons-codec</groupId>

@@ -8,9 +8,9 @@ import org.testng.annotations.Test;
 
 import java.io.IOException;
 
-public class CadesReferenceTest {
+public class AsicCadesReferenceTest {
 
-    private static Logger log = LoggerFactory.getLogger(CadesReferenceTest.class);
+    private static Logger log = LoggerFactory.getLogger(AsicCadesReferenceTest.class);
 
     private AsicVerifierFactory asicVerifierFactory = AsicVerifierFactory.newFactory(SignatureMethod.CAdES);
     private AsicReaderFactory asicRederFactory = AsicReaderFactory.newFactory(SignatureMethod.CAdES);

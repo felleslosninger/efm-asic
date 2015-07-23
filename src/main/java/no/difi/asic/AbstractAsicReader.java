@@ -46,6 +46,8 @@ class AbstractAsicReader {
                 return zipEntry.getName();
         }
 
+        manifestVerifier.verifyAllVerified();
+
         return null;
     }
 
@@ -68,8 +70,6 @@ class AbstractAsicReader {
     }
 
     void close() throws IOException {
-        manifestVerifier.verifyAllVerified();
-
         if (zipInputStream != null) {
             zipInputStream.close();
             zipInputStream = null;

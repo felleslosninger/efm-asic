@@ -22,6 +22,13 @@ public class AsicXadesReferenceTest {
         assertEquals(6, asicVerifier.getAsicManifest().getFiles().size());
     }
 
+    // Uses slightly different namespace in root element.
+    @Test(enabled = false)
+    public void validDigidoc4j() throws IOException {
+        AsicVerifier asicVerifier = asicVerifierFactory.verify(getClass().getResourceAsStream("/asic-xades-digidoc4j.asice"));
+        assertEquals(3, asicVerifier.getAsicManifest().getFiles().size());
+    }
+
     @Test(enabled = false)
     public void invalidManifest() throws IOException {
         try {

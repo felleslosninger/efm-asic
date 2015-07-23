@@ -109,10 +109,7 @@ class XadesAsicManifest extends AbstractAsicManifest {
             Marshaller marshaller = jaxbContext.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 
-            // JAXBElement<XAdESSignaturesType> jaxbRootElement = objectFactory.createXAdESSignatures(xAdESSignaturesType);
-
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            // marshaller.marshal(jaxbRootElement, baos);
             marshaller.marshal(xAdESSignaturesType, baos);
             return baos.toByteArray();
         } catch (JAXBException e) {

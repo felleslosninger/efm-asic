@@ -3,7 +3,6 @@ package no.difi.asic;
 import org.bouncycastle.util.encoders.Base64;
 import org.etsi.uri._2918.v1_2.ASiCManifest;
 import org.etsi.uri._2918.v1_2.DataObjectReference;
-import org.etsi.uri._2918.v1_2.ObjectFactory;
 import org.etsi.uri._2918.v1_2.SigReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +19,6 @@ class CadesAsicManifest extends AbstractAsicManifest {
 
     public static final Logger log = LoggerFactory.getLogger(AbstractAsicManifest.class);
 
-    private static ObjectFactory objectFactory = new ObjectFactory();
     private static JAXBContext jaxbContext; // Thread safe
 
     static {
@@ -68,8 +66,6 @@ class CadesAsicManifest extends AbstractAsicManifest {
         try {
             Marshaller marshaller = jaxbContext.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-
-            // JAXBElement<ASiCManifest> jaxbRootElement = objectFactory.createASiCManifest(ASiCManifestType);
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             marshaller.marshal(ASiCManifestType, baos);

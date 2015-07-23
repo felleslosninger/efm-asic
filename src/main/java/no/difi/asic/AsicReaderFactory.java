@@ -1,6 +1,5 @@
 package no.difi.asic;
 
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;

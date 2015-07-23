@@ -123,7 +123,7 @@ class AbstractAsicReader {
                     IOUtils.copy(zipInputStream, signatureStream);
 
                     Certificate certificate = SignatureHelper.validate(manifestStream.toByteArray(), signatureStream.toByteArray());
-                    certificate.setManifest(currentZipEntry.getName());
+                    certificate.setCert(currentZipEntry.getName());
                     manifestVerifier.addCertificate(certificate);
                 }
             } else if (filename.endsWith(".xml")) {

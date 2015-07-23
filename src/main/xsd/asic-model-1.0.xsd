@@ -18,7 +18,7 @@
             <element name="name" type="string" />
             <element name="mimetype" type="string" />
             <element name="digest" type="base64Binary" />
-            <element name="manifest" type="string" maxOccurs="unbounded" />
+            <element name="certRef" type="string" maxOccurs="unbounded" />
             <element name="verified" type="boolean" />
         </sequence>
     </complexType>
@@ -28,7 +28,7 @@
             <element name="subject" type="string" />
             <element name="certificate" type="base64Binary" />
         </sequence>
-        <attribute name="manifest" type="string" />
+        <attribute name="cert" type="string" />
     </complexType>
 
 </schema>

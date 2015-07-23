@@ -76,6 +76,8 @@ class AbstractAsicReader {
         }
     }
 
+    ByteArrayOutputStream manifestStream = null;
+
     boolean specialFile() throws IOException {
         if (!zipEntry.getName().startsWith("META-INF/"))
             return false;
@@ -85,15 +87,23 @@ class AbstractAsicReader {
         // Handling manifest in ASiC CAdES.
         if (filename.startsWith("asicmanifest")) {
             // Read content in manifest (also used for verification of signature)
-            ByteArrayOutputStream manifestStream = new ByteArrayOutputStream();
+            manifestStream = new ByteArrayOutputStream();
             IOUtils.copy(zipInputStream, manifestStream);
 
             CadesAsicManifest.extractAndVerify(new ByteArrayInputStream(manifestStream.toByteArray()), manifestVerifier);
             return true;
         }
 
-        if (filename.startsWith("signature"))
+        if (filename.startsWith("signature")) {
+            if (manifestStream != null) {
+                ByteArrayOutputStream signatureStream = new ByteArrayOutputStream();
+                IOUtils.copy(zipInputStream, signatureStream);
+
+                SignatureHelper.validate(manifestStream.toByteArray(), signatureStream.toByteArray());
+            }
+
             return true;
+        }
 
         return false;
     }

@@ -1,12 +1,11 @@
 package no.difi.asic;
 
 import org.apache.commons.codec.binary.Base64;
+import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaCertStore;
-import org.bouncycastle.cms.CMSProcessableByteArray;
-import org.bouncycastle.cms.CMSSignedData;
-import org.bouncycastle.cms.CMSSignedDataGenerator;
-import org.bouncycastle.cms.SignerInfoGenerator;
+import org.bouncycastle.cms.*;
 import org.bouncycastle.cms.jcajce.JcaSignerInfoGeneratorBuilder;
+import org.bouncycastle.cms.jcajce.JcaSimpleSignerInfoVerifierBuilder;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.DigestCalculatorProvider;
@@ -37,7 +36,9 @@ import java.util.Arrays;
  */
 public class SignatureHelper {
 
-    public static final Logger log = LoggerFactory.getLogger(SignatureHelper.class);
+    private static final Logger log = LoggerFactory.getLogger(SignatureHelper.class);
+
+    private static JcaSimpleSignerInfoVerifierBuilder jcaSimpleSignerInfoVerifierBuilder = new JcaSimpleSignerInfoVerifierBuilder();
 
     static {
         Security.addProvider(new BouncyCastleProvider());
@@ -130,6 +131,31 @@ public class SignatureHelper {
         } catch (Exception e) {
             throw new IllegalStateException("Unable to sign " + e.getMessage(), e);
         }
+    }
+
+    public static void validate(byte[] data, byte[] signature) {
+        boolean result = false;
+
+        try {
+            CMSSignedData sd = new CMSSignedData(new CMSProcessableByteArray(data), signature);
+            Store store = sd.getCertificates();
+            SignerInformationStore signerInformationStore = sd.getSignerInfos();
+
+            for (SignerInformation signerInformation : signerInformationStore.getSigners()) {
+                X509CertificateHolder x509Certificate = (X509CertificateHolder) store.getMatches(signerInformation.getSID()).iterator().next();
+                log.info(x509Certificate.getSubject().toString());
+
+                result = signerInformation.verify(jcaSimpleSignerInfoVerifierBuilder.setProvider("BC").build(x509Certificate));
+                if (!result)
+                    break;
+            }
+        } catch (Exception e) {
+            log.warn(e.getMessage());
+            result = false;
+        }
+
+        if (!result)
+            throw new IllegalStateException("Unable to verify signature.");
     }
 
     public X509Certificate getX509Certificate() {

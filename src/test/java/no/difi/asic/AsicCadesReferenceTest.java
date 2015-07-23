@@ -2,11 +2,14 @@ package no.difi.asic;
 
 import static org.testng.Assert.*;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.security.Security;
 
 public class AsicCadesReferenceTest {
 
@@ -14,6 +17,11 @@ public class AsicCadesReferenceTest {
 
     private AsicVerifierFactory asicVerifierFactory = AsicVerifierFactory.newFactory(SignatureMethod.CAdES);
     private AsicReaderFactory asicRederFactory = AsicReaderFactory.newFactory(SignatureMethod.CAdES);
+
+    @BeforeClass
+    public void beforeClass() {
+        Security.addProvider(new BouncyCastleProvider());
+    }
 
     @Test
     public void valid() throws IOException {
@@ -41,7 +49,7 @@ public class AsicCadesReferenceTest {
         }
     }
 
-    @Test(enabled = false)
+    @Test
     public void invalidSignature() throws IOException {
         try {
             asicVerifierFactory.verify(getClass().getResourceAsStream("/asic-cades-invalid-signature.asice"));

@@ -2,6 +2,7 @@ package no.difi.asic;
 
 import no.difi.xsd.asic.model._1.AsicFile;
 import no.difi.xsd.asic.model._1.AsicManifest;
+import no.difi.xsd.asic.model._1.Certificate;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -18,11 +19,11 @@ class ManifestVerifier {
         this.messageDigestAlgorithm = messageDigestAlgorithm;
     }
 
-    public void update(String filename, byte[] digest) {
-        update(filename, null, digest, null);
+    public void update(String filename, byte[] digest, String sigReference) {
+        update(filename, null, digest, null, sigReference);
     }
 
-    public void update(String filename, String mimetype, byte[] digest, String digestAlgorithm) {
+    public void update(String filename, String mimetype, byte[] digest, String digestAlgorithm, String sigReference) {
         if (digestAlgorithm != null && !digestAlgorithm.equals(messageDigestAlgorithm.getUri()))
             throw new IllegalStateException(String.format("Wrong digest method for file %s: %s", filename, digestAlgorithm));
 
@@ -31,21 +32,27 @@ class ManifestVerifier {
         if (asicFile == null) {
             asicFile = new AsicFile();
             asicFile.setName(filename);
-            asicFile.setMimetype(mimetype);
             asicFile.setDigest(digest);
             asicFile.setVerified(false);
 
             asicManifest.getFile().add(asicFile);
             asicManifestMap.put(filename, asicFile);
         } else {
-            if (mimetype != null)
-                asicFile.setMimetype(mimetype);
-
             if (!Arrays.equals(asicFile.getDigest(), digest))
                 throw new IllegalStateException(String.format("Mismatching digest for file %s", filename));
 
             asicFile.setVerified(true);
         }
+
+        if (mimetype != null)
+            asicFile.setMimetype(mimetype);
+        if (sigReference != null)
+            asicFile.getManifest().add(sigReference);
+
+    }
+
+    public void addCertificate(Certificate certificate) {
+        this.asicManifest.getCertificate().add(certificate);
     }
 
     public void verifyAllVerified() {

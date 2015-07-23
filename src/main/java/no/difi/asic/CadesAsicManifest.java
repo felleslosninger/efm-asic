@@ -83,9 +83,13 @@ class CadesAsicManifest extends AbstractAsicManifest {
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
             ASiCManifestType manifest = ((JAXBElement<ASiCManifestType>) unmarshaller.unmarshal(inputStream)).getValue();
 
+            String sigReference = manifest.getSigReference().getURI();
+            if (sigReference == null)
+                sigReference = "META-INF/signature.p7s";
+
             // Run through recorded objects
             for (DataObjectReferenceType reference : manifest.getDataObjectReference())
-                manifestVerifier.update(reference.getURI(), reference.getMimeType(), reference.getDigestValue(), reference.getDigestMethod().getAlgorithm());
+                manifestVerifier.update(reference.getURI(), reference.getMimeType(), reference.getDigestValue(), reference.getDigestMethod().getAlgorithm(), sigReference);
         } catch (JAXBException e) {
             throw new IllegalStateException("Unable to read content as XML");
         }

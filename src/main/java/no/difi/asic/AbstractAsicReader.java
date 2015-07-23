@@ -1,6 +1,7 @@
 package no.difi.asic;
 
 import no.difi.xsd.asic.model._1.AsicManifest;
+import no.difi.xsd.asic.model._1.Certificate;
 import org.apache.commons.io.IOUtils;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
@@ -66,7 +67,7 @@ class AbstractAsicReader {
         byte[] digest = messageDigest.digest();
         log.debug(String.format("Digest: %s", new String(Base64.encode(digest))));
 
-        manifestVerifier.update(zipEntry.getName(), digest);
+        manifestVerifier.update(zipEntry.getName(), digest, null);
     }
 
     void close() throws IOException {
@@ -100,7 +101,9 @@ class AbstractAsicReader {
                     ByteArrayOutputStream signatureStream = new ByteArrayOutputStream();
                     IOUtils.copy(zipInputStream, signatureStream);
 
-                    SignatureHelper.validate(manifestStream.toByteArray(), signatureStream.toByteArray());
+                    Certificate certificate = SignatureHelper.validate(manifestStream.toByteArray(), signatureStream.toByteArray());
+                    certificate.setManifest(zipEntry.getName());
+                    manifestVerifier.addCertificate(certificate);
                 }
             } else if (filename.endsWith(".xml")) {
                 log.info("Found for XAdES: " + filename);

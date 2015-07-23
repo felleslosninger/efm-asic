@@ -131,8 +131,8 @@ public class SignatureHelper {
     }
 
     @SuppressWarnings("unchecked")
-    public static void validate(byte[] data, byte[] signature) {
-        boolean result = false;
+    public static no.difi.xsd.asic.model._1.Certificate validate(byte[] data, byte[] signature) {
+        no.difi.xsd.asic.model._1.Certificate certificate = null;
 
         try {
             CMSSignedData cmsSignedData = new CMSSignedData(new CMSProcessableByteArray(data), signature);
@@ -143,15 +143,21 @@ public class SignatureHelper {
                 X509CertificateHolder x509Certificate = (X509CertificateHolder) store.getMatches(signerInformation.getSID()).iterator().next();
                 log.info(x509Certificate.getSubject().toString());
 
-                result = signerInformation.verify(jcaSimpleSignerInfoVerifierBuilder.build(x509Certificate));
+                if (signerInformation.verify(jcaSimpleSignerInfoVerifierBuilder.build(x509Certificate))) {
+                    certificate = new no.difi.xsd.asic.model._1.Certificate();
+                    certificate.setCertificate(x509Certificate.getEncoded());
+                    certificate.setSubject(x509Certificate.getSubject().toString());
+                }
             }
         } catch (Exception e) {
             log.warn(e.getMessage());
-            result = false;
+            certificate = null;
         }
 
-        if (!result)
+        if (certificate == null)
             throw new IllegalStateException("Unable to verify signature.");
+
+        return certificate;
     }
 
     public X509Certificate getX509Certificate() {

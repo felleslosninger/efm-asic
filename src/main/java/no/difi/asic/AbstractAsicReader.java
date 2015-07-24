@@ -62,9 +62,9 @@ class AbstractAsicReader {
         while ((currentZipEntry = zipInputStream.getNextEntry()) != null) {
             log.info(String.format("Found file: %s", currentZipEntry.getName()));
 
-            // Files used for validation is not exposed
+            // Files used for validation are not exposed
             if (currentZipEntry.getName().startsWith("META-INF/"))
-                handleMetadata();
+                handleMetadataEntry();
             else
                 return currentZipEntry.getName();
         }
@@ -117,26 +117,32 @@ class AbstractAsicReader {
         }
     }
 
-    private void handleMetadata() throws IOException {
+    /**
+     * Handles zip entries in the META-INF/ directory.
+     *
+     * @throws IOException
+     */
+    private void handleMetadataEntry() throws IOException {
+        // Extracts everything after META-INF/
         String filename = currentZipEntry.getName().substring(9).toLowerCase();
 
         // Read content in file
-        ByteArrayOutputStream contentStream = new ByteArrayOutputStream();
-        IOUtils.copy(zipInputStream, contentStream);
+        ByteArrayOutputStream contentsOfStream = new ByteArrayOutputStream();
+        IOUtils.copy(zipInputStream, contentsOfStream);
 
         if (filename.startsWith("asicmanifest")) {
             // Handling manifest in ASiC CAdES.
-            String sigReference = CadesAsicManifest.extractAndVerify(contentStream.toString(), manifestVerifier);
-            handleCadesSigning(sigReference, contentStream.toString());
+            String sigReference = CadesAsicManifest.extractAndVerify(contentsOfStream.toString(), manifestVerifier);
+            handleCadesSigning(sigReference, contentsOfStream.toString());
         } else if (filename.startsWith("signature") && filename.endsWith(".xml")) {
             // Handling manifest in ASiC XAdES.
-            XadesAsicManifest.extractAndVerify(contentStream.toString(), manifestVerifier);
+            XadesAsicManifest.extractAndVerify(contentsOfStream.toString(), manifestVerifier);
         } else if (filename.startsWith("signature") && filename.endsWith(".p7s")) {
             // Handling signature in ASiC CAdES.
-            handleCadesSigning(currentZipEntry.getName(), contentStream);
+            handleCadesSigning(currentZipEntry.getName(), contentsOfStream);
         } else if (filename.equals("manifest.xml")) {
             // Read manifest.
-            manifest = OasisManifest.read(new ByteArrayInputStream(contentStream.toByteArray()));
+            manifest = OasisManifest.read(new ByteArrayInputStream(contentsOfStream.toByteArray()));
         } else {
             throw new IllegalStateException(String.format("Contains unknown metadata file: %s", currentZipEntry.getName()));
         }

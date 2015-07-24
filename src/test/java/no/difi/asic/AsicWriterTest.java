@@ -1,5 +1,6 @@
 package no.difi.asic;
 
+import no.difi.xsd.asic.model._1.AsicManifest;
 import org.etsi.uri._02918.v1_2.DataObjectReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -181,6 +182,9 @@ public class AsicWriterTest {
             file.delete();
         }
         asicReader.close();
+        AsicManifest asicManifest = asicReader.getAsicManifest();
+
+
     }
 
     @Test

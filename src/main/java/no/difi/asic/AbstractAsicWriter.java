@@ -29,6 +29,8 @@ abstract class AbstractAsicWriter implements AsicWriter {
     protected OutputStream containerOutputStream = null;
     protected Path containerPath = null;
 
+    protected OasisManifest oasisManifest = null;
+
     /**
      * Prepares creation of a new container.
      * @param outputStream Stream used to write container.
@@ -43,6 +45,9 @@ abstract class AbstractAsicWriter implements AsicWriter {
 
         // Initiate zip container
         asicOutputStream = new AsicOutputStream(outputStream);
+
+        // Add mimetype to OASIS OpenDocument manifest
+        oasisManifest = new OasisManifest(MimeType.forString(APPLICATION_VND_ETSI_ASIC_E_ZIP));
     }
 
     // Helper method
@@ -148,6 +153,9 @@ abstract class AbstractAsicWriter implements AsicWriter {
         // Adds contents of input stream to manifest which will be signed and written once all data objects have been added
         asicManifest.add(filename, mimeType);
 
+        // Add record of file to OASIS OpenDocument Manifest
+        oasisManifest.add(filename, mimeType);
+
         return this;
     }
 
@@ -187,6 +195,8 @@ abstract class AbstractAsicWriter implements AsicWriter {
 
         // Delegates the actual signature creation to the signature helper
         performSign(signatureHelper);
+
+        asicOutputStream.writeZipEntry("META-INF/manifest.xml", oasisManifest.toBytes());
 
         // Close container
         try {

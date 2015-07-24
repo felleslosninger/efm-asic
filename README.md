@@ -85,7 +85,6 @@ This component is currently work-in-progress.
 These features have not yet been implemented:
 
 * Proper signing when using XAdES format for signatures.
-* Creation of META-INF/manifest.xml.
 * Support for rootfile in CAdES manifest.
 
 ## Security

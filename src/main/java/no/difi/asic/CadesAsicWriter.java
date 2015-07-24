@@ -42,6 +42,7 @@ class CadesAsicWriter extends AbstractAsicWriter {
         // Adding signature file to asic manifest before actual signing
         ((CadesAsicManifest) asicManifest).setSignature(signatureFilename, "application/x-pkcs7-signature");
 
+
         // Generates and writes manifest (META-INF/asicmanifest.xml) to the zip archive
         byte[] manifestBytes = ((CadesAsicManifest) asicManifest).toBytes();
         asicOutputStream.writeZipEntry("META-INF/asicmanifest.xml", manifestBytes);

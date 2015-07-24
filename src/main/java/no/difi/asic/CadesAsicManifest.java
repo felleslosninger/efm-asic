@@ -54,7 +54,7 @@ class CadesAsicManifest extends AbstractAsicManifest {
 
     public void setRootFilename(String filename) {
         if (rootFilenameIsSet)
-            throw new IllegalStateException("Multiple root files is not allowed.");
+            throw new IllegalStateException("Multiple root files are not allowed.");
 
         for (DataObjectReference dataObject : ASiCManifestType.getDataObjectReferences()) {
             if (dataObject.getURI().equals(filename)) {

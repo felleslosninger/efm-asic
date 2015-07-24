@@ -63,7 +63,7 @@ public class AsicWriterFactory {
      * @see #newContainer(File)
      */
     public AsicWriter newContainer(Path path) throws IOException {
-        return newContainer(Files.newOutputStream(path), path);
+        return newContainer(Files.newOutputStream(path), true);
     }
 
     /**
@@ -73,15 +73,15 @@ public class AsicWriterFactory {
      * @throws IOException
      */
     public AsicWriter newContainer(OutputStream outputStream) throws IOException {
-        return newContainer(outputStream, null);
+        return newContainer(outputStream, false);
     }
 
-    AsicWriter newContainer(OutputStream outputStream, Path file) throws IOException {
+    AsicWriter newContainer(OutputStream outputStream, boolean closeStreamOnClose) throws IOException {
         switch (signatureMethod) {
             case CAdES:
-                return new CadesAsicWriter(signatureMethod, outputStream, file);
+                return new CadesAsicWriter(signatureMethod, outputStream, closeStreamOnClose);
             case XAdES:
-                return new XadesAsicWriter(signatureMethod, outputStream, file);
+                return new XadesAsicWriter(signatureMethod, outputStream, closeStreamOnClose);
             default:
                 throw new IllegalStateException(String.format("Not implemented: %s", signatureMethod));
         }

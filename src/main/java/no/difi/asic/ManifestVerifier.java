@@ -55,6 +55,10 @@ class ManifestVerifier {
         this.asicManifest.getCertificates().add(certificate);
     }
 
+    public void setRootFilename(String filename) {
+        asicManifest.setRootfile(filename);
+    }
+
     public void verifyAllVerified() {
         for (AsicFile asicFile : asicManifest.getFiles())
             if (!asicFile.isVerified())

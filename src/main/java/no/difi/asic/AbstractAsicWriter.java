@@ -27,7 +27,7 @@ abstract class AbstractAsicWriter implements AsicWriter {
 
     protected boolean finished = false;
     protected OutputStream containerOutputStream = null;
-    protected Path containerPath = null;
+    protected boolean closeStreamOnClose = false;
 
     protected OasisManifest oasisManifest = null;
 
@@ -35,10 +35,10 @@ abstract class AbstractAsicWriter implements AsicWriter {
      * Prepares creation of a new container.
      * @param outputStream Stream used to write container.
      */
-    public AbstractAsicWriter(OutputStream outputStream, Path containerPath, AbstractAsicManifest asicManifest) throws IOException {
+    public AbstractAsicWriter(OutputStream outputStream, boolean closeStreamOnClose, AbstractAsicManifest asicManifest) throws IOException {
         // Keep original output stream
         this.containerOutputStream = outputStream;
-        this.containerPath = containerPath;
+        this.closeStreamOnClose = closeStreamOnClose;
 
         // Initiate manifest
         this.asicManifest = asicManifest;
@@ -206,7 +206,7 @@ abstract class AbstractAsicWriter implements AsicWriter {
             throw new IllegalStateException(String.format("Unable to finish the container: %s", e.getMessage()), e);
         }
 
-        if (containerPath != null) {
+        if (closeStreamOnClose) {
             try {
                 containerOutputStream.flush();
                 containerOutputStream.close();
@@ -220,19 +220,6 @@ abstract class AbstractAsicWriter implements AsicWriter {
 
     /** Creating the signature and writing it into the archive is delegated to the actual implementation */
     abstract void performSign(SignatureHelper signatureHelper) throws IOException;
-
-    @Override
-    public File getContainerFile() {
-        return getContainerPath().toFile();
-    }
-
-    @Override
-    public Path getContainerPath() {
-        if (containerPath == null)
-            throw new IllegalStateException("Output path is not known");
-
-        return containerPath;
-    }
 
     public AbstractAsicManifest getAsicManifest() {
         return asicManifest;

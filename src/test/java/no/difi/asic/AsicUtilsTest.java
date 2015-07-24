@@ -1,8 +1,6 @@
 package no.difi.asic;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
 import java.io.ByteArrayInputStream;
@@ -12,8 +10,6 @@ import java.io.IOException;
 import static org.testng.Assert.*;
 
 public class AsicUtilsTest {
-
-    private static Logger log = LoggerFactory.getLogger(AsicUtilsTest.class);
 
     private AsicReaderFactory asicReaderFactory = AsicReaderFactory.newFactory();
     private AsicWriterFactory asicWriterFactory = AsicWriterFactory.newFactory();
@@ -36,14 +32,6 @@ public class AsicUtilsTest {
                 .add(new ByteArrayInputStream(fileContent2.getBytes()), "content2.txt", MimeType.forString("text/plain"))
                 // .add(new ByteArrayInputStream("manifest".getBytes()), "META-INF/manifest.xml", MimeType.forString("application/xml"))
                 .sign(signatureHelper);
-
-        // Test to make sure exception is thrown.
-        try {
-            asicWriter.getContainerFile();
-            fail("Exception expected");
-        } catch (IllegalStateException e) {
-            log.info(e.getMessage());
-        }
 
         // Combine containers
         ByteArrayOutputStream target = new ByteArrayOutputStream();

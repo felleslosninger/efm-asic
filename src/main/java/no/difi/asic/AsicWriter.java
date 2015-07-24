@@ -80,6 +80,8 @@ public interface AsicWriter {
      */
     AsicWriter add(InputStream inputStream, String filename, MimeType mimeType) throws IOException;
 
+    AsicWriter setRootFilename(String filename);
+
     /**
      * Signs and closes the ASiC archive. The private and public key is obtained from the supplied key store.
      *
@@ -104,8 +106,4 @@ public interface AsicWriter {
     AsicWriter sign(File keyStoreFile, String keyStorePassword, String keyAlias, String keyPassword) throws IOException;
 
     AsicWriter sign(SignatureHelper signatureHelper) throws IOException;
-
-    File getContainerFile();
-
-    Path getContainerPath();
 }

@@ -80,9 +80,8 @@ public class AsicCadesWriterTest {
                 .add(new File(envelopeUrl.toURI()))
                 // Specifies the file, the archive entry name and explicitly names the MIME type
                 .add(new File(messageUrl.toURI()), BII_MESSAGE_XML, MimeType.forString("application/xml"))
+                .setRootFilename(envelopeUrl.toURI().toString())
                 .sign(keystoreFile, TestUtil.keyStorePassword(), TestUtil.keyPairAlias(), TestUtil.privateKeyPassword());
-
-        File file = asicWriter.getContainerFile();
 
         // Verifies that both files have been added.
         {
@@ -97,11 +96,11 @@ public class AsicCadesWriterTest {
             assertEquals(matchCount, 2, "Entries were not added properly into list");
         }
 
-        assertTrue(file.canRead(), "ASiC container can not be read");
+        assertTrue(asicOutputFile.canRead(), "ASiC container can not be read");
 
-        log.info("Generated file " + file);
+        log.info("Generated file " + asicOutputFile);
 
-        ZipFile zipFile = new ZipFile(file);
+        ZipFile zipFile = new ZipFile(asicOutputFile);
         Enumeration<? extends ZipEntry> entries = zipFile.entries();
 
         {
@@ -135,7 +134,7 @@ public class AsicCadesWriterTest {
             assertTrue(e instanceof IllegalStateException);
         }
 
-        asicVerifierFactory.verify(file);
+        asicVerifierFactory.verify(asicOutputFile);
     }
 
     @Test

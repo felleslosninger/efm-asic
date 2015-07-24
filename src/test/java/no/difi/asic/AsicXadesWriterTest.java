@@ -63,7 +63,7 @@ public class AsicXadesWriterTest {
                 .add(new File(messageUrl.toURI()), "bii-message.xml", MimeType.forString("application/xml"))
                 .sign(keystoreFile, "changeit", "client_alias", "changeit");
 
-        File file = asicWriter.getContainerFile();
+        File file = new File(System.getProperty("java.io.tmpdir"), "asic-sample-xades.zip");
 
         // Verifies that both files have been added.
         {

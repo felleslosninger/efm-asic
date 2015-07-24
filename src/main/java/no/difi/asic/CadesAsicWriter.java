@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.file.Path;
 import java.util.UUID;
 
 /**
@@ -25,8 +24,14 @@ class CadesAsicWriter extends AbstractAsicWriter {
      * Prepares creation of a new container.
      * @param outputStream Stream used to write container.
      */
-    public CadesAsicWriter(SignatureMethod signatureMethod, OutputStream outputStream, Path containerPath) throws IOException {
-        super(outputStream, containerPath, new CadesAsicManifest(signatureMethod.getMessageDigestAlgorithm()));
+    public CadesAsicWriter(SignatureMethod signatureMethod, OutputStream outputStream, boolean closeStreamOnClose) throws IOException {
+        super(outputStream, closeStreamOnClose, new CadesAsicManifest(signatureMethod.getMessageDigestAlgorithm()));
+    }
+
+    @Override
+    public AsicWriter setRootFilename(String filename) {
+        ((CadesAsicManifest) asicManifest).setRootFilename(filename);
+        return this;
     }
 
     @Override

@@ -31,6 +31,7 @@ class CadesAsicManifest extends AbstractAsicManifest {
 
     // Automagically generated from XML Schema Definition files
     private ASiCManifest ASiCManifestType = new ASiCManifest();
+    private boolean rootFilenameIsSet = false;
 
     public CadesAsicManifest(MessageDigestAlgorithm messageDigestAlgorithm) {
         super(messageDigestAlgorithm);
@@ -49,6 +50,18 @@ class CadesAsicManifest extends AbstractAsicManifest {
 
         ASiCManifestType.getDataObjectReferences().add(dataObject);
         log.debug(String.format("Digest: %s", new String(Base64.encode(dataObject.getDigestValue()))));
+    }
+
+    public void setRootFilename(String filename) {
+        if (rootFilenameIsSet)
+            throw new IllegalStateException("Multiple root files is not allowed.");
+
+        for (DataObjectReference dataObject : ASiCManifestType.getDataObjectReferences()) {
+            if (dataObject.getURI().equals(filename)) {
+                setRootFilename(filename);
+                rootFilenameIsSet = true;
+            }
+        }
     }
 
     public void setSignature(String filename, String mimeType) {
@@ -92,8 +105,11 @@ class CadesAsicManifest extends AbstractAsicManifest {
                 sigReference = "META-INF/signature.p7s";
 
             // Run through recorded objects
-            for (DataObjectReference reference : manifest.getDataObjectReferences())
+            for (DataObjectReference reference : manifest.getDataObjectReferences()) {
                 manifestVerifier.update(reference.getURI(), reference.getMimeType(), reference.getDigestValue(), reference.getDigestMethod().getAlgorithm(), sigReference);
+                if (reference.isRootfile() == Boolean.TRUE)
+                    manifestVerifier.setRootFilename(reference.getURI());
+            }
 
             log.info(sigReference);
             return sigReference;

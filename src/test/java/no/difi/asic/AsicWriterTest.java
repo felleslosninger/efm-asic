@@ -26,7 +26,6 @@ public class AsicWriterTest {
 
     public static final Logger log = LoggerFactory.getLogger(AsicWriterTest.class);
 
-    public static final int BYTES_TO_CHECK = 40;
     public static final String BII_ENVELOPE_XML = "bii-envelope.xml";
     public static final String BII_MESSAGE_XML = "bii-message.xml";
     private File keystoreFile;
@@ -85,9 +84,6 @@ public class AsicWriterTest {
 
 
         // PART 2 - verify the contents of the archive.
-        File file = asicWriter.getContainerFile();
-
-        assertEquals(archiveOutputFile, file);
 
         {
             int matchCount = 0;
@@ -101,11 +97,11 @@ public class AsicWriterTest {
             assertEquals(matchCount, 2, "Entries were not added properly into list");
         }
 
-        assertTrue(file.canRead(), "ASiC container can not be read");
+        assertTrue(archiveOutputFile.canRead(), "ASiC container can not be read");
 
-        log.info("Generated file " + file);
+        log.info("Generated file " + archiveOutputFile);
 
-        ZipFile zipFile = new ZipFile(file);
+        ZipFile zipFile = new ZipFile(archiveOutputFile);
         Enumeration<? extends ZipEntry> entries = zipFile.entries();
 
         {
@@ -139,7 +135,7 @@ public class AsicWriterTest {
             assertTrue(e instanceof IllegalStateException);
         }
 
-        AsicVerifier asicVerifier = asicVerifierFactory.verify(file);
+        AsicVerifier asicVerifier = asicVerifierFactory.verify(archiveOutputFile);
         assertEquals(asicVerifier.getAsicManifest().getFiles().size(), 2);
     }
 
@@ -152,7 +148,7 @@ public class AsicWriterTest {
         AsicWriterFactory asicWriterFactory = AsicWriterFactory.newFactory();
 
         // Creates the actual container with all the data objects (files) and signs it.
-        AsicWriter asicWriter = asicWriterFactory.newContainer(archiveOutputFile)
+        asicWriterFactory.newContainer(archiveOutputFile)
                 // Adds an ordinary file, using the file name as the entry name
                 .add(biiEnvelopeFile)
                         // Adds another file, explicitly naming the entry and specifying the MIME type

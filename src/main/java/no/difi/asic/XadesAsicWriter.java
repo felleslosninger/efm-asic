@@ -2,12 +2,16 @@ package no.difi.asic;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.file.Path;
 
 class XadesAsicWriter extends AbstractAsicWriter {
 
-    public XadesAsicWriter(SignatureMethod signatureMethod, OutputStream outputStream, Path containerPath) throws IOException {
-        super(outputStream, containerPath, new XadesAsicManifest(signatureMethod.getMessageDigestAlgorithm()));
+    public XadesAsicWriter(SignatureMethod signatureMethod, OutputStream outputStream, boolean closeStreamOnClose) throws IOException {
+        super(outputStream, closeStreamOnClose, new XadesAsicManifest(signatureMethod.getMessageDigestAlgorithm()));
+    }
+
+    @Override
+    public AsicWriter setRootFilename(String filename) {
+        throw new IllegalStateException("ASiC-E XAdES does not support defining root file.");
     }
 
     @Override

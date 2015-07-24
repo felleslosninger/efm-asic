@@ -11,6 +11,8 @@ import java.io.*;
 import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 
 /**
@@ -28,6 +30,11 @@ class AbstractAsicReader {
     private ZipEntry currentZipEntry;
 
     private ManifestVerifier manifestVerifier;
+
+    /**
+     * Used to hold signature or manifest for CAdES as they are not in the same file.
+     */
+    private Map<String, Object> signingContent = new HashMap<>();
 
     AbstractAsicReader(MessageDigestAlgorithm messageDigestAlgorithm, InputStream inputStream) throws IOException {
         this.manifestVerifier = new ManifestVerifier(messageDigestAlgorithm);
@@ -100,50 +107,42 @@ class AbstractAsicReader {
         }
     }
 
-    ByteArrayOutputStream manifestStream = null;
-
-    void handleMetadata() throws IOException {
+    private void handleMetadata() throws IOException {
         String filename = currentZipEntry.getName().substring(9).toLowerCase();
 
-        // Handling manifest in ASiC CAdES.
+        // Read content in file
+        ByteArrayOutputStream contentStream = new ByteArrayOutputStream();
+        IOUtils.copy(zipInputStream, contentStream);
+
         if (filename.startsWith("asicmanifest")) {
-            // Read content in manifest (also used for verification of signature)
-            manifestStream = new ByteArrayOutputStream();
-            IOUtils.copy(zipInputStream, manifestStream);
-
-            // Updating namespace
-            String manifest = manifestStream.toString();
-            manifest = manifest.replace("http://uri.etsi.org/2918/v1.1.1#", "http://uri.etsi.org/2918/v1.2.1#");
-
-            CadesAsicManifest.extractAndVerify(new ByteArrayInputStream(manifest.getBytes()), manifestVerifier);
-        }
-
-        // if (filename.equals("manifest.xml")) {
-            // No action
-        // }
-
-        if (filename.startsWith("signature")) {
+            // Handling manifest in ASiC CAdES.
+            String sigReference = CadesAsicManifest.extractAndVerify(contentStream.toString(), manifestVerifier);
+            handleCadesSigning(sigReference, contentStream.toString());
+        } else if (filename.startsWith("signature")) {
             if (filename.endsWith(".p7s")) {
-                if (manifestStream != null) {
-                    ByteArrayOutputStream signatureStream = new ByteArrayOutputStream();
-                    IOUtils.copy(zipInputStream, signatureStream);
-
-                    Certificate certificate = SignatureHelper.validate(manifestStream.toByteArray(), signatureStream.toByteArray());
-                    certificate.setCert(currentZipEntry.getName());
-                    manifestVerifier.addCertificate(certificate);
-                }
+                // Handling signature in ASiC CAdES.
+                handleCadesSigning(currentZipEntry.getName(), contentStream);
             } else if (filename.endsWith(".xml")) {
-                log.info("Found for XAdES: " + filename);
-
-                manifestStream = new ByteArrayOutputStream();
-                IOUtils.copy(zipInputStream, manifestStream);
-
-                // Updating namespace
-                String manifest = manifestStream.toString();
-                manifest = manifest.replace("http://uri.etsi.org/02918/v1.2.1#", "http://uri.etsi.org/2918/v1.2.1#");
-
-                XadesAsicManifest.extractAndVerify(new ByteArrayInputStream(manifest.getBytes()), manifestVerifier);
+                // Handling manifest in ASiC XAdES.
+                XadesAsicManifest.extractAndVerify(contentStream.toString(), manifestVerifier);
             }
+        // } else if (filename.equals("manifest.xml")) {
+        // No action
+        }
+    }
+
+    private void handleCadesSigning(String sigReference, Object o) {
+        if (!signingContent.containsKey(sigReference))
+            signingContent.put(sigReference, o);
+        else {
+            byte[] data = o instanceof String ? ((String) o).getBytes() : ((String) signingContent.get(sigReference)).getBytes();
+            byte[] sign = o instanceof ByteArrayOutputStream ? ((ByteArrayOutputStream) o).toByteArray() : ((ByteArrayOutputStream) signingContent.get(sigReference)).toByteArray();
+
+            Certificate certificate = SignatureHelper.validate(data, sign);
+            certificate.setCert(currentZipEntry.getName());
+            manifestVerifier.addCertificate(certificate);
+
+            signingContent.remove(sigReference);
         }
     }
 

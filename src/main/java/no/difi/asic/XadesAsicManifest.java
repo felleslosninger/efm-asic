@@ -13,6 +13,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.security.cert.Certificate;
@@ -244,12 +245,16 @@ class XadesAsicManifest extends AbstractAsicManifest {
     }
 
     @SuppressWarnings("unchecked")
-    public static void extractAndVerify(InputStream inputStream, ManifestVerifier manifestVerifier) {
+    public static void extractAndVerify(String xml, ManifestVerifier manifestVerifier) {
+        // Updating namespace
+        xml = xml.replace("http://uri.etsi.org/2918/v1.1.1#", "http://uri.etsi.org/2918/v1.2.1#");
+        xml = xml.replace("http://uri.etsi.org/02918/v1.2.1#", "http://uri.etsi.org/2918/v1.2.1#");
+
         XAdESSignatures manifest;
 
         try {
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-            manifest = (XAdESSignatures) unmarshaller.unmarshal(inputStream);
+            manifest = (XAdESSignatures) unmarshaller.unmarshal(new ByteArrayInputStream(xml.getBytes()));
         } catch (Exception e) {
             throw new IllegalStateException("Unable to read content as XML", e);
         }

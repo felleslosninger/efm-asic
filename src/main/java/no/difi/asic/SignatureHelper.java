@@ -112,7 +112,7 @@ public class SignatureHelper {
      * @param data Content to be signed
      * @return Signature
      */
-    public byte[] signData(byte[] data) {
+    byte[] signData(byte[] data) {
         try {
             DigestCalculatorProvider digestCalculatorProvider = jcaDigestCalculatorProviderBuilder.build();
             ContentSigner contentSigner = jcaContentSignerBuilder.build(keyPair.getPrivate());
@@ -131,7 +131,7 @@ public class SignatureHelper {
     }
 
     @SuppressWarnings("unchecked")
-    public static no.difi.xsd.asic.model._1.Certificate validate(byte[] data, byte[] signature) {
+    static no.difi.xsd.asic.model._1.Certificate validate(byte[] data, byte[] signature) {
         no.difi.xsd.asic.model._1.Certificate certificate = null;
 
         try {
@@ -160,11 +160,11 @@ public class SignatureHelper {
         return certificate;
     }
 
-    public X509Certificate getX509Certificate() {
+    X509Certificate getX509Certificate() {
         return x509Certificate;
     }
 
-    public Certificate[] getCertificateChain() {
+    Certificate[] getCertificateChain() {
         return certificateChain;
     }
 }

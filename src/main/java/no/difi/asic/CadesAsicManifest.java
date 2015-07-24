@@ -12,6 +12,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
@@ -76,11 +77,15 @@ class CadesAsicManifest extends AbstractAsicManifest {
     }
 
     @SuppressWarnings("unchecked")
-    public static void extractAndVerify(InputStream inputStream, ManifestVerifier manifestVerifier) {
+    public static String extractAndVerify(String xml, ManifestVerifier manifestVerifier) {
+        // Updating namespace
+        xml = xml.replace("http://uri.etsi.org/2918/v1.1.1#", "http://uri.etsi.org/2918/v1.2.1#");
+        xml = xml.replace("http://uri.etsi.org/02918/v1.2.1#", "http://uri.etsi.org/2918/v1.2.1#");
+
         try {
             // Read XML
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-            ASiCManifest manifest = (ASiCManifest) unmarshaller.unmarshal(inputStream);
+            ASiCManifest manifest = (ASiCManifest) unmarshaller.unmarshal(new ByteArrayInputStream(xml.getBytes()));
 
             String sigReference = manifest.getSigReference().getURI();
             if (sigReference == null)
@@ -89,6 +94,8 @@ class CadesAsicManifest extends AbstractAsicManifest {
             // Run through recorded objects
             for (DataObjectReference reference : manifest.getDataObjectReferences())
                 manifestVerifier.update(reference.getURI(), reference.getMimeType(), reference.getDigestValue(), reference.getDigestMethod().getAlgorithm(), sigReference);
+
+            return sigReference;
         } catch (JAXBException e) {
             throw new IllegalStateException("Unable to read content as XML");
         }

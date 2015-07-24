@@ -13,6 +13,14 @@ public class AsicUtils {
         // No action
     }
 
+    /**
+     * Combine multiple containers to one container.
+     *
+     * Does not preserve META-INF/manifest.xml.
+     *
+     * @param outputStream Stream for target container.
+     * @param inputStreams Streams for source containers.
+     */
     public static void combine(OutputStream outputStream, InputStream... inputStreams) throws IOException {
         AsicOutputStream target = new AsicOutputStream(outputStream);
         int counter = 0;
@@ -23,8 +31,10 @@ public class AsicUtils {
             ZipEntry zipEntry;
             while ((zipEntry = source.getNextEntry()) != null) {
                 // TODO Better code to make sure manifest filenames doesn't collide.
-                if (zipEntry.getName().equals("META-INF/asicmanifest.xml"))
+                if (zipEntry.getName().startsWith("META-INF/asicmanifest"))
                     zipEntry = new ZipEntry(String.format("META-INF/asicmanifest%s.xml", ++counter));
+                if (zipEntry.getName().equals("META-INF/manifest.xml"))
+                    continue;
 
                 target.putNextEntry(zipEntry);
                 IOUtils.copy(source, target);

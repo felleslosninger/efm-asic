@@ -129,7 +129,7 @@ abstract class AbstractAsicWriter implements AsicWriter {
             throw new IllegalStateException("Adding content to container after signing container is not supported.");
 
         if (filename.startsWith("META-INF/"))
-            throw new IllegalStateException("Adding files to META-INF is currently not allowed.");
+            throw new IllegalStateException("Adding files to META-INF is not allowed.");
 
         // Creates new zip entry
         log.debug(String.format("Writing file %s to container", filename));

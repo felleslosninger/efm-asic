@@ -95,6 +95,7 @@ class CadesAsicManifest extends AbstractAsicManifest {
             for (DataObjectReference reference : manifest.getDataObjectReferences())
                 manifestVerifier.update(reference.getURI(), reference.getMimeType(), reference.getDigestValue(), reference.getDigestMethod().getAlgorithm(), sigReference);
 
+            log.info(sigReference);
             return sigReference;
         } catch (JAXBException e) {
             throw new IllegalStateException("Unable to read content as XML");

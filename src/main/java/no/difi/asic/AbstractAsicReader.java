@@ -67,8 +67,16 @@ class AbstractAsicReader {
                 return currentZipEntry.getName();
         }
 
+        // Making sure signatures are used and all files are signed after reading all content.
+
+        // All files must be signed by minimum one manifest/signature.
         manifestVerifier.verifyAllVerified();
 
+        // All CAdES signatures and manifest must be verified.
+        if (signingContent.size() > 0)
+            throw new IllegalStateException(String.format("Signature not verified: %s", signingContent.keySet().iterator().next()));
+
+        // Return null when container is out of content to read.
         return null;
     }
 
@@ -118,16 +126,16 @@ class AbstractAsicReader {
             // Handling manifest in ASiC CAdES.
             String sigReference = CadesAsicManifest.extractAndVerify(contentStream.toString(), manifestVerifier);
             handleCadesSigning(sigReference, contentStream.toString());
-        } else if (filename.startsWith("signature")) {
-            if (filename.endsWith(".p7s")) {
-                // Handling signature in ASiC CAdES.
-                handleCadesSigning(currentZipEntry.getName(), contentStream);
-            } else if (filename.endsWith(".xml")) {
-                // Handling manifest in ASiC XAdES.
-                XadesAsicManifest.extractAndVerify(contentStream.toString(), manifestVerifier);
-            }
-        // } else if (filename.equals("manifest.xml")) {
-        // No action
+        } else if (filename.startsWith("signature") && filename.endsWith(".xml")) {
+            // Handling manifest in ASiC XAdES.
+            XadesAsicManifest.extractAndVerify(contentStream.toString(), manifestVerifier);
+        } else if (filename.startsWith("signature") && filename.endsWith(".p7s")) {
+            // Handling signature in ASiC CAdES.
+            handleCadesSigning(currentZipEntry.getName(), contentStream);
+        } else if (filename.equals("manifest.xml")) {
+            // No action
+        } else {
+            throw new IllegalStateException(String.format("Contains unknown metadata file: %s", currentZipEntry.getName()));
         }
     }
 

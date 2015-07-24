@@ -77,7 +77,18 @@ public class AsicCadesReferenceTest {
         }
     }
 
-    @Test(enabled = false)
+    @Test
+    public void invalidMetadataFile() throws IOException {
+        try {
+            asicVerifierFactory.verify(getClass().getResourceAsStream("/asic-cades-test-invalid-metadata-file.asice"));
+            fail("Exception expected.");
+        } catch (IllegalStateException e) {
+            log.info(e.getMessage());
+            assertTrue(e.getMessage().contains("signature.malformed"));
+        }
+    }
+
+    @Test//(enabled = false)
     public void invalidSigReference() throws IOException {
         try {
             asicVerifierFactory.verify(getClass().getResourceAsStream("/asic-cades-test-invalid-sigreference.asice"));

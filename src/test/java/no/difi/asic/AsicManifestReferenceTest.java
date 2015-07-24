@@ -33,7 +33,7 @@ public class AsicManifestReferenceTest {
             obj1.setMimeType("application/xml");
 
             DigestMethod digestMethodType = new DigestMethod();
-            digestMethodType.setAlgorithm("http://www.w3.org/2000/09/xmldsig#sha256");
+            digestMethodType.setAlgorithm("http://www.w3.org/2001/04/xmlenc#sha256");
             obj1.setDigestMethod(digestMethodType);
             obj1.setDigestValue("j61wx3SAvKTMUP4NbeZ1".getBytes());
 
@@ -46,7 +46,7 @@ public class AsicManifestReferenceTest {
             obj2.setMimeType("application/xml");
 
             DigestMethod digestMethodType = new DigestMethod();
-            digestMethodType.setAlgorithm("http://www.w3.org/2000/09/xmldsig#sha256");
+            digestMethodType.setAlgorithm("http://www.w3.org/2001/04/xmlenc#sha256");
             obj2.setDigestMethod(digestMethodType);
             obj2.setDigestValue("j61wx3SAvKTMUP4NbeZ1".getBytes());
 

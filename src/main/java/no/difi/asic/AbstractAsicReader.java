@@ -54,7 +54,9 @@ class AbstractAsicReader {
             log.info(String.format("Found file: %s", currentZipEntry.getName()));
 
             // Files used for validation is not exposed
-            if (!specialFile())
+            if (currentZipEntry.getName().startsWith("META-INF/"))
+                handleMetadata();
+            else
                 return currentZipEntry.getName();
         }
 
@@ -100,10 +102,7 @@ class AbstractAsicReader {
 
     ByteArrayOutputStream manifestStream = null;
 
-    boolean specialFile() throws IOException {
-        if (!currentZipEntry.getName().startsWith("META-INF/"))
-            return false;
-
+    void handleMetadata() throws IOException {
         String filename = currentZipEntry.getName().substring(9).toLowerCase();
 
         // Handling manifest in ASiC CAdES.
@@ -117,13 +116,11 @@ class AbstractAsicReader {
             manifest = manifest.replace("http://uri.etsi.org/2918/v1.1.1#", "http://uri.etsi.org/2918/v1.2.1#");
 
             CadesAsicManifest.extractAndVerify(new ByteArrayInputStream(manifest.getBytes()), manifestVerifier);
-            return true;
         }
 
-        if (filename.equals("manifest.xml")) {
+        // if (filename.equals("manifest.xml")) {
             // No action
-            return true;
-        }
+        // }
 
         if (filename.startsWith("signature")) {
             if (filename.endsWith(".p7s")) {
@@ -147,11 +144,7 @@ class AbstractAsicReader {
 
                 XadesAsicManifest.extractAndVerify(new ByteArrayInputStream(manifest.getBytes()), manifestVerifier);
             }
-
-            return true;
         }
-
-        return false;
     }
 
     /**

@@ -1,9 +1,9 @@
 package no.difi.asic;
 
 import org.bouncycastle.util.encoders.Base64;
-import org.etsi.uri._2918.v1_2.ASiCManifest;
-import org.etsi.uri._2918.v1_2.DataObjectReference;
-import org.etsi.uri._2918.v1_2.SigReference;
+import org.etsi.uri._02918.v1_2.ASiCManifest;
+import org.etsi.uri._02918.v1_2.DataObjectReference;
+import org.etsi.uri._02918.v1_2.SigReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3._2000._09.xmldsig_.DigestMethod;
@@ -14,7 +14,6 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 
 class CadesAsicManifest extends AbstractAsicManifest {
 
@@ -79,8 +78,8 @@ class CadesAsicManifest extends AbstractAsicManifest {
     @SuppressWarnings("unchecked")
     public static String extractAndVerify(String xml, ManifestVerifier manifestVerifier) {
         // Updating namespace
-        xml = xml.replace("http://uri.etsi.org/2918/v1.1.1#", "http://uri.etsi.org/2918/v1.2.1#");
-        xml = xml.replace("http://uri.etsi.org/02918/v1.2.1#", "http://uri.etsi.org/2918/v1.2.1#");
+        xml = xml.replace("http://uri.etsi.org/02918/v1.1.1#", "http://uri.etsi.org/02918/v1.2.1#");
+        xml = xml.replace("http://uri.etsi.org/2918/v1.2.1#", "http://uri.etsi.org/02918/v1.2.1#");
 
         try {
             // Read XML

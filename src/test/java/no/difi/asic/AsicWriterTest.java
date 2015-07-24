@@ -1,6 +1,6 @@
 package no.difi.asic;
 
-import org.etsi.uri._2918.v1_2.DataObjectReference;
+import org.etsi.uri._02918.v1_2.DataObjectReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeMethod;

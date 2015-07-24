@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Fetched from https://github.com/difi/begrep-SikkerDigitalPost/blob/master/xsd/asic-e/ts_102918v010201.xsd -->
-<xsd:schema targetNamespace="http://uri.etsi.org/2918/v1.2.1#"
-	xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns="http://uri.etsi.org/2918/v1.2.1#"
+<!--
+History:
+2015-07-19: Fetched from https://github.com/difi/begrep-SikkerDigitalPost/blob/master/xsd/asic-e/ts_102918v010201.xsd [Erlend Klakegg Bergheim]
+2015-07-24: Updated namespace from 'http://uri.etsi.org/2918/v1.2.1#' to 'http://uri.etsi.org/02918/v1.2.1#' as defined in the standard. [Erlend Klakegg Bergheim]
+-->
+<xsd:schema targetNamespace="http://uri.etsi.org/02918/v1.2.1#"
+	xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns="http://uri.etsi.org/02918/v1.2.1#"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
 	attributeFormDefault="unqualified">
 	<xsd:import namespace="http://www.w3.org/2000/09/xmldsig#"

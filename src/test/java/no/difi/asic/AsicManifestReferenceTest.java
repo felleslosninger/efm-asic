@@ -1,9 +1,9 @@
 package no.difi.asic;
 
-import org.etsi.uri._2918.v1_2.ASiCManifest;
-import org.etsi.uri._2918.v1_2.DataObjectReference;
-import org.etsi.uri._2918.v1_2.ObjectFactory;
-import org.etsi.uri._2918.v1_2.SigReference;
+import org.etsi.uri._02918.v1_2.ASiCManifest;
+import org.etsi.uri._02918.v1_2.DataObjectReference;
+import org.etsi.uri._02918.v1_2.ObjectFactory;
+import org.etsi.uri._02918.v1_2.SigReference;
 import org.testng.annotations.Test;
 import org.w3._2000._09.xmldsig_.DigestMethod;
 

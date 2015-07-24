@@ -2,7 +2,7 @@ package no.difi.asic;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.etsi.uri._01903.v1_3.*;
-import org.etsi.uri._2918.v1_2.XAdESSignatures;
+import org.etsi.uri._02918.v1_2.XAdESSignatures;
 import org.w3._2000._09.xmldsig_.*;
 import org.w3._2000._09.xmldsig_.Object;
 import org.w3._2000._09.xmldsig_.SignatureMethod;
@@ -15,7 +15,6 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.util.GregorianCalendar;
@@ -247,8 +246,8 @@ class XadesAsicManifest extends AbstractAsicManifest {
     @SuppressWarnings("unchecked")
     public static void extractAndVerify(String xml, ManifestVerifier manifestVerifier) {
         // Updating namespace
-        xml = xml.replace("http://uri.etsi.org/2918/v1.1.1#", "http://uri.etsi.org/2918/v1.2.1#");
-        xml = xml.replace("http://uri.etsi.org/02918/v1.2.1#", "http://uri.etsi.org/2918/v1.2.1#");
+        xml = xml.replace("http://uri.etsi.org/02918/v1.1.1#", "http://uri.etsi.org/02918/v1.2.1#");
+        xml = xml.replace("http://uri.etsi.org/2918/v1.2.1#", "http://uri.etsi.org/02918/v1.2.1#");
 
         XAdESSignatures manifest;
 

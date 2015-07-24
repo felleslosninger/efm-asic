@@ -135,6 +135,7 @@ class AbstractAsicReader {
             // Handling signature in ASiC CAdES.
             handleCadesSigning(currentZipEntry.getName(), contentStream);
         } else if (filename.equals("manifest.xml")) {
+            // Read manifest.
             manifest = OasisManifest.read(new ByteArrayInputStream(contentStream.toByteArray()));
         } else {
             throw new IllegalStateException(String.format("Contains unknown metadata file: %s", currentZipEntry.getName()));

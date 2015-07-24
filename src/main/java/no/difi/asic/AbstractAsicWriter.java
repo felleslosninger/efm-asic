@@ -50,25 +50,25 @@ abstract class AbstractAsicWriter implements AsicWriter {
         oasisManifest = new OasisManifest(MimeType.forString(APPLICATION_VND_ETSI_ASIC_E_ZIP));
     }
 
-    // Helper method
+    /** {@inheritDoc} */
     @Override
     public AsicWriter add(File file) throws IOException {
         return add(file.toPath());
     }
 
-    // Helper method
+    /** {@inheritDoc} */
     @Override
     public AsicWriter add(File file, String entryName) throws IOException {
         return add(file.toPath(), entryName);
     }
 
-    // Helper method
+    /** {@inheritDoc} */
     @Override
     public AsicWriter add(Path path) throws IOException {
         return add(path, path.toFile().getName());
     }
 
-    // Helper method
+    /** {@inheritDoc} */
     @Override
     public AsicWriter add(Path path, String entryName) throws IOException {
         InputStream inputStream = Files.newInputStream(path);
@@ -77,14 +77,7 @@ abstract class AbstractAsicWriter implements AsicWriter {
         return this;
     }
 
-    /**
-     * Add content to container. Content type is detected using filename.
-     *
-     * @param inputStream Content to write to container
-     * @param filename Filename to use inside container
-     * @return Return self to allow using builder pattern
-     * @throws IOException
-     */
+    /** {@inheritDoc} */
     @Override
     public AsicWriter add(InputStream inputStream, String filename) throws IOException {
         // Use Files to find content type
@@ -105,11 +98,13 @@ abstract class AbstractAsicWriter implements AsicWriter {
         return add(inputStream, filename, MimeType.forString(mimeType));
     }
 
+    /** {@inheritDoc} */
     @Override
     public AsicWriter add(File file, String entryName, MimeType mimeType) throws IOException {
         return add(file.toPath(), entryName, mimeType);
     }
 
+    /** {@inheritDoc} */
     @Override
     public AsicWriter add(Path path, String entryName, MimeType mimeType) throws IOException {
         InputStream inputStream = Files.newInputStream(path);
@@ -118,15 +113,7 @@ abstract class AbstractAsicWriter implements AsicWriter {
         return this;
     }
 
-    /**
-     * Add content to container.
-     *
-     * @param inputStream Content to write to container
-     * @param filename Filename to use inside container
-     * @param mimeType Content type of inputStream
-     * @return Return self to allow using builder pattern
-     * @throws IOException
-     */
+    /** {@inheritDoc} */
     @Override
     public AsicWriter add(InputStream inputStream, String filename, MimeType mimeType) throws IOException {
         // Check status
@@ -159,31 +146,19 @@ abstract class AbstractAsicWriter implements AsicWriter {
         return this;
     }
 
+    /** {@inheritDoc} */
     @Override
     public AsicWriter sign(File keyStoreFile, String keyStorePassword, String keyPassword) throws IOException {
         return sign(keyStoreFile, keyStorePassword, null, keyPassword);
     }
 
-    /**
-     * Signs and closes ASiC container.
-     *
-     * @param keyStoreFile File reference for location of keystore.
-     * @param keyStorePassword Password for keystore.
-     * @param  keyAlias Alias for private key.
-     * @param keyPassword Password for private key.
-     * @return Return self to allow using builder pattern
-     */
+    /** {@inheritDoc} */
     @Override
     public AbstractAsicWriter sign(File keyStoreFile, String keyStorePassword, String keyAlias, String keyPassword) throws IOException {
         return sign(new SignatureHelper(keyStoreFile, keyStorePassword, keyAlias, keyPassword));
     }
 
-    /**
-     * Signs and closes ASiC container.
-     * @param signatureHelper Loaded SignatureHelper.
-     * @return Return self to allow using builder pattern
-     * @throws IOException
-     */
+    /** {@inheritDoc} */
     @Override
     public AbstractAsicWriter sign(SignatureHelper signatureHelper) throws IOException {
         // You may only sign once

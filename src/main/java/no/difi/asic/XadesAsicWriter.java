@@ -10,7 +10,7 @@ class XadesAsicWriter extends AbstractAsicWriter {
     }
 
     @Override
-    public AsicWriter setRootFilename(String filename) {
+    public AsicWriter setRootEntryName(String name) {
         throw new IllegalStateException("ASiC-E XAdES does not support defining root file.");
     }
 

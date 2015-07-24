@@ -80,7 +80,13 @@ public interface AsicWriter {
      */
     AsicWriter add(InputStream inputStream, String filename, MimeType mimeType) throws IOException;
 
-    AsicWriter setRootFilename(String filename);
+    /**
+     * Specifies which entry (file) represents the "root" document, i.e. which business document to read first.
+     *
+     * @param name of entry holding the root document.
+     * @return reference to this AsicWriter
+     */
+    AsicWriter setRootEntryName(String name);
 
     /**
      * Signs and closes the ASiC archive. The private and public key is obtained from the supplied key store.
@@ -105,5 +111,13 @@ public interface AsicWriter {
      */
     AsicWriter sign(File keyStoreFile, String keyStorePassword, String keyAlias, String keyPassword) throws IOException;
 
+    /**
+     * Allows re-use of the same SignatureHelper object when creating multiple ASiC archive and hence the need to create multiple signatures.
+     *
+     * @param signatureHelper instantiated SignatureHelper
+     * @return reference to this AsicWriter
+     * @see #sign(File, String, String, String)
+     * @throws IOException
+     */
     AsicWriter sign(SignatureHelper signatureHelper) throws IOException;
 }

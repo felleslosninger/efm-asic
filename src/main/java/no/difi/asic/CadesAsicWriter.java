@@ -28,9 +28,12 @@ class CadesAsicWriter extends AbstractAsicWriter {
         super(outputStream, closeStreamOnClose, new CadesAsicManifest(signatureMethod.getMessageDigestAlgorithm()));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public AsicWriter setRootFilename(String filename) {
-        ((CadesAsicManifest) asicManifest).setRootFilename(filename);
+    public AsicWriter setRootEntryName(String name) {
+        ((CadesAsicManifest) asicManifest).setRootFilename(name);
         return this;
     }
 

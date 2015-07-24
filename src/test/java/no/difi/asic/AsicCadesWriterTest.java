@@ -80,7 +80,7 @@ public class AsicCadesWriterTest {
                 .add(new File(envelopeUrl.toURI()))
                 // Specifies the file, the archive entry name and explicitly names the MIME type
                 .add(new File(messageUrl.toURI()), BII_MESSAGE_XML, MimeType.forString("application/xml"))
-                .setRootFilename(envelopeUrl.toURI().toString())
+                .setRootEntryName(envelopeUrl.toURI().toString())
                 .sign(keystoreFile, TestUtil.keyStorePassword(), TestUtil.keyPairAlias(), TestUtil.privateKeyPassword());
 
         // Verifies that both files have been added.

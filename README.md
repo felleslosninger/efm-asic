@@ -84,9 +84,14 @@ This component is currently work-in-progress.
 
 These features have not yet been implemented:
 
-* Verification of ASiC container.
 * Proper signing when using XAdES format for signatures.
- 
+* Creation of META-INF/manifest.xml.
+* Support for rootfile in CAdES manifest.
+
+## Security
+
+This library validate signatures, but does not validate the certificate. It's up to the implementer using the library
+to choose if and how to validate certificates. Certificate used for signing is exposed by the library.
 
 ## Creating an ASiC-E container manually
 

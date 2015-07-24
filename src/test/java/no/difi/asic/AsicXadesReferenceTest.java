@@ -7,6 +7,7 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.fail;
 
 public class AsicXadesReferenceTest {
@@ -27,6 +28,7 @@ public class AsicXadesReferenceTest {
     public void validDigidoc4j() throws IOException {
         AsicVerifier asicVerifier = asicVerifierFactory.verify(getClass().getResourceAsStream("/asic-xades-external-digidoc4j.asice"));
         assertEquals(asicVerifier.getAsicManifest().getFiles().size(), 2);
+        assertNotNull(asicVerifier.getOasisManifest());
     }
 
     // Fetched from https://github.com/esig/dss/blob/master/dss-asic/src/test/resources/plugtest/esig2014/ESIG-ASiC/EE_AS/Signature-A-EE_AS-1.asice
@@ -34,6 +36,7 @@ public class AsicXadesReferenceTest {
     public void validDss() throws IOException {
         AsicVerifier asicVerifier = asicVerifierFactory.verify(getClass().getResourceAsStream("/asic-xades-external-dss.asice"));
         assertEquals(asicVerifier.getAsicManifest().getFiles().size(), 1);
+        assertNotNull(asicVerifier.getOasisManifest());
     }
 
     @Test(enabled = false)

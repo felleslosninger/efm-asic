@@ -2,6 +2,7 @@ package no.difi.asic;
 
 import no.difi.xsd.asic.model._1.AsicManifest;
 import no.difi.xsd.asic.model._1.Certificate;
+import oasis.names.tc.opendocument.xmlns.manifest._1.Manifest;
 import org.apache.commons.io.IOUtils;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
@@ -30,6 +31,7 @@ class AbstractAsicReader {
     private ZipEntry currentZipEntry;
 
     private ManifestVerifier manifestVerifier;
+    private Manifest manifest;
 
     /**
      * Used to hold signature or manifest for CAdES as they are not in the same file.
@@ -133,7 +135,7 @@ class AbstractAsicReader {
             // Handling signature in ASiC CAdES.
             handleCadesSigning(currentZipEntry.getName(), contentStream);
         } else if (filename.equals("manifest.xml")) {
-            // No action
+            manifest = OasisManifest.read(new ByteArrayInputStream(contentStream.toByteArray()));
         } else {
             throw new IllegalStateException(String.format("Contains unknown metadata file: %s", currentZipEntry.getName()));
         }
@@ -161,6 +163,15 @@ class AbstractAsicReader {
      */
     public AsicManifest getAsicManifest() {
         return manifestVerifier.getAsicManifest();
+    }
+
+    /**
+     * Property getter for the OpenDocument manifest.
+     *
+     * @return value of property, null if document is not found in container.
+     */
+    public Manifest getOasisManifest() {
+        return manifest;
     }
 
 }

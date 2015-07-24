@@ -174,7 +174,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <excludePackageNames>org.etsi.*:org.w3.*:no.difi.xsd.*</excludePackageNames>
+                    <excludePackageNames>org.etsi.*:org.w3.*:oasis.names.*:no.difi.xsd.*</excludePackageNames>
                 </configuration>
             </plugin>
         </plugins>
@@ -193,6 +193,7 @@
                             <excludes>
                                 <exclude>org/etsi/**/*.class</exclude>
                                 <exclude>org/w3/**/*.class</exclude>
+                                <exclude>oasis/names/**/*.class</exclude>
                                 <exclude>no/difi/xsd/**/*.class</exclude>
                             </excludes>
                         </instrumentation>

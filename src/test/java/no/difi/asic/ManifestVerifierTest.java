@@ -10,7 +10,7 @@ public class ManifestVerifierTest {
 
     private static Logger log = LoggerFactory.getLogger(ManifestVerifierTest.class);
 
-    @Test(enabled = false) // Temporarily disabled
+    @Test
     public void validateMessageDigestAlgorithm() {
         ManifestVerifier manifestVerifier = new ManifestVerifier(MessageDigestAlgorithm.SHA256);
 

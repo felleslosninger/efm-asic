@@ -24,9 +24,8 @@ class ManifestVerifier {
     }
 
     public void update(String filename, String mimetype, byte[] digest, String digestAlgorithm, String sigReference) {
-        // Temporarily disabled
-        // if (digestAlgorithm != null && !digestAlgorithm.equals(messageDigestAlgorithm.getUri()))
-        //     throw new IllegalStateException(String.format("Wrong digest method for file %s: %s", filename, digestAlgorithm));
+        if (digestAlgorithm != null && !digestAlgorithm.equals(messageDigestAlgorithm.getUri()))
+            throw new IllegalStateException(String.format("Wrong digest method for file %s: %s", filename, digestAlgorithm));
 
         AsicFile asicFile = asicManifestMap.get(filename);
 

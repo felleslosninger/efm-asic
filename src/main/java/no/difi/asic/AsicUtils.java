@@ -18,7 +18,7 @@ public class AsicUtils {
     /**
      * Combine multiple containers to one container.
      *
-     * Does not preserve META-INF/manifest.xml.
+     * OASIS OpenDocument manifest is regenerated if all source containers contains valid manifest.
      *
      * @param outputStream Stream for target container.
      * @param inputStreams Streams for source containers.

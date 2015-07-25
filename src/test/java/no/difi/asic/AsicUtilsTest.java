@@ -1,6 +1,7 @@
 package no.difi.asic;
 
 
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
@@ -8,6 +9,7 @@ import org.testng.annotations.Test;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import static org.testng.Assert.*;
@@ -35,7 +37,6 @@ public class AsicUtilsTest {
         ByteArrayOutputStream source2 = new ByteArrayOutputStream();
         asicWriterFactory.newContainer(source2)
                 .add(new ByteArrayInputStream(fileContent2.getBytes()), "content2.txt", MimeType.forString("text/plain"))
-                // .add(new ByteArrayInputStream("manifest".getBytes()), "META-INF/manifest.xml", MimeType.forString("application/xml"))
                 .sign(signatureHelper);
 
         // Combine containers
@@ -76,6 +77,57 @@ public class AsicUtilsTest {
         assertEquals(zipInputStream.getNextEntry().getName(), "META-INF/asicmanifest2.xml");
         zipInputStream.getNextEntry(); // Signature filename is unknown
         assertEquals(zipInputStream.getNextEntry().getName(), "META-INF/manifest.xml");
+        assertNull(zipInputStream.getNextEntry());
+        zipInputStream.close();
+    }
+
+    @Test
+    public void combineWhereOnlyOneHasManifest() throws IOException {
+        // Create first container
+        ByteArrayOutputStream source1 = new ByteArrayOutputStream();
+        asicWriterFactory.newContainer(source1)
+                .add(new ByteArrayInputStream(fileContent1.getBytes()), "content1.txt", MimeType.forString("text/plain"))
+                .sign(signatureHelper);
+
+        // Create second container
+        ByteArrayOutputStream source2 = new ByteArrayOutputStream();
+        asicWriterFactory.newContainer(source2)
+                .add(new ByteArrayInputStream(fileContent2.getBytes()), "content2.txt", MimeType.forString("text/plain"))
+                .sign(signatureHelper);
+
+        // Rewrite source2 to remove META-INF/manifest.xml
+        ByteArrayOutputStream source2simpler = new ByteArrayOutputStream();
+        AsicInputStream source2input = new AsicInputStream(new ByteArrayInputStream(source2.toByteArray()));
+        AsicOutputStream source2output = new AsicOutputStream(source2simpler);
+
+        ZipEntry zipEntry;
+        while ((zipEntry = source2input.getNextEntry()) != null) {
+            if (!zipEntry.getName().equals("META-INF/manifest.xml")) {
+                source2output.putNextEntry(zipEntry);
+                IOUtils.copy(source2input, source2output);
+                source2output.closeEntry();
+                source2input.closeEntry();
+            }
+        }
+
+        source2output.close();
+        source2input.close();
+        source2simpler.close();
+
+        // Combine containers
+        ByteArrayOutputStream target = new ByteArrayOutputStream();
+        AsicUtils.combine(target, new ByteArrayInputStream(source1.toByteArray()), new ByteArrayInputStream(source2simpler.toByteArray()));
+
+        // Read container (zip)
+        ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(target.toByteArray()));
+        assertEquals(zipInputStream.getNextEntry().getName(), "mimetype");
+        assertEquals(zipInputStream.getNextEntry().getName(), "content1.txt");
+        assertEquals(zipInputStream.getNextEntry().getName(), "META-INF/asicmanifest1.xml");
+        zipInputStream.getNextEntry(); // Signature filename is unknown
+        assertEquals(zipInputStream.getNextEntry().getName(), "content2.txt");
+        assertEquals(zipInputStream.getNextEntry().getName(), "META-INF/asicmanifest2.xml");
+        zipInputStream.getNextEntry(); // Signature filename is unknown
+        assertNull(zipInputStream.getNextEntry());
         zipInputStream.close();
     }
 

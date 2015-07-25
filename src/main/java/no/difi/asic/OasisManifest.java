@@ -48,8 +48,10 @@ class OasisManifest {
         manifest.getFileEntries().add(fileEntry);
     }
 
-    public void add(FileEntry fileEntry) {
-        manifest.getFileEntries().add(fileEntry);
+    public void append(OasisManifest oasisManifest) {
+        for (FileEntry fileEntry : oasisManifest.getManifest().getFileEntries())
+            if (!fileEntry.getFullPath().equals("/"))
+                manifest.getFileEntries().add(fileEntry);
     }
 
     public int size() {

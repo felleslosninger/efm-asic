@@ -1,15 +1,19 @@
 package no.difi.asic;
 
-import oasis.names.tc.opendocument.xmlns.manifest._1.FileEntry;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 
 public class AsicUtils {
 
     /** The MIME type, which should be the very first entry in the container */
     public static final String MIMETYPE_ASICE = "application/vnd.etsi.asic-e+zip";
+
+    static final Pattern PATTERN_CADES_MANIFEST = Pattern.compile("META-INF\\/asicmanifest(.*)\\.xml", Pattern.CASE_INSENSITIVE);
+    static final Pattern PATTERN_CADES_SIGNATURE = Pattern.compile("META-INF\\/signature(.*)\\.p7s", Pattern.CASE_INSENSITIVE);
+    static final Pattern PATTERN_XADES_SIGNATURES = Pattern.compile("META-INF\\/signatures(.*)\\.xml", Pattern.CASE_INSENSITIVE);
 
     AsicUtils() {
         // No action
@@ -43,7 +47,7 @@ public class AsicUtils {
             ZipEntry zipEntry;
             while ((zipEntry = source.getNextEntry()) != null) {
                 // TODO Better code to make sure XAdES manifest filenames doesn't collide.
-                if (zipEntry.getName().startsWith("META-INF/asicmanifest")) {
+                if (PATTERN_CADES_MANIFEST.matcher(zipEntry.getName()).matches()) {
                     // Fetch content
                     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                     IOUtils.copy(source, byteArrayOutputStream);
@@ -62,16 +66,17 @@ public class AsicUtils {
                     // Write manifest to container
                     target.putNextEntry(new ZipEntry(String.format("META-INF/asicmanifest%s.xml", ++manifestCounter)));
                     IOUtils.copy(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()), target);
+                } else if (PATTERN_XADES_SIGNATURES.matcher(zipEntry.getName()).matches()) {
+                    // Copy content to target container
+                    target.putNextEntry(new ZipEntry(String.format("META-INF/signatures%s.xml", ++manifestCounter)));
+                    IOUtils.copy(source, target);
                 } else if (zipEntry.getName().equals("META-INF/manifest.xml")) {
                     // Fetch content
                     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                     IOUtils.copy(source, byteArrayOutputStream);
 
                     // Copy entries
-                    OasisManifest sourceOasisManifest = new OasisManifest(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()));
-                    for (FileEntry fileEntry : sourceOasisManifest.getManifest().getFileEntries())
-                        if (!fileEntry.getFullPath().equals("/"))
-                            oasisManifest.add(fileEntry);
+                    oasisManifest.append(new OasisManifest(new ByteArrayInputStream(byteArrayOutputStream.toByteArray())));
 
                     // Nothing to write to target container
                     target.closeEntry();

@@ -130,14 +130,14 @@ class AbstractAsicReader {
         ByteArrayOutputStream contentsOfStream = new ByteArrayOutputStream();
         IOUtils.copy(zipInputStream, contentsOfStream);
 
-        if (filename.startsWith("asicmanifest")) {
+        if (AsicUtils.PATTERN_CADES_MANIFEST.matcher(currentZipEntry.getName()).matches()) {
             // Handling manifest in ASiC CAdES.
             String sigReference = CadesAsicManifest.extractAndVerify(contentsOfStream.toString(), manifestVerifier);
             handleCadesSigning(sigReference, contentsOfStream.toString());
-        } else if (filename.startsWith("signature") && filename.endsWith(".xml")) {
+        } else if (AsicUtils.PATTERN_XADES_SIGNATURES.matcher(currentZipEntry.getName()).matches()) {
             // Handling manifest in ASiC XAdES.
             XadesAsicManifest.extractAndVerify(contentsOfStream.toString(), manifestVerifier);
-        } else if (filename.startsWith("signature") && filename.endsWith(".p7s")) {
+        } else if (AsicUtils.PATTERN_CADES_SIGNATURE.matcher(currentZipEntry.getName()).matches()) {
             // Handling signature in ASiC CAdES.
             handleCadesSigning(currentZipEntry.getName(), contentsOfStream);
         } else if (filename.equals("manifest.xml")) {

@@ -113,7 +113,7 @@ class CadesAsicManifest extends AbstractAsicManifest {
 
             return sigReference;
         } catch (JAXBException e) {
-            throw new IllegalStateException("Unable to read content as XML");
+            throw new IllegalStateException("Unable to read content as XML", e);
         }
     }
 

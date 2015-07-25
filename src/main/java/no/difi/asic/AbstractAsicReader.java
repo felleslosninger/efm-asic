@@ -45,7 +45,7 @@ class AbstractAsicReader {
             messageDigest = MessageDigest.getInstance(messageDigestAlgorithm.getAlgorithm());
             messageDigest.reset();
         } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException(String.format("Algorithm %s not supported", messageDigestAlgorithm.getAlgorithm()));
+            throw new IllegalStateException(String.format("Algorithm %s not supported", messageDigestAlgorithm.getAlgorithm()), e);
         }
 
         zipInputStream = new AsicInputStream(inputStream);

@@ -37,7 +37,7 @@ class OasisManifest {
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
             manifest = (Manifest) unmarshaller.unmarshal(inputStream);
         } catch (JAXBException e) {
-            throw new IllegalStateException("Unable to read XML as OASIS OpenDocument Manifest.");
+            throw new IllegalStateException("Unable to read XML as OASIS OpenDocument Manifest.", e);
         }
     }
 
@@ -76,7 +76,7 @@ class OasisManifest {
 
             return byteArrayOutputStream.toByteArray();
         } catch (JAXBException e) {
-            throw new IllegalStateException("Unable to create OASIS OpenDocument Manifest.");
+            throw new IllegalStateException("Unable to create OASIS OpenDocument Manifest.", e);
         }
     }
 }

@@ -70,7 +70,7 @@ public class AsicUtils {
                     // Copy entries
                     OasisManifest sourceOasisManifest = new OasisManifest(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()));
                     for (FileEntry fileEntry : sourceOasisManifest.getManifest().getFileEntries())
-                        if (fileEntry.getFullPath().equals("/"))
+                        if (!fileEntry.getFullPath().equals("/"))
                             oasisManifest.add(fileEntry);
 
                     // Nothing to write to target container
@@ -81,7 +81,8 @@ public class AsicUtils {
                     target.putNextEntry(zipEntry);
                     IOUtils.copy(source, target);
 
-                    fileCounter++;
+                    if (!zipEntry.getName().startsWith("META-INF/"))
+                        fileCounter++;
                 }
 
                 source.closeEntry();
@@ -93,7 +94,7 @@ public class AsicUtils {
         }
 
         // Add manifest if it contains the same amount of files as the container.
-        if (oasisManifest.size() == fileCounter)
+        if (oasisManifest.size() == fileCounter + 1)
             target.writeZipEntry("META-INF/manifest.xml", oasisManifest.toBytes());
 
         // Close target container

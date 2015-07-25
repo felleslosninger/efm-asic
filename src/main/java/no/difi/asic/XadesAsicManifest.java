@@ -82,7 +82,7 @@ class XadesAsicManifest extends AbstractAsicManifest {
         }
     }
 
-    public byte[] toBytes(SignatureHelper signatureHelper) {
+    XAdESSignatures getCreateXAdESSignatures(SignatureHelper signatureHelper) {
         // \XAdESSignature
         XAdESSignatures xAdESSignaturesType = new XAdESSignatures();
 
@@ -105,12 +105,17 @@ class XadesAsicManifest extends AbstractAsicManifest {
         // \XAdESSignature\Signature\Object\SignatureValue
         signatureType.setSignatureValue(getSignature());
 
+        return xAdESSignaturesType;
+    }
+
+    public byte[] toBytes(SignatureHelper signatureHelper) {
+
         try {
             Marshaller marshaller = jaxbContext.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            marshaller.marshal(xAdESSignaturesType, baos);
+            marshaller.marshal(getCreateXAdESSignatures(signatureHelper), baos);
             return baos.toByteArray();
         } catch (JAXBException e) {
             throw new IllegalStateException("Unable to marshall the XAdESSignature into string output", e);
@@ -129,7 +134,7 @@ class XadesAsicManifest extends AbstractAsicManifest {
                 // \XAdESSignature\Signature\KeyInfo\X509Data\X509Certificate
                 x509DataType.getX509IssuerSerialsAndX509SKISAndX509SubjectNames().add(objectFactory.createX509DataX509Certificate(certificate.getEncoded()));
             } catch (CertificateEncodingException e) {
-                throw new IllegalStateException("Unable to insert certificate.");
+                throw new IllegalStateException("Unable to insert certificate.", e);
             }
         }
 

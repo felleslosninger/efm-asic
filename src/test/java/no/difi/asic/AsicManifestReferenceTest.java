@@ -4,11 +4,14 @@ import org.etsi.uri._02918.v1_2.ASiCManifest;
 import org.etsi.uri._02918.v1_2.DataObjectReference;
 import org.etsi.uri._02918.v1_2.ObjectFactory;
 import org.etsi.uri._02918.v1_2.SigReference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 import org.w3._2000._09.xmldsig_.DigestMethod;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
+import java.io.ByteArrayOutputStream;
 
 /**
  * @author steinar
@@ -16,6 +19,8 @@ import javax.xml.bind.Marshaller;
  *         Time: 09.09
  */
 public class AsicManifestReferenceTest {
+
+    private static Logger log = LoggerFactory.getLogger(AsicManifestReferenceTest.class);
 
     @Test
     public void createSampleManifest() throws Exception {
@@ -64,7 +69,9 @@ public class AsicManifestReferenceTest {
 
 
         // marshaller.marshal(m, System.out);
-        marshaller.marshal(asicManifest, System.out);
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        marshaller.marshal(asicManifest, byteArrayOutputStream);
+        log.info(byteArrayOutputStream.toString());
     }
 
 

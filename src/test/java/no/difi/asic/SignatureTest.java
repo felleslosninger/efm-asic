@@ -1,6 +1,8 @@
 package no.difi.asic;
 
 import org.apache.commons.codec.binary.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -28,6 +30,8 @@ import sun.security.x509.X500Name;
  */
 public class SignatureTest {
 
+    private static Logger log = LoggerFactory.getLogger(SignatureTest.class);
+
     @Test
     public void createSampleDigest() throws Exception {
 
@@ -47,7 +51,7 @@ public class SignatureTest {
 
         byte[] digest = md.digest();
         byte[] bytes = Base64.encodeBase64(digest);
-        System.out.println(new String(bytes));
+        log.debug(new String(bytes));
 
     }
 

@@ -8,6 +8,7 @@ import org.testng.annotations.Test;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.zip.ZipInputStream;
 
 import static org.testng.Assert.*;
 
@@ -32,7 +33,7 @@ public class AsicUtilsTest {
 
         // Create second container
         ByteArrayOutputStream source2 = new ByteArrayOutputStream();
-        AsicWriter asicWriter = asicWriterFactory.newContainer(source2)
+        asicWriterFactory.newContainer(source2)
                 .add(new ByteArrayInputStream(fileContent2.getBytes()), "content2.txt", MimeType.forString("text/plain"))
                 // .add(new ByteArrayInputStream("manifest".getBytes()), "META-INF/manifest.xml", MimeType.forString("application/xml"))
                 .sign(signatureHelper);
@@ -41,7 +42,7 @@ public class AsicUtilsTest {
         ByteArrayOutputStream target = new ByteArrayOutputStream();
         AsicUtils.combine(target, new ByteArrayInputStream(source1.toByteArray()), new ByteArrayInputStream(source2.toByteArray()));
 
-        // Read container
+        // Read container (asic)
         AsicReader asicReader = asicReaderFactory.open(new ByteArrayInputStream(target.toByteArray()));
 
         ByteArrayOutputStream fileStream;
@@ -64,6 +65,18 @@ public class AsicUtilsTest {
         assertNull(asicReader.getNextFile());
 
         asicReader.close();
+
+        // Read container (zip)
+        ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(target.toByteArray()));
+        assertEquals(zipInputStream.getNextEntry().getName(), "mimetype");
+        assertEquals(zipInputStream.getNextEntry().getName(), "content1.txt");
+        assertEquals(zipInputStream.getNextEntry().getName(), "META-INF/asicmanifest1.xml");
+        zipInputStream.getNextEntry(); // Signature filename is unknown
+        assertEquals(zipInputStream.getNextEntry().getName(), "content2.txt");
+        assertEquals(zipInputStream.getNextEntry().getName(), "META-INF/asicmanifest2.xml");
+        zipInputStream.getNextEntry(); // Signature filename is unknown
+        assertEquals(zipInputStream.getNextEntry().getName(), "META-INF/manifest.xml");
+        zipInputStream.close();
     }
 
     @Test

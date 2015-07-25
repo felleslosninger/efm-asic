@@ -1,6 +1,8 @@
 package no.difi.asic;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
 import java.io.ByteArrayInputStream;
@@ -10,6 +12,8 @@ import java.io.IOException;
 import static org.testng.Assert.*;
 
 public class AsicUtilsTest {
+
+    private static Logger log = LoggerFactory.getLogger(AsicUtilsTest.class);
 
     private AsicReaderFactory asicReaderFactory = AsicReaderFactory.newFactory();
     private AsicWriterFactory asicWriterFactory = AsicWriterFactory.newFactory();
@@ -61,6 +65,32 @@ public class AsicUtilsTest {
 
         asicReader.close();
     }
+
+    @Test
+    public void simpleMultipleRootfiles() throws IOException {
+        // Create first container
+        ByteArrayOutputStream source1 = new ByteArrayOutputStream();
+        asicWriterFactory.newContainer(source1)
+                .add(new ByteArrayInputStream(fileContent1.getBytes()), "content1.txt", MimeType.forString("text/plain"))
+                .setRootEntryName("content1.txt")
+                .sign(signatureHelper);
+
+        // Create second container
+        ByteArrayOutputStream source2 = new ByteArrayOutputStream();
+        AsicWriter asicWriter = asicWriterFactory.newContainer(source2)
+                .add(new ByteArrayInputStream(fileContent2.getBytes()), "content2.txt", MimeType.forString("text/plain"))
+                .setRootEntryName("content2.txt")
+                .sign(signatureHelper);
+
+        // Combine containers
+        try {
+            AsicUtils.combine(new ByteArrayOutputStream(), new ByteArrayInputStream(source1.toByteArray()), new ByteArrayInputStream(source2.toByteArray()));
+            fail("Exception expected.");
+        } catch (IllegalStateException e) {
+            log.info(e.getMessage());
+        }
+    }
+
 
     // Making Cobertura happy!
     @Test

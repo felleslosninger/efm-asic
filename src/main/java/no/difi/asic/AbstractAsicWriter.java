@@ -19,9 +19,6 @@ abstract class AbstractAsicWriter implements AsicWriter {
 
     public static final Logger log = LoggerFactory.getLogger(AbstractAsicWriter.class);
 
-    /** The MIME type, which should be the very first entry in the container */
-    public static final String APPLICATION_VND_ETSI_ASIC_E_ZIP = "application/vnd.etsi.asic-e+zip";
-
     protected AsicOutputStream asicOutputStream;
     protected AbstractAsicManifest asicManifest;
 
@@ -47,7 +44,7 @@ abstract class AbstractAsicWriter implements AsicWriter {
         asicOutputStream = new AsicOutputStream(outputStream);
 
         // Add mimetype to OASIS OpenDocument manifest
-        oasisManifest = new OasisManifest(MimeType.forString(APPLICATION_VND_ETSI_ASIC_E_ZIP));
+        oasisManifest = new OasisManifest(MimeType.forString(AsicUtils.MIMETYPE_ASICE));
     }
 
     /** {@inheritDoc} */

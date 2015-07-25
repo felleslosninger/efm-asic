@@ -58,7 +58,7 @@ class CadesAsicManifest extends AbstractAsicManifest {
 
         for (DataObjectReference dataObject : ASiCManifestType.getDataObjectReferences()) {
             if (dataObject.getURI().equals(filename)) {
-                setRootFilename(filename);
+                dataObject.setRootfile(true);
                 rootFilenameIsSet = true;
             }
         }
@@ -111,7 +111,6 @@ class CadesAsicManifest extends AbstractAsicManifest {
                     manifestVerifier.setRootFilename(reference.getURI());
             }
 
-            log.info(sigReference);
             return sigReference;
         } catch (JAXBException e) {
             throw new IllegalStateException("Unable to read content as XML");

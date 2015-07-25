@@ -28,14 +28,17 @@ public class AsicUtilsTest {
     @Test
     public void validatePatterns() {
         assertTrue(AsicUtils.PATTERN_CADES_MANIFEST.matcher("META-INF/asicmanifest.xml").matches());
+        assertTrue(AsicUtils.PATTERN_CADES_MANIFEST.matcher("META-INF/ASICMANIFESTt.xml").matches());
         assertTrue(AsicUtils.PATTERN_CADES_MANIFEST.matcher("META-INF/asicmanifest1.xml").matches());
         assertFalse(AsicUtils.PATTERN_CADES_MANIFEST.matcher("META-INF/asicmanifesk.xml").matches());
 
         assertTrue(AsicUtils.PATTERN_CADES_SIGNATURE.matcher("META-INF/signature.p7s").matches());
+        assertTrue(AsicUtils.PATTERN_CADES_SIGNATURE.matcher("META-INF/SIGNATURE.p7s").matches());
         assertTrue(AsicUtils.PATTERN_CADES_SIGNATURE.matcher("META-INF/signature-cafecafe.p7s").matches());
         assertFalse(AsicUtils.PATTERN_CADES_SIGNATURE.matcher("META-INF/signatures.xml").matches());
 
         assertTrue(AsicUtils.PATTERN_XADES_SIGNATURES.matcher("META-INF/signatures.xml").matches());
+        assertTrue(AsicUtils.PATTERN_XADES_SIGNATURES.matcher("META-INF/SIGNATURES.xml").matches());
         assertTrue(AsicUtils.PATTERN_XADES_SIGNATURES.matcher("META-INF/signatures1.xml").matches());
         assertFalse(AsicUtils.PATTERN_XADES_SIGNATURES.matcher("META-INF/signature.xml").matches());
     }

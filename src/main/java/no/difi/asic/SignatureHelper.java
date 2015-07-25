@@ -20,8 +20,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.security.*;
-import java.security.cert.*;
 import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 import java.util.Arrays;
 
 
@@ -96,14 +96,8 @@ public class SignatureHelper {
 
             jcaContentSignerBuilder = new JcaContentSignerBuilder(String.format("SHA1with%s", privateKey.getAlgorithm()))
                     .setProvider(BouncyCastleProvider.PROVIDER_NAME);
-        } catch (KeyStoreException e) {
-            throw new IllegalStateException("Unable to retrieve next element from keystore " + e.getMessage(), e);
-        } catch (UnrecoverableKeyException e) {
-            throw new IllegalStateException("Unable to get the private key from keystore " + e.getMessage(), e);
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException("Unable to retrieve private key from keystore " + e.getMessage(), e);
         } catch (Exception e) {
-            throw new IllegalStateException("Unable to load keystore: " + e.getMessage(), e);
+            throw new IllegalStateException(String.format("Unable to retrieve private key from keystore: %s", e.getMessage()), e);
         }
     }
 

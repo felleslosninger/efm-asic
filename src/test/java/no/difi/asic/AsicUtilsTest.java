@@ -41,6 +41,11 @@ public class AsicUtilsTest {
         assertTrue(AsicUtils.PATTERN_XADES_SIGNATURES.matcher("META-INF/SIGNATURES.xml").matches());
         assertTrue(AsicUtils.PATTERN_XADES_SIGNATURES.matcher("META-INF/signatures1.xml").matches());
         assertFalse(AsicUtils.PATTERN_XADES_SIGNATURES.matcher("META-INF/signature.xml").matches());
+
+        assertTrue(AsicUtils.PATTERN_EXTENSION_ASICE.matcher("mycontainer.asice").matches());
+        assertFalse(AsicUtils.PATTERN_EXTENSION_ASICE.matcher("mycontainer.asice3").matches());
+        assertFalse(AsicUtils.PATTERN_EXTENSION_ASICE.matcher("file://c/Users/skrue/mycontainer.asice3").matches());
+        assertTrue(AsicUtils.PATTERN_EXTENSION_ASICE.matcher("mycontainer.sce").matches());
     }
 
     @Test

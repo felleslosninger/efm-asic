@@ -1,19 +1,33 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>no.difi</groupId>
     <artifactId>asic</artifactId>
+    <version>0.9.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <version>0.1-SNAPSHOT</version>
+
     <name>asic</name>
+    <description>Implementation of ASiC-E.</description>
+    <url>https://github.com/difi/asic</url>
 
     <scm>
-        <connection>scm:git:git@github.com:difi/asic.git</connection>
-        <url>scm:git:git@github.com:difi/asic.git</url>
-        <developerConnection>scm:git:git@github.com:difi/asic.git</developerConnection>
         <tag>HEAD</tag>
+        <url>https://github.com/difi/asic</url>
+        <connection>scm:git:https://github.com/difi/asic.git</connection>
+        <developerConnection>scm:git:git@github.com:difi/asic.git</developerConnection>
     </scm>
+
+    <issueManagement>
+        <url>https://github.com/difi/asic/issues</url>
+        <system>GitHub Issues</system>
+    </issueManagement>
+
+    <organization>
+        <name>Direktoratet for forvaltning og IKT (Difi)</name>
+        <url>http://www.difi.no/</url>
+    </organization>
 
     <contributors>
         <contributor>
@@ -33,6 +47,14 @@
             </roles>
         </contributor>
     </contributors>
+
+    <licenses>
+        <license>
+            <name>GNU Lesser General Public License (LGPL), Version 3.0</name>
+            <url>http://www.gnu.org/licenses/lgpl-3.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
     <properties>
         <java.encoding>UTF-8</java.encoding>
@@ -64,6 +86,12 @@
             <artifactId>logback-classic</artifactId>
             <version>${logback.version}</version>
             <scope>runtime</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Commons -->
@@ -88,7 +116,7 @@
     </dependencies>
 
     <build>
-        <defaultGoal>install</defaultGoal>
+        <defaultGoal>clean install</defaultGoal>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>

@@ -15,6 +15,8 @@ public class AsicUtils {
     static final Pattern PATTERN_CADES_SIGNATURE = Pattern.compile("META-INF/signature(.*)\\.p7s", Pattern.CASE_INSENSITIVE);
     static final Pattern PATTERN_XADES_SIGNATURES = Pattern.compile("META-INF/signatures(.*)\\.xml", Pattern.CASE_INSENSITIVE);
 
+    static final Pattern PATTERN_EXTENSION_ASICE = Pattern.compile(".+\\.(asice|sce)", Pattern.CASE_INSENSITIVE);
+
     AsicUtils() {
         // No action
     }

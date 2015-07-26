@@ -117,10 +117,9 @@ class CadesAsicManifest extends AbstractAsicManifest {
                     manifestVerifier.setRootFilename(reference.getURI());
             }
 
-            log.info(sigReference);
             return sigReference;
         } catch (JAXBException e) {
-            throw new IllegalStateException("Unable to read content as XML");
+            throw new IllegalStateException("Unable to read content as XML", e);
         }
     }
 

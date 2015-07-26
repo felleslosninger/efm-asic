@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+import org.w3._2000._09.xmldsig_.Reference;
 
 import java.io.*;
 import java.net.URL;
@@ -57,11 +58,12 @@ public class AsicXadesWriterTest {
 
     @Test
     public void createSampleContainer() throws Exception {
+        SignatureHelper signatureHelper = new SignatureHelper(keystoreFile, "changeit", "client_alias", "changeit");
 
         AsicWriter asicWriter = asicContainerWriterFactory.newContainer(new File(System.getProperty("java.io.tmpdir")), "asic-sample-xades.zip")
                 .add(new File(envelopeUrl.toURI()))
                 .add(new File(messageUrl.toURI()), TestUtil.BII_SAMPLE_MESSAGE_XML, MimeType.forString("application/xml"))
-                .sign(keystoreFile, "changeit", "client_alias", "changeit");
+                .sign(signatureHelper);
 
         File file = new File(System.getProperty("java.io.tmpdir"), "asic-sample-xades.zip");
 
@@ -69,15 +71,14 @@ public class AsicXadesWriterTest {
         {
             int matchCount = 0;
             XadesAsicManifest asicManifest = (XadesAsicManifest) ((XadesAsicWriter) asicWriter).getAsicManifest();
-            /*
-            for (DataObjectReferenceType dataObject : asicManifest.getASiCManifestType().getDataObjectReference()) {
-                if (dataObject.getURI().equals(BII_ENVELOPE_XML))
+
+            for (Reference reference : asicManifest.getCreateXAdESSignatures(signatureHelper).getSignatures().get(0).getSignedInfo().getReferences()) {
+                if (reference.getURI().equals(BII_ENVELOPE_XML))
                     matchCount++;
-                if (dataObject.getURI().equals(BII_MESSAGE_XML))
+                if (reference.getURI().equals(BII_MESSAGE_XML))
                     matchCount++;
             }
-            */
-            // assertEquals(matchCount, 2, "Entries were not added properly into list");
+            assertEquals(matchCount, 2, "Entries were not added properly into list");
         }
 
         assertTrue(file.canRead(), "ASiC container can not be read");
@@ -99,7 +100,6 @@ public class AsicXadesWriterTest {
                     matchCount++;
                 }
                 log.info("Found " + name);
-                InputStream stream = zipFile.getInputStream(entry);
             }
             assertEquals(matchCount, 2, "Number of items in archive did not match");
         }
@@ -116,6 +116,19 @@ public class AsicXadesWriterTest {
             fail("Exception expected");
         } catch (Exception e) {
             assertTrue(e instanceof IllegalStateException);
+        }
+    }
+
+    @Test
+    public void rootfileNotSupported() throws IOException {
+        AsicWriter asicWriter = asicContainerWriterFactory.newContainer(new ByteArrayOutputStream());
+        asicWriter.add(new ByteArrayInputStream("Content".getBytes()), "rootfile.txt");
+
+        try {
+            asicWriter.setRootEntryName("rootfile.txt");
+            fail("Exception expected.");
+        } catch (IllegalStateException e) {
+            log.info(e.getMessage());
         }
     }
 }

@@ -23,12 +23,7 @@ class OasisManifest {
     }
 
     public static Manifest read(InputStream inputStream) {
-        try {
-            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-            return (Manifest) unmarshaller.unmarshal(inputStream);
-        } catch (JAXBException e) {
-            throw new IllegalStateException("Unable to read XML as OASIS OpenDocument Manifest.");
-        }
+        return new OasisManifest(inputStream).getManifest();
     }
 
     private Manifest manifest = new Manifest();
@@ -37,11 +32,34 @@ class OasisManifest {
         add("/", mimeType);
     }
 
+    public OasisManifest(InputStream inputStream) {
+        try {
+            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+            manifest = (Manifest) unmarshaller.unmarshal(inputStream);
+        } catch (JAXBException e) {
+            throw new IllegalStateException("Unable to read XML as OASIS OpenDocument Manifest.", e);
+        }
+    }
+
     public void add(String path, MimeType mimeType) {
         FileEntry fileEntry = new FileEntry();
         fileEntry.setMediaType(mimeType.toString());
         fileEntry.setFullPath(path);
         manifest.getFileEntries().add(fileEntry);
+    }
+
+    public void append(OasisManifest oasisManifest) {
+        for (FileEntry fileEntry : oasisManifest.getManifest().getFileEntries())
+            if (!fileEntry.getFullPath().equals("/"))
+                manifest.getFileEntries().add(fileEntry);
+    }
+
+    public int size() {
+        return manifest.getFileEntries().size();
+    }
+
+    public Manifest getManifest() {
+        return manifest;
     }
 
     public byte[] toBytes() {
@@ -60,7 +78,7 @@ class OasisManifest {
 
             return byteArrayOutputStream.toByteArray();
         } catch (JAXBException e) {
-            throw new IllegalStateException("Unable to create OASIS OpenDocument Manifest.");
+            throw new IllegalStateException("Unable to create OASIS OpenDocument Manifest.", e);
         }
     }
 }

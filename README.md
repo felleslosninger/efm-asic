@@ -8,13 +8,14 @@ The benefits of using containers for message transfer are:
 * due to the compressed format, communication bandwith is utilized better
 * message integrity is provided, using message digests and signatures.
 
-This component provides an easy-to-use factory for creating ASiC-E containers according to 
-[ETSI TS 102 918](http://webapp.etsi.org/workprogram/Report_WorkItem.asp?WKI_ID=42455).
+This component provides an easy-to-use factory for creating ASiC-E containers.
 
-This implementation uses CAdES (CMS Advanced Electronic Signature) 
-for signatures rather than XAdES, both of which are allowed according to the ASiC specification.
+Conformance is claimed according to 7.2.1 (TBA) and 7.2.2 in
+[ETSI TS 102 918 V1.3.1](http://webapp.etsi.org/workprogram/Report_WorkItem.asp?WKI_ID=42455).
+
 
 ## What does it look like?
+
 In general the archive looks something like depicted below 
 
 ```
@@ -78,18 +79,11 @@ asicReader.close();
 ```
 
 
-## Current status
-
-This component is currently work-in-progress.
-
-These features have not yet been implemented:
-
-* Proper signing when using XAdES format for signatures.
-
 ## Security
 
 This library validate signatures, but does not validate the certificate. It's up to the implementer using the library
-to choose if and how to validate certificates. Certificate used for signing is exposed by the library.
+to choose if and how to validate certificates. Certificate(s) used for validation is exposed by the library.
+
 
 ## Creating an ASiC-E container manually
 
@@ -108,7 +102,8 @@ openssl dgst -sha256 -binary bii-message |base64
 paste the SHA-256 values computed in the previous step. The file should look something like this:
 ```xml
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ASiCManifest xmlns="http://uri.etsi.org/2918/v1.1.1#" xmlns:ns2="http://www.w3.org/2000/09/xmldsig#">
+<ASiCManifest xmlns="http://uri.etsi.org/02918/v1.2.1#" xmlns:ns2="http://www.w3.org/2000/09/xmldsig#">
+    <SigReference URI="META-INF/signature.p7s" MimeType="application/x-pkcs7-signature"/>
     <DataObjectReference URI="bii-trns081.xml" MimeType="application/xml">
         <ns2:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
         <ns2:DigestValue>morANIlh3TGxMUsJWKfICly7YXoduG7LCohAKc2Sip8=</ns2:DigestValue>
@@ -160,4 +155,3 @@ or on Windows:
 ```
 set MAVEN_OPTS=-Xmx1024m -XX:MaxPermSize=512m
 ```
- 

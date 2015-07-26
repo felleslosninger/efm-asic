@@ -26,8 +26,8 @@ class AsicInputStream extends ZipInputStream {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             IOUtils.copy(this, baos);
 
-            log.info(String.format("Content of mimetype: %s", baos.toString()));
-            if (!AbstractAsicWriter.APPLICATION_VND_ETSI_ASIC_E_ZIP.equals(baos.toString()))
+            log.debug(String.format("Content of mimetype: %s", baos.toString()));
+            if (!AsicUtils.MIMETYPE_ASICE.equals(baos.toString()))
                 throw new IllegalStateException("Content is not ASiC-E container.");
 
             // Fetch next

@@ -19,9 +19,6 @@ abstract class AbstractAsicWriter implements AsicWriter {
 
     public static final Logger log = LoggerFactory.getLogger(AbstractAsicWriter.class);
 
-    /** The MIME type, which should be the very first entry in the container */
-    public static final String APPLICATION_VND_ETSI_ASIC_E_ZIP = "application/vnd.etsi.asic-e+zip";
-
     protected AsicOutputStream asicOutputStream;
     protected AbstractAsicManifest asicManifest;
 
@@ -47,7 +44,7 @@ abstract class AbstractAsicWriter implements AsicWriter {
         asicOutputStream = new AsicOutputStream(outputStream);
 
         // Add mimetype to OASIS OpenDocument manifest
-        oasisManifest = new OasisManifest(MimeType.forString(APPLICATION_VND_ETSI_ASIC_E_ZIP));
+        oasisManifest = new OasisManifest(MimeType.forString(AsicUtils.MIMETYPE_ASICE));
     }
 
     /** {@inheritDoc} */
@@ -71,6 +68,8 @@ abstract class AbstractAsicWriter implements AsicWriter {
     /** {@inheritDoc} */
     @Override
     public AsicWriter add(Path path, String entryName) throws IOException {
+        testExtension(path.toString());
+
         InputStream inputStream = Files.newInputStream(path);
         add(inputStream, entryName);
         inputStream.close();
@@ -107,6 +106,8 @@ abstract class AbstractAsicWriter implements AsicWriter {
     /** {@inheritDoc} */
     @Override
     public AsicWriter add(Path path, String entryName, MimeType mimeType) throws IOException {
+        testExtension(path.toString());
+
         InputStream inputStream = Files.newInputStream(path);
         add(inputStream, entryName, mimeType);
         inputStream.close();
@@ -195,6 +196,14 @@ abstract class AbstractAsicWriter implements AsicWriter {
 
     /** Creating the signature and writing it into the archive is delegated to the actual implementation */
     abstract void performSign(SignatureHelper signatureHelper) throws IOException;
+
+    /**
+     * Conformance to ETSI TS 102 918, 6.2.1 1)
+     */
+    void testExtension(String extension) {
+        if (!AsicUtils.PATTERN_EXTENSION_ASICE.matcher(extension).matches())
+            log.warn("ASiC-E files should use \"asice\" as file extension.");
+    }
 
     public AbstractAsicManifest getAsicManifest() {
         return asicManifest;

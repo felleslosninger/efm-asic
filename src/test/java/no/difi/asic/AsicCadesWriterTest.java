@@ -25,7 +25,7 @@ public class AsicCadesWriterTest {
 
     public static final int BYTES_TO_CHECK = 40;
     public static final String BII_ENVELOPE_XML = "bii-envelope.xml";
-    public static final String BII_MESSAGE_XML = "bii-message.xml";
+    public static final String BII_MESSAGE_XML = TestUtil.BII_SAMPLE_MESSAGE_XML;
     private URL envelopeUrl;
     private URL messageUrl;
     private File keystoreFile;

@@ -23,7 +23,7 @@ public class AsicXadesWriterTest {
     public static final Logger log = LoggerFactory.getLogger(AsicXadesWriterTest.class);
 
     public static final String BII_ENVELOPE_XML = "bii-envelope.xml";
-    public static final String BII_MESSAGE_XML = "bii-message.xml";
+    public static final String BII_MESSAGE_XML = TestUtil.BII_SAMPLE_MESSAGE_XML;
     private URL envelopeUrl;
     private URL messageUrl;
     private File keystoreFile;
@@ -60,7 +60,7 @@ public class AsicXadesWriterTest {
 
         AsicWriter asicWriter = asicContainerWriterFactory.newContainer(new File(System.getProperty("java.io.tmpdir")), "asic-sample-xades.zip")
                 .add(new File(envelopeUrl.toURI()))
-                .add(new File(messageUrl.toURI()), "bii-message.xml", MimeType.forString("application/xml"))
+                .add(new File(messageUrl.toURI()), TestUtil.BII_SAMPLE_MESSAGE_XML, MimeType.forString("application/xml"))
                 .sign(keystoreFile, "changeit", "client_alias", "changeit");
 
         File file = new File(System.getProperty("java.io.tmpdir"), "asic-sample-xades.zip");

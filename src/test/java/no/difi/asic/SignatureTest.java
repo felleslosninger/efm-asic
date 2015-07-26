@@ -31,7 +31,7 @@ public class SignatureTest {
     @Test
     public void createSampleDigest() throws Exception {
 
-        InputStream is = SignatureTest.class.getClassLoader().getResourceAsStream("bii-message.xml");
+        InputStream is = SignatureTest.class.getClassLoader().getResourceAsStream(TestUtil.BII_SAMPLE_MESSAGE_XML);
         assertNotNull(is);
 
         MessageDigest md = MessageDigest.getInstance("SHA-256");

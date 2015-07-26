@@ -96,7 +96,7 @@ to choose if and how to validate certificates. Certificate used for signing is e
 This is how you create an ASiC container manually:
 
 1. Create empty directory named `asic-sample`
-1. Copy the files `bii-envelope.xml`and `bii-message.xml` into `asic-sample`
+1. Copy the files `bii-envelope.xml`and `bii-trns081.xml` into `asic-sample`
 1. Create the directory `META-INF`:
 1. Compute the SHA-256 digest value for the files and save them:
 ```
@@ -109,7 +109,7 @@ paste the SHA-256 values computed in the previous step. The file should look som
 ```xml
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ASiCManifest xmlns="http://uri.etsi.org/2918/v1.1.1#" xmlns:ns2="http://www.w3.org/2000/09/xmldsig#">
-    <DataObjectReference URI="bii-message.xml" MimeType="application/xml">
+    <DataObjectReference URI="bii-trns081.xml" MimeType="application/xml">
         <ns2:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
         <ns2:DigestValue>morANIlh3TGxMUsJWKfICly7YXoduG7LCohAKc2Sip8=</ns2:DigestValue>
     </DataObjectReference>

@@ -33,7 +33,7 @@ class CadesAsicWriter extends AbstractAsicWriter {
      */
     @Override
     public AsicWriter setRootEntryName(String name) {
-        ((CadesAsicManifest) asicManifest).setRootFilename(name);
+        ((CadesAsicManifest) asicManifest).setRootfileForEntry(name);
         return this;
     }
 

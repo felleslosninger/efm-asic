@@ -13,6 +13,7 @@ import java.net.URL;
 public class TestUtil {
 
     public static final String KEY_STORE_RESOURCE_NAME = "kontaktinfo-client-test.jks";
+    public static final String BII_SAMPLE_MESSAGE_XML = "bii-trns081.xml";
 
     /**
      * Provides simple access to the KeyStore file provided as part of the distribution.

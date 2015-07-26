@@ -52,14 +52,20 @@ class CadesAsicManifest extends AbstractAsicManifest {
         log.debug(String.format("Digest: %s", new String(Base64.encode(dataObject.getDigestValue()))));
     }
 
-    public void setRootFilename(String filename) {
+    /**
+     * Locates the DataObjectReference for the given file name and sets the attribute Rootfile to Boolean.TRUE
+     *
+     * @param entryName name of entry for which the attribute <code>Rootfile</code> should be set to "true".
+     */
+    public void setRootfileForEntry(String entryName) {
         if (rootFilenameIsSet)
             throw new IllegalStateException("Multiple root files are not allowed.");
 
         for (DataObjectReference dataObject : ASiCManifestType.getDataObjectReferences()) {
-            if (dataObject.getURI().equals(filename)) {
-                setRootFilename(filename);
+            if (dataObject.getURI().equals(entryName)) {
+                dataObject.setRootfile(true);
                 rootFilenameIsSet = true;
+                return;
             }
         }
     }

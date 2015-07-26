@@ -28,7 +28,7 @@ public class AsicWriterTest {
     public static final Logger log = LoggerFactory.getLogger(AsicWriterTest.class);
 
     public static final String BII_ENVELOPE_XML = "bii-envelope.xml";
-    public static final String BII_MESSAGE_XML = "bii-message.xml";
+    public static final String BII_MESSAGE_XML = TestUtil.BII_SAMPLE_MESSAGE_XML;
     private File keystoreFile;
 
     private AsicVerifierFactory asicVerifierFactory;
@@ -77,11 +77,12 @@ public class AsicWriterTest {
         AsicWriter asicWriter = asicWriterFactory.newContainer(archiveOutputFile)
                 // Adds an ordinary file, using the file name as the entry name
                 .add(biiEnvelopeFile)
-                // Adds another file, explicitly naming the entry and specifying the MIME type
+                        // Adds another file, explicitly naming the entry and specifying the MIME type
                 .add(biiMessageFile, BII_MESSAGE_XML, MimeType.forString("application/xml"))
-                // Signing the contents of the archive, closes it for further changes.
+                        // Indicates that the BII message is the root document
+                .setRootEntryName(BII_MESSAGE_XML)
+                        // Signing the contents of the archive, closes it for further changes.
                 .sign(keystoreFile, TestUtil.keyStorePassword(), TestUtil.privateKeyPassword());
-
 
 
         // PART 2 - verify the contents of the archive.
@@ -154,9 +155,12 @@ public class AsicWriterTest {
                 .add(biiEnvelopeFile)
                         // Adds another file, explicitly naming the entry and specifying the MIME type
                 .add(biiMessageFile, BII_MESSAGE_XML, MimeType.forString("application/xml"))
+                // Indicates which file is the root file
+                .setRootEntryName(BII_MESSAGE_XML)
                         // Signing the contents of the archive, closes it for further changes.
                 .sign(keystoreFile, TestUtil.keyStorePassword(), TestUtil.privateKeyPassword());
 
+        log.debug("Wrote ASiC-e container to " + archiveOutputFile);
         // Opens the generated archive and reads each entry
         AsicReader asicReader = AsicReaderFactory.newFactory().open(archiveOutputFile);
 
@@ -179,6 +183,10 @@ public class AsicWriterTest {
         }
         asicReader.close();
         AsicManifest asicManifest = asicReader.getAsicManifest();
+        String asicManifestRootfile = asicManifest.getRootfile();
+        assertNotNull(asicManifestRootfile,"Root file not found");
+        assertEquals(asicManifestRootfile,BII_MESSAGE_XML,"Invalid Rootfile found");
+
 
 
     }

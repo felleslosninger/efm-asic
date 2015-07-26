@@ -96,7 +96,8 @@ class CadesAsicManifest extends AbstractAsicManifest {
 
     @SuppressWarnings("unchecked")
     public static String extractAndVerify(String xml, ManifestVerifier manifestVerifier) {
-        // Updating namespace
+        // Updating namespaces for compatibility with previous releases and other implementations
+
         xml = xml.replace("http://uri.etsi.org/02918/v1.1.1#", "http://uri.etsi.org/02918/v1.2.1#");
         xml = xml.replace("http://uri.etsi.org/2918/v1.2.1#", "http://uri.etsi.org/02918/v1.2.1#");
         xml = xml.replaceAll("http://www.w3.org/2000/09/xmldsig#sha", "http://www.w3.org/2001/04/xmlenc#sha");

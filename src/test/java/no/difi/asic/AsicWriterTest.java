@@ -143,6 +143,12 @@ public class AsicWriterTest {
 
     @Test
     public void writeAndRead() throws Exception {
+
+        URL brochureUrl = AsicWriterTest.class.getClassLoader().getResource("e-Delivery_target_architecture.pdf");
+        assertNotNull(brochureUrl, "Unable to locate brochure in class path");
+        File brochurePdfFile = new File(brochureUrl.toURI());
+        assertTrue(brochurePdfFile.canRead(),"Brochure found in class path, but not readable as File object");
+
         // Name of the file to hold the the ASiC archive
         File archiveOutputFile = new File(System.getProperty("java.io.tmpdir"), "asic-sample-default.zip");
 
@@ -151,12 +157,12 @@ public class AsicWriterTest {
 
         // Creates the actual container with all the data objects (files) and signs it.
         asicWriterFactory.newContainer(archiveOutputFile)
-                // Adds an ordinary file, using the file name as the entry name
-                .add(biiEnvelopeFile)
-                        // Adds another file, explicitly naming the entry and specifying the MIME type
+                // Adds file, explicitly naming the entry and specifying the MIME type
                 .add(biiMessageFile, BII_MESSAGE_XML, MimeType.forString("application/xml"))
                 // Indicates which file is the root file
                 .setRootEntryName(BII_MESSAGE_XML)
+                // Adds a PDF attachment, using the name of the file, i.e. with path removed, as the entry name
+                .add(brochurePdfFile)
                         // Signing the contents of the archive, closes it for further changes.
                 .sign(keystoreFile, TestUtil.keyStorePassword(), TestUtil.privateKeyPassword());
 
@@ -184,9 +190,8 @@ public class AsicWriterTest {
         asicReader.close();
         AsicManifest asicManifest = asicReader.getAsicManifest();
         String asicManifestRootfile = asicManifest.getRootfile();
-        assertNotNull(asicManifestRootfile,"Root file not found");
-        assertEquals(asicManifestRootfile,BII_MESSAGE_XML,"Invalid Rootfile found");
-
+        assertNotNull(asicManifestRootfile, "Root file not found");
+        assertEquals(asicManifestRootfile, BII_MESSAGE_XML, "Invalid Rootfile found");
 
 
     }

@@ -8,7 +8,10 @@
     <packaging>jar</packaging>
 
     <name>asic</name>
-    <description>Implementation of ASiC-E.</description>
+    <description>
+        Generic implementation of ASiC archives in accordance with ETSI 102 918 v1.3.1
+        Only ASiC-E are supported. The much simpler ASiC-S is of no use.
+    </description>
     <url>https://github.com/difi/asic</url>
 
     <scm>
@@ -24,7 +27,7 @@
     </issueManagement>
 
     <organization>
-        <name>Direktoratet for forvaltning og IKT (Difi)</name>
+        <name>Norwegian Agency for Public Management and eGovernment (Difi)</name>
         <url>http://www.difi.no/</url>
     </organization>
 

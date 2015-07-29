@@ -68,8 +68,6 @@ abstract class AbstractAsicWriter implements AsicWriter {
     /** {@inheritDoc} */
     @Override
     public AsicWriter add(Path path, String entryName) throws IOException {
-        testExtension(path.toString());
-
         InputStream inputStream = Files.newInputStream(path);
         add(inputStream, entryName);
         inputStream.close();
@@ -106,8 +104,6 @@ abstract class AbstractAsicWriter implements AsicWriter {
     /** {@inheritDoc} */
     @Override
     public AsicWriter add(Path path, String entryName, MimeType mimeType) throws IOException {
-        testExtension(path.toString());
-
         InputStream inputStream = Files.newInputStream(path);
         add(inputStream, entryName, mimeType);
         inputStream.close();
@@ -196,14 +192,6 @@ abstract class AbstractAsicWriter implements AsicWriter {
 
     /** Creating the signature and writing it into the archive is delegated to the actual implementation */
     abstract void performSign(SignatureHelper signatureHelper) throws IOException;
-
-    /**
-     * Conformance to ETSI TS 102 918, 6.2.1 1)
-     */
-    void testExtension(String extension) {
-        if (!AsicUtils.PATTERN_EXTENSION_ASICE.matcher(extension).matches())
-            log.warn("ASiC-E files should use \"asice\" as file extension.");
-    }
 
     public AbstractAsicManifest getAsicManifest() {
         return asicManifest;

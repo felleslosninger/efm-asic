@@ -4,6 +4,7 @@ import no.difi.xsd.asic.model._1.AsicManifest;
 import no.difi.xsd.asic.model._1.Certificate;
 import oasis.names.tc.opendocument.xmlns.manifest._1.Manifest;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.NullOutputStream;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +34,9 @@ class AbstractAsicReader {
     private ManifestVerifier manifestVerifier;
     private Manifest manifest;
 
+    // Initiated with 'true' as the first file should not do anything.
+    private boolean contentIsWritten = true;
+
     /**
      * Used to hold signature or manifest for CAdES as they are not in the same file.
      */
@@ -59,14 +63,20 @@ class AbstractAsicReader {
      * @throws IOException
      */
     String getNextFile() throws IOException {
+        // Read last file if the user didn't.
+        if (!contentIsWritten)
+            writeFile(new NullOutputStream());
+
         while ((currentZipEntry = zipInputStream.getNextEntry()) != null) {
             log.info(String.format("Found file: %s", currentZipEntry.getName()));
 
             // Files used for validation are not exposed
             if (currentZipEntry.getName().startsWith("META-INF/"))
                 handleMetadataEntry();
-            else
+            else {
+                contentIsWritten = false;
                 return currentZipEntry.getName();
+            }
         }
 
         // Making sure signatures are used and all files are signed after reading all content.
@@ -103,6 +113,7 @@ class AbstractAsicReader {
         log.debug(String.format("Digest: %s", new String(Base64.encode(digest))));
 
         manifestVerifier.update(currentZipEntry.getName(), digest, null);
+        contentIsWritten = true;
     }
 
     /**

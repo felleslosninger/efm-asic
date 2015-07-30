@@ -14,6 +14,17 @@ Conformance is claimed according to 7.2.1 (TBA) and 7.2.2 in
 [ETSI TS 102 918 V1.3.1](http://webapp.etsi.org/workprogram/Report_WorkItem.asp?WKI_ID=42455).
 
 
+## Maven
+
+```xml
+<dependency>
+	<groupId>no.difi.commons</groupId>
+	<artifactId>commons-asic</artifactId>
+	<version>0.9.0</version>
+</dependency>
+```
+
+
 ## What does it look like?
 
 In general the archive looks something like depicted below 

@@ -7,7 +7,7 @@
     <version>0.9.2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>asic</name>
+    <name>Associated Signature Container (ASiC)</name>
     <description>
         Generic implementation of ASiC archives in accordance with ETSI 102 918 v1.3.1
         Only ASiC-E are supported. The much simpler ASiC-S is of no use.

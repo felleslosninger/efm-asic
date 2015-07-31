@@ -1,4 +1,4 @@
-# ASiC - Associated Signature Container
+# Associated Signature Container (ASiC)
 
 An ASiC file is simply a ZIP archive created according to some rules set forth in the specifications. 
 

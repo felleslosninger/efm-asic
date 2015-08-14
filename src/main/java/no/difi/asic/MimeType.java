@@ -2,6 +2,8 @@ package no.difi.asic;
 
 public class MimeType {
 
+    public static final MimeType XML = MimeType.forString("application/xml");
+
     public static MimeType forString(String mimeType) {
         return new MimeType(mimeType);
     }

@@ -15,6 +15,7 @@ import org.bouncycastle.util.Store;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -59,10 +60,10 @@ public class SignatureHelper {
     }
 
     /** Loads the keystore and obtains the private key, the public key and the associated certificate referenced by the alias.
-     * @param keyStoreFile file holding the JKS keystore.
+     * @param keyStoreFile     file holding the JKS keystore.
      * @param keyStorePassword password of the key store itself
-     * @param keyAlias the alias referencing the private and public key pair.
-     * @param keyPassword password protecting the private key
+     * @param keyAlias         the alias referencing the private and public key pair.
+     * @param keyPassword      password protecting the private key
      * @throws IOException
      */
     public SignatureHelper(File keyStoreFile, String keyStorePassword, String keyAlias, String keyPassword) throws IOException {
@@ -71,10 +72,10 @@ public class SignatureHelper {
 
     /**
      * Loading keystore and fetching key
-     * @param keyStoreStream Stream for keystore
+     * @param keyStoreStream   Stream for keystore
      * @param keyStorePassword Password to open keystore
-     * @param keyAlias Key alias, uses first key if set to null
-     * @param keyPassword Key password
+     * @param keyAlias         Key alias, uses first key if set to null
+     * @param keyPassword      Key password
      */
     public SignatureHelper(InputStream keyStoreStream, String keyStorePassword, String keyAlias, String keyPassword) {
         try {
@@ -96,6 +97,9 @@ public class SignatureHelper {
 
             jcaContentSignerBuilder = new JcaContentSignerBuilder(String.format("SHA1with%s", privateKey.getAlgorithm()))
                     .setProvider(BouncyCastleProvider.PROVIDER_NAME);
+        } catch (EOFException eof) {
+            throw new IllegalStateException(String.format("EOF reached while reading from keystore input stream. Stream Already read?: %s", eof));
+
         } catch (Exception e) {
             throw new IllegalStateException(String.format("Unable to retrieve private key from keystore: %s", e.getMessage()), e);
         }

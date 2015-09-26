@@ -1,6 +1,6 @@
 package no.difi.asic;
 
-import org.etsi.uri._02918.v1_2.DataObjectReference;
+import org.etsi.uri._02918.v1_2.DataObjectReferenceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeMethod;
@@ -87,7 +87,7 @@ public class AsicCadesWriterTest {
         {
             int matchCount = 0;
             CadesAsicManifest asicManifest = (CadesAsicManifest) ((CadesAsicWriter) asicWriter).getAsicManifest();
-            for (DataObjectReference dataObject : asicManifest.getASiCManifestType().getDataObjectReferences()) {
+            for (DataObjectReferenceType dataObject : asicManifest.getASiCManifestType().getDataObjectReference()) {
                 if (dataObject.getURI().equals(BII_ENVELOPE_XML))
                     matchCount++;
                 if (dataObject.getURI().equals(BII_MESSAGE_XML))

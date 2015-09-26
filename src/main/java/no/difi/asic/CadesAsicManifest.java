@@ -1,17 +1,15 @@
 package no.difi.asic;
 
 import org.bouncycastle.util.encoders.Base64;
-import org.etsi.uri._02918.v1_2.ASiCManifest;
-import org.etsi.uri._02918.v1_2.DataObjectReference;
-import org.etsi.uri._02918.v1_2.SigReference;
+import org.etsi.uri._02918.v1_2.ASiCManifestType;
+import org.etsi.uri._02918.v1_2.DataObjectReferenceType;
+import org.etsi.uri._02918.v1_2.ObjectFactory;
+import org.etsi.uri._02918.v1_2.SigReferenceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3._2000._09.xmldsig_.DigestMethod;
+import org.w3._2000._09.xmldsig_.DigestMethodType;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.*;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
@@ -20,17 +18,18 @@ class CadesAsicManifest extends AbstractAsicManifest {
     public static final Logger log = LoggerFactory.getLogger(AbstractAsicManifest.class);
 
     private static JAXBContext jaxbContext; // Thread safe
+    private static ObjectFactory objectFactory = new ObjectFactory();
 
     static {
         try {
-            jaxbContext = JAXBContext.newInstance(ASiCManifest.class);
+            jaxbContext = JAXBContext.newInstance(ASiCManifestType.class);
         } catch (JAXBException e) {
             throw new IllegalStateException(String.format("Unable to create JAXBContext: %s ", e.getMessage()), e);
         }
     }
 
     // Automagically generated from XML Schema Definition files
-    private ASiCManifest ASiCManifestType = new ASiCManifest();
+    private ASiCManifestType ASiCManifestType = new ASiCManifestType();
     private boolean rootFilenameIsSet = false;
 
     public CadesAsicManifest(MessageDigestAlgorithm messageDigestAlgorithm) {
@@ -39,16 +38,16 @@ class CadesAsicManifest extends AbstractAsicManifest {
 
     @Override
     public void add(String filename, MimeType mimeType) {
-        DataObjectReference dataObject = new DataObjectReference();
+        DataObjectReferenceType dataObject = new DataObjectReferenceType();
         dataObject.setURI(filename);
         dataObject.setMimeType(mimeType.toString());
         dataObject.setDigestValue(messageDigest.digest());
 
-        DigestMethod digestMethodType = new DigestMethod();
+        DigestMethodType digestMethodType = new DigestMethodType();
         digestMethodType.setAlgorithm(messageDigestAlgorithm.getUri());
         dataObject.setDigestMethod(digestMethodType);
 
-        ASiCManifestType.getDataObjectReferences().add(dataObject);
+        ASiCManifestType.getDataObjectReference().add(dataObject);
         log.debug(String.format("Digest: %s", new String(Base64.encode(dataObject.getDigestValue()))));
     }
 
@@ -61,7 +60,7 @@ class CadesAsicManifest extends AbstractAsicManifest {
         if (rootFilenameIsSet)
             throw new IllegalStateException("Multiple root files are not allowed.");
 
-        for (DataObjectReference dataObject : ASiCManifestType.getDataObjectReferences()) {
+        for (DataObjectReferenceType dataObject : ASiCManifestType.getDataObjectReference()) {
             if (dataObject.getURI().equals(entryName)) {
                 dataObject.setRootfile(true);
                 rootFilenameIsSet = true;
@@ -71,13 +70,13 @@ class CadesAsicManifest extends AbstractAsicManifest {
     }
 
     public void setSignature(String filename, String mimeType) {
-        SigReference sigReferenceType = new SigReference();
+        SigReferenceType sigReferenceType = new SigReferenceType();
         sigReferenceType.setURI(filename);
         sigReferenceType.setMimeType(mimeType);
         ASiCManifestType.setSigReference(sigReferenceType);
     }
 
-    public ASiCManifest getASiCManifestType() {
+    public ASiCManifestType getASiCManifestType() {
         return ASiCManifestType;
     }
 
@@ -87,7 +86,7 @@ class CadesAsicManifest extends AbstractAsicManifest {
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            marshaller.marshal(ASiCManifestType, baos);
+            marshaller.marshal(objectFactory.createASiCManifest(ASiCManifestType), baos);
             return baos.toByteArray();
         } catch (JAXBException e) {
             throw new IllegalStateException("Unable to marshall the ASiCManifest into string output", e);
@@ -105,14 +104,14 @@ class CadesAsicManifest extends AbstractAsicManifest {
         try {
             // Read XML
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-            ASiCManifest manifest = (ASiCManifest) unmarshaller.unmarshal(new ByteArrayInputStream(xml.getBytes()));
+            ASiCManifestType manifest = (ASiCManifestType) ((JAXBElement) unmarshaller.unmarshal(new ByteArrayInputStream(xml.getBytes()))).getValue();
 
             String sigReference = manifest.getSigReference().getURI();
             if (sigReference == null)
                 sigReference = "META-INF/signature.p7s";
 
             // Run through recorded objects
-            for (DataObjectReference reference : manifest.getDataObjectReferences()) {
+            for (DataObjectReferenceType reference : manifest.getDataObjectReference()) {
                 manifestVerifier.update(reference.getURI(), reference.getMimeType(), reference.getDigestValue(), reference.getDigestMethod().getAlgorithm(), sigReference);
                 if (reference.isRootfile() == Boolean.TRUE)
                     manifestVerifier.setRootFilename(reference.getURI());

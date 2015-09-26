@@ -45,17 +45,17 @@ class OasisManifest {
         FileEntry fileEntry = new FileEntry();
         fileEntry.setMediaType(mimeType.toString());
         fileEntry.setFullPath(path);
-        manifest.getFileEntries().add(fileEntry);
+        manifest.getFileEntry().add(fileEntry);
     }
 
     public void append(OasisManifest oasisManifest) {
-        for (FileEntry fileEntry : oasisManifest.getManifest().getFileEntries())
+        for (FileEntry fileEntry : oasisManifest.getManifest().getFileEntry())
             if (!fileEntry.getFullPath().equals("/"))
-                manifest.getFileEntries().add(fileEntry);
+                manifest.getFileEntry().add(fileEntry);
     }
 
     public int size() {
-        return manifest.getFileEntries().size();
+        return manifest.getFileEntry().size();
     }
 
     public Manifest getManifest() {

@@ -35,7 +35,7 @@ class ManifestVerifier {
             asicFile.setDigest(digest);
             asicFile.setVerified(false);
 
-            asicManifest.getFiles().add(asicFile);
+            asicManifest.getFile().add(asicFile);
             asicManifestMap.put(filename, asicFile);
         } else {
             if (!Arrays.equals(asicFile.getDigest(), digest))
@@ -47,12 +47,12 @@ class ManifestVerifier {
         if (mimetype != null)
             asicFile.setMimetype(mimetype);
         if (sigReference != null)
-            asicFile.getCertReves().add(sigReference);
+            asicFile.getCertRef().add(sigReference);
 
     }
 
     public void addCertificate(Certificate certificate) {
-        this.asicManifest.getCertificates().add(certificate);
+        this.asicManifest.getCertificate().add(certificate);
     }
 
     public void setRootFilename(String filename) {
@@ -60,7 +60,7 @@ class ManifestVerifier {
     }
 
     public void verifyAllVerified() {
-        for (AsicFile asicFile : asicManifest.getFiles())
+        for (AsicFile asicFile : asicManifest.getFile())
             if (!asicFile.isVerified())
                 throw new IllegalStateException(String.format("File not verified: %s", asicFile.getName()));
     }

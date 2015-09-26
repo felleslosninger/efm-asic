@@ -20,14 +20,14 @@ public class AsicXadesReferenceTest {
     @Test
     public void validSdp() throws IOException {
         AsicVerifier asicVerifier = asicVerifierFactory.verify(getClass().getResourceAsStream("/asic-xades-external-sdp.asice"));
-        assertEquals(asicVerifier.getAsicManifest().getFiles().size(), 6);
+        assertEquals(asicVerifier.getAsicManifest().getFile().size(), 6);
     }
 
     // Fetched from https://github.com/open-eid/digidoc4j/blob/master/testFiles/test.asice
     @Test
     public void validDigidoc4j() throws IOException {
         AsicVerifier asicVerifier = asicVerifierFactory.verify(getClass().getResourceAsStream("/asic-xades-external-digidoc4j.asice"));
-        assertEquals(asicVerifier.getAsicManifest().getFiles().size(), 2);
+        assertEquals(asicVerifier.getAsicManifest().getFile().size(), 2);
         assertNotNull(asicVerifier.getOasisManifest());
     }
 
@@ -35,7 +35,7 @@ public class AsicXadesReferenceTest {
     @Test
     public void validDss() throws IOException {
         AsicVerifier asicVerifier = asicVerifierFactory.verify(getClass().getResourceAsStream("/asic-xades-external-dss.asice"));
-        assertEquals(asicVerifier.getAsicManifest().getFiles().size(), 1);
+        assertEquals(asicVerifier.getAsicManifest().getFile().size(), 1);
         assertNotNull(asicVerifier.getOasisManifest());
     }
 

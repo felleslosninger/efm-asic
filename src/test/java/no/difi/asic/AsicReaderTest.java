@@ -11,9 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNull;
-import static org.testng.Assert.fail;
+import static org.testng.Assert.*;
 
 public class AsicReaderTest {
 
@@ -74,7 +72,7 @@ public class AsicReaderTest {
             fail("No exception expected");
         }
 
-        assertEquals(asicReader.getAsicManifest().getFiles().size(), 2);
+        assertEquals(asicReader.getAsicManifest().getFile().size(), 2);
 
     }
 

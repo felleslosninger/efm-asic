@@ -1,7 +1,7 @@
 package no.difi.asic;
 
 import no.difi.xsd.asic.model._1.AsicManifest;
-import org.etsi.uri._02918.v1_2.DataObjectReference;
+import org.etsi.uri._02918.v1_2.DataObjectReferenceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeMethod;
@@ -90,7 +90,7 @@ public class AsicWriterTest {
         {
             int matchCount = 0;
             CadesAsicManifest asicManifest = (CadesAsicManifest) ((CadesAsicWriter) asicWriter).getAsicManifest();
-            for (DataObjectReference dataObject : asicManifest.getASiCManifestType().getDataObjectReferences()) {
+            for (DataObjectReferenceType dataObject : asicManifest.getASiCManifestType().getDataObjectReference()) {
                 if (dataObject.getURI().equals(BII_ENVELOPE_XML))
                     matchCount++;
                 if (dataObject.getURI().equals(BII_MESSAGE_XML))
@@ -138,7 +138,7 @@ public class AsicWriterTest {
         }
 
         AsicVerifier asicVerifier = asicVerifierFactory.verify(archiveOutputFile);
-        assertEquals(asicVerifier.getAsicManifest().getFiles().size(), 2);
+        assertEquals(asicVerifier.getAsicManifest().getFile().size(), 2);
     }
 
     @Test

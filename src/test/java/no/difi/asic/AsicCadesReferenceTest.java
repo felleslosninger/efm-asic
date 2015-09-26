@@ -1,7 +1,5 @@
 package no.difi.asic;
 
-import static org.testng.Assert.*;
-
 import no.difi.xsd.asic.model._1.AsicManifest;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
@@ -14,6 +12,8 @@ import javax.xml.bind.Marshaller;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.Security;
+
+import static org.testng.Assert.*;
 
 public class AsicCadesReferenceTest {
 
@@ -30,7 +30,7 @@ public class AsicCadesReferenceTest {
     @Test
     public void valid() throws IOException {
         AsicVerifier asicVerifier = asicVerifierFactory.verify(getClass().getResourceAsStream("/asic-cades-test-valid.asice"));
-        assertEquals(asicVerifier.getAsicManifest().getFiles().size(), 2);
+        assertEquals(asicVerifier.getAsicManifest().getFile().size(), 2);
 
         // Printing internal manifest for reference.
         try {

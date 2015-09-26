@@ -4,9 +4,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-import org.w3._2000._09.xmldsig_.Reference;
+import org.w3._2000._09.xmldsig_.ReferenceType;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
@@ -72,7 +75,7 @@ public class AsicXadesWriterTest {
             int matchCount = 0;
             XadesAsicManifest asicManifest = (XadesAsicManifest) ((XadesAsicWriter) asicWriter).getAsicManifest();
 
-            for (Reference reference : asicManifest.getCreateXAdESSignatures(signatureHelper).getSignatures().get(0).getSignedInfo().getReferences()) {
+            for (ReferenceType reference : asicManifest.getCreateXAdESSignatures(signatureHelper).getSignature().get(0).getSignedInfo().getReference()) {
                 if (reference.getURI().equals(BII_ENVELOPE_XML))
                     matchCount++;
                 if (reference.getURI().equals(BII_MESSAGE_XML))

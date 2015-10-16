@@ -13,9 +13,9 @@ import java.nio.file.Files;
 
 import static org.testng.Assert.*;
 
-public class AsicReaderTest {
+public class AsicReaderImplTest {
 
-    private static Logger log = LoggerFactory.getLogger(AsicReaderTest.class);
+    private static Logger log = LoggerFactory.getLogger(AsicReaderImplTest.class);
 
     private AsicReaderFactory asicReaderFactory = AsicReaderFactory.newFactory();
     private AsicWriterFactory asicWriterFactory = AsicWriterFactory.newFactory();

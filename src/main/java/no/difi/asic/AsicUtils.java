@@ -3,6 +3,9 @@ package no.difi.asic;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
+import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 
@@ -106,4 +109,23 @@ public class AsicUtils {
         // Close target container
         target.close();
     }
+
+    public static MimeType detectMime(String filename) throws IOException {
+        // Use Files to find content type
+        String mimeType = Files.probeContentType(Paths.get(filename));
+
+        // Use URLConnection to find content type
+        if (mimeType == null) {
+            CadesAsicWriter.log.info("Unable to determine MIME type using Files.probeContentType(), trying URLConnection.getFileNameMap()");
+            mimeType = URLConnection.getFileNameMap().getContentTypeFor(filename);
+        }
+
+        // Throw exception if content type is not detected
+        if (mimeType == null) {
+            throw new IllegalStateException(String.format("Unable to determine MIME type of %s", filename));
+        }
+
+        return MimeType.forString(mimeType);
+    }
+
 }

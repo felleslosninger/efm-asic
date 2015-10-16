@@ -1,63 +1,49 @@
 package no.difi.asic;
 
+import no.difi.xsd.asic.model._1.AsicManifest;
+
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class AsicReader extends AbstractAsicReader {
-
-    AsicReader(MessageDigestAlgorithm messageDigestAlgorithm, InputStream inputStream) throws IOException {
-        super(messageDigestAlgorithm, inputStream);
-    }
+public interface AsicReader {
 
     /**
-     * {@inheritDoc}
+     * Provides the name of the next entry in the ASiC archive and positions the inputstream at the beginning of the data.
+     *
+     * @return name of next entry in archive.
+     * @throws IOException
      */
-    @Override
-    public String getNextFile() throws IOException {
-        return super.getNextFile();
-    }
+    String getNextFile() throws IOException;
 
     /**
      * Writes the contents of the current entry into a file
      * @param file into which the contents should be written.
      * @throws IOException
      */
-    public void writeFile(File file) throws IOException {
-        writeFile(file.toPath());
-    }
+    void writeFile(File file) throws IOException;
 
     /**
      * Writes contents of current archive entry into a file.
      * @param path into which the contents of current entry should be written.
      * @throws IOException
      */
-    public void writeFile(Path path) throws IOException {
-        OutputStream outputStream = Files.newOutputStream(path);
-        writeFile(outputStream);
-        outputStream.close();
-    }
+    void writeFile(Path path) throws IOException;
 
     /**
-     * {@inheritDoc}
+     * Writes contents of current archive entry to the supplied output stream.
      * @param outputStream into which data from current entry should be written.
      * @throws IOException
      */
-    @Override
-    public void writeFile(OutputStream outputStream) throws IOException {
-        super.writeFile(outputStream);
-    }
+    void writeFile(OutputStream outputStream) throws IOException;
 
     /**
-     * {@inheritDoc}
+     * Closes the underlying zip input stream.
+     *
      * @throws IOException
      */
-    @Override
-    public void close() throws IOException {
-        super.close();
-    }
+    void close() throws IOException;
 
+    AsicManifest getAsicManifest();
 }

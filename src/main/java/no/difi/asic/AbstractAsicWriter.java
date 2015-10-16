@@ -8,10 +8,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.DigestOutputStream;
 import java.util.zip.ZipEntry;
 
@@ -32,7 +30,7 @@ abstract class AbstractAsicWriter implements AsicWriter {
      * Prepares creation of a new container.
      * @param outputStream Stream used to write container.
      */
-    public AbstractAsicWriter(OutputStream outputStream, boolean closeStreamOnClose, AbstractAsicManifest asicManifest) throws IOException {
+    AbstractAsicWriter(OutputStream outputStream, boolean closeStreamOnClose, AbstractAsicManifest asicManifest) throws IOException {
         // Keep original output stream
         this.containerOutputStream = outputStream;
         this.closeStreamOnClose = closeStreamOnClose;
@@ -77,22 +75,8 @@ abstract class AbstractAsicWriter implements AsicWriter {
     /** {@inheritDoc} */
     @Override
     public AsicWriter add(InputStream inputStream, String filename) throws IOException {
-        // Use Files to find content type
-        String mimeType = Files.probeContentType(Paths.get(filename));
-
-        // Use URLConnection to find content type
-        if (mimeType == null) {
-            CadesAsicWriter.log.info("Unable to determine MIME type using Files.probeContentType(), trying URLConnection.getFileNameMap()");
-            mimeType = URLConnection.getFileNameMap().getContentTypeFor(filename);
-        }
-
-        // Throw exception if content type is not detected
-        if (mimeType == null) {
-            throw new IllegalStateException(String.format("Unable to determine MIME type of %s", filename));
-        }
-
         // Add file to container
-        return add(inputStream, filename, MimeType.forString(mimeType));
+        return add(inputStream, filename, AsicUtils.detectMime(filename));
     }
 
     /** {@inheritDoc} */
@@ -151,13 +135,13 @@ abstract class AbstractAsicWriter implements AsicWriter {
 
     /** {@inheritDoc} */
     @Override
-    public AbstractAsicWriter sign(File keyStoreFile, String keyStorePassword, String keyAlias, String keyPassword) throws IOException {
+    public AsicWriter sign(File keyStoreFile, String keyStorePassword, String keyAlias, String keyPassword) throws IOException {
         return sign(new SignatureHelper(keyStoreFile, keyStorePassword, keyAlias, keyPassword));
     }
 
     /** {@inheritDoc} */
     @Override
-    public AbstractAsicWriter sign(SignatureHelper signatureHelper) throws IOException {
+    public AsicWriter sign(SignatureHelper signatureHelper) throws IOException {
         // You may only sign once
         if (finished)
             throw new IllegalStateException("Adding content to container after signing container is not supported.");

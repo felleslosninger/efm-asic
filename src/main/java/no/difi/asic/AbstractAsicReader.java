@@ -22,7 +22,7 @@ import java.util.zip.ZipEntry;
  *
  * @author Erlend Klakegg Bergheim
  */
-class AbstractAsicReader {
+abstract class AbstractAsicReader {
 
     private static final Logger log = LoggerFactory.getLogger(AbstractAsicReader.class);
 
@@ -56,13 +56,7 @@ class AbstractAsicReader {
         // Comment in ZIP is stored in Central Directory in the end of the file.
     }
 
-    /**
-     * Provides the name of the next entry in the ASiC archive and positions the inputstream at the beginning of the data.
-     *
-     * @return name of next entry in archive.
-     * @throws IOException
-     */
-    String getNextFile() throws IOException {
+    public String getNextFile() throws IOException {
         // Read last file if the user didn't.
         if (!contentIsWritten)
             writeFile(new NullOutputStream());
@@ -92,11 +86,6 @@ class AbstractAsicReader {
         return null;
     }
 
-    /**
-     * Writes contents of current archive entry to the supplied output stream.
-     * @param outputStream into which data from current entry should be written.
-     * @throws IOException
-     */
     void writeFile(OutputStream outputStream) throws IOException {
         if (currentZipEntry == null)
             throw new IllegalStateException("No file to read.");
@@ -116,12 +105,7 @@ class AbstractAsicReader {
         contentIsWritten = true;
     }
 
-    /**
-     * Closes the underlying zip input stream.
-     *
-     * @throws IOException
-     */
-    void close() throws IOException {
+    public void close() throws IOException {
         if (zipInputStream != null) {
             zipInputStream.close();
             zipInputStream = null;

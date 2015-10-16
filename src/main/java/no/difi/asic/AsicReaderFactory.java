@@ -35,6 +35,6 @@ public class AsicReaderFactory {
     }
 
     public AsicReader open(InputStream inputStream) throws IOException {
-        return new AsicReader(messageDigestAlgorithm, inputStream);
+        return new AsicReaderImpl(messageDigestAlgorithm, inputStream);
     }
 }

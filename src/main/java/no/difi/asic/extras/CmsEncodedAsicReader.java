@@ -1,0 +1,91 @@
+package no.difi.asic.extras;
+
+import no.difi.asic.AsicReader;
+import no.difi.xsd.asic.model._1.AsicManifest;
+import org.apache.commons.io.IOUtils;
+import org.bouncycastle.cms.CMSEnvelopedDataParser;
+import org.bouncycastle.cms.RecipientInformation;
+import org.bouncycastle.cms.jcajce.JceKeyTransEnvelopedRecipient;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.security.PrivateKey;
+import java.security.Security;
+import java.util.Collection;
+
+/**
+ * Wrapper to seamlessly decode encoded files.
+ */
+public class CmsEncodedAsicReader implements AsicReader {
+
+    private static final String BC = BouncyCastleProvider.PROVIDER_NAME;
+
+    static {
+        if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null)
+            Security.addProvider(new BouncyCastleProvider());
+    }
+
+    private AsicReader asicReader;
+    private PrivateKey privateKey;
+
+    private String currentFile;
+
+    public CmsEncodedAsicReader(AsicReader asicReader, PrivateKey privateKey) {
+        this.asicReader = asicReader;
+        this.privateKey = privateKey;
+    }
+
+    public String getNextFile() throws IOException {
+        currentFile = asicReader.getNextFile();
+        if (currentFile == null)
+            return null;
+
+        return currentFile.endsWith(".p7m") ? currentFile.substring(0, currentFile.length() - 4) : currentFile;
+    }
+
+    public void writeFile(File file) throws IOException {
+        writeFile(file.toPath());
+    }
+
+    public void writeFile(Path path) throws IOException {
+        OutputStream outputStream = Files.newOutputStream(path);
+        writeFile(outputStream);
+        outputStream.close();
+
+    }
+
+    public void writeFile(OutputStream outputStream) throws IOException {
+        if (currentFile.endsWith(".p7m")) {
+            try {
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                asicReader.writeFile(byteArrayOutputStream);
+
+                CMSEnvelopedDataParser cmsEnvelopedDataParser = new CMSEnvelopedDataParser(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()));
+                // expect exactly one recipient
+                Collection<?> recipients = cmsEnvelopedDataParser.getRecipientInfos().getRecipients();
+                if (recipients.size() != 1)
+                    throw new IllegalArgumentException();
+
+                // retrieve recipient and decode it
+                RecipientInformation recipient = (RecipientInformation) recipients.iterator().next();
+                byte[] decryptedData = recipient.getContent(new JceKeyTransEnvelopedRecipient(privateKey).setProvider(BC));
+
+                IOUtils.copy(new ByteArrayInputStream(decryptedData), outputStream);
+            } catch (Exception e) {
+                throw new IOException(e.getMessage(), e);
+            }
+        } else {
+            asicReader.writeFile(outputStream);
+        }
+    }
+
+    public void close() throws IOException {
+        asicReader.close();
+    }
+
+    public AsicManifest getAsicManifest() {
+        return asicReader.getAsicManifest();
+    }
+}

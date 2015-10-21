@@ -23,7 +23,7 @@ import java.security.cert.X509Certificate;
 /**
  * Wrapper to seamlessly encode specific files.
  */
-public class CmsEncodedAsicWriter implements AsicWriter {
+public class CmsEncryptedAsicWriter implements AsicWriter {
 
     private static final String BC = BouncyCastleProvider.PROVIDER_NAME;
 
@@ -36,11 +36,11 @@ public class CmsEncodedAsicWriter implements AsicWriter {
     private X509Certificate certificate;
     private ASN1ObjectIdentifier cmsAlgorithm;
 
-    public CmsEncodedAsicWriter(AsicWriter asicWriter, X509Certificate certificate) {
+    public CmsEncryptedAsicWriter(AsicWriter asicWriter, X509Certificate certificate) {
         this(asicWriter, certificate,  CMSAlgorithm.AES128_CBC);
     }
 
-    public CmsEncodedAsicWriter(AsicWriter asicWriter, X509Certificate certificate, ASN1ObjectIdentifier cmsAlgorithm) {
+    public CmsEncryptedAsicWriter(AsicWriter asicWriter, X509Certificate certificate, ASN1ObjectIdentifier cmsAlgorithm) {
         this.asicWriter = asicWriter;
         this.certificate = certificate;
         this.cmsAlgorithm = cmsAlgorithm;
@@ -105,41 +105,41 @@ public class CmsEncodedAsicWriter implements AsicWriter {
         return asicWriter.add(inputStream, filename, mimeType);
     }
 
-    public AsicWriter addEncoded(File file) throws IOException {
-        return addEncoded(file.toPath());
+    public AsicWriter addEncrypted(File file) throws IOException {
+        return addEncrypted(file.toPath());
     }
 
-    public AsicWriter addEncoded(File file, String entryName) throws IOException {
-        return addEncoded(file.toPath(), entryName);
+    public AsicWriter addEncrypted(File file, String entryName) throws IOException {
+        return addEncrypted(file.toPath(), entryName);
     }
 
-    public AsicWriter addEncoded(Path path) throws IOException {
-        return addEncoded(path, path.toFile().getName());
+    public AsicWriter addEncrypted(Path path) throws IOException {
+        return addEncrypted(path, path.toFile().getName());
     }
 
-    public AsicWriter addEncoded(Path path, String entryName) throws IOException {
+    public AsicWriter addEncrypted(Path path, String entryName) throws IOException {
         InputStream inputStream = Files.newInputStream(path);
-        addEncoded(inputStream, entryName);
+        addEncrypted(inputStream, entryName);
         inputStream.close();
         return this;
     }
 
-    public AsicWriter addEncoded(InputStream inputStream, String filename) throws IOException {
-        return addEncoded(inputStream, filename, AsicUtils.detectMime(filename));
+    public AsicWriter addEncrypted(InputStream inputStream, String filename) throws IOException {
+        return addEncrypted(inputStream, filename, AsicUtils.detectMime(filename));
     }
 
-    public AsicWriter addEncoded(File file, String entryName, MimeType mimeType) throws IOException {
-        return addEncoded(file.toPath(), entryName, mimeType);
+    public AsicWriter addEncrypted(File file, String entryName, MimeType mimeType) throws IOException {
+        return addEncrypted(file.toPath(), entryName, mimeType);
     }
 
-    public AsicWriter addEncoded(Path path, String entryName, MimeType mimeType) throws IOException {
+    public AsicWriter addEncrypted(Path path, String entryName, MimeType mimeType) throws IOException {
         InputStream inputStream = Files.newInputStream(path);
-        addEncoded(inputStream, entryName, mimeType);
+        addEncrypted(inputStream, entryName, mimeType);
         inputStream.close();
         return this;
     }
 
-    public AsicWriter addEncoded(InputStream inputStream, String filename, MimeType mimeType) throws IOException {
+    public AsicWriter addEncrypted(InputStream inputStream, String filename, MimeType mimeType) throws IOException {
         try {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             IOUtils.copy(inputStream, byteArrayOutputStream);

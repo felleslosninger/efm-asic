@@ -18,7 +18,7 @@ import java.util.Collection;
 /**
  * Wrapper to seamlessly decode encoded files.
  */
-public class CmsEncodedAsicReader implements AsicReader {
+public class CmsEncryptedAsicReader implements AsicReader {
 
     private static final String BC = BouncyCastleProvider.PROVIDER_NAME;
 
@@ -32,7 +32,7 @@ public class CmsEncodedAsicReader implements AsicReader {
 
     private String currentFile;
 
-    public CmsEncodedAsicReader(AsicReader asicReader, PrivateKey privateKey) {
+    public CmsEncryptedAsicReader(AsicReader asicReader, PrivateKey privateKey) {
         this.asicReader = asicReader;
         this.privateKey = privateKey;
     }

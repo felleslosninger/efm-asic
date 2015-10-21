@@ -13,7 +13,7 @@ import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 
-public class CmsEncodedAsicTest {
+public class CmsEncryptedAsicTest {
 
     @Test
     public void simple() throws Exception {
@@ -24,14 +24,14 @@ public class CmsEncodedAsicTest {
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
-        CmsEncodedAsicWriter writer = new CmsEncodedAsicWriter(AsicWriterFactory.newFactory().newContainer(byteArrayOutputStream), certificate);
+        CmsEncryptedAsicWriter writer = new CmsEncryptedAsicWriter(AsicWriterFactory.newFactory().newContainer(byteArrayOutputStream), certificate);
         writer.add(getClass().getResourceAsStream("/image.bmp"), "simple.bmp", MimeType.forString("image/bmp"));
-        writer.addEncoded(getClass().getResourceAsStream("/image.bmp"), "encrypted.bmp", MimeType.forString("image/bmp"));
+        writer.addEncrypted(getClass().getResourceAsStream("/image.bmp"), "encrypted.bmp", MimeType.forString("image/bmp"));
         writer.sign(new SignatureHelper(getClass().getResourceAsStream("/keystore.jks"), "changeit", "selfsigned", "changeit"));
 
         PrivateKey privateKey = (PrivateKey) keyStore.getKey("selfsigned", "changeit".toCharArray());
 
-        CmsEncodedAsicReader reader = new CmsEncodedAsicReader(AsicReaderFactory.newFactory().open(new ByteArrayInputStream(byteArrayOutputStream.toByteArray())), privateKey);
+        CmsEncryptedAsicReader reader = new CmsEncryptedAsicReader(AsicReaderFactory.newFactory().open(new ByteArrayInputStream(byteArrayOutputStream.toByteArray())), privateKey);
 
         Assert.assertEquals(reader.getNextFile(), "simple.bmp");
         ByteArrayOutputStream file1 = new ByteArrayOutputStream();

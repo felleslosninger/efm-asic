@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/difi/asic.svg?branch=master)](https://travis-ci.org/difi/asic)
+
 # Associated Signature Container (ASiC)
 
 An ASiC file is simply a ZIP archive created according to some rules set forth in the specifications. 

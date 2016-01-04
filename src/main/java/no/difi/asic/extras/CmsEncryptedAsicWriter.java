@@ -1,10 +1,10 @@
 package no.difi.asic.extras;
 
+import com.google.common.io.ByteStreams;
 import no.difi.asic.AsicUtils;
 import no.difi.asic.AsicWriter;
 import no.difi.asic.MimeType;
 import no.difi.asic.SignatureHelper;
-import org.apache.commons.io.IOUtils;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.cms.CMSAlgorithm;
 import org.bouncycastle.cms.CMSEnvelopedData;
@@ -142,7 +142,7 @@ public class CmsEncryptedAsicWriter implements AsicWriter {
     public AsicWriter addEncrypted(InputStream inputStream, String filename, MimeType mimeType) throws IOException {
         try {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            IOUtils.copy(inputStream, byteArrayOutputStream);
+            ByteStreams.copy(inputStream, byteArrayOutputStream);
 
             CMSEnvelopedDataGenerator cmsEnvelopedDataGenerator = new CMSEnvelopedDataGenerator();
             cmsEnvelopedDataGenerator.addRecipientInfoGenerator(new JceKeyTransRecipientInfoGenerator(certificate).setProvider(BC));

@@ -1,5 +1,6 @@
 package no.difi.asic;
 
+import com.google.common.io.BaseEncoding;
 import org.apache.commons.codec.binary.Base64;
 import org.bouncycastle.asn1.x500.X500NameBuilder;
 import org.bouncycastle.asn1.x500.style.BCStyle;
@@ -77,7 +78,7 @@ public class BouncyCastleSignatureTest {
         cmsSignedDataGenerator.addCertificates(jcaCertStore);
         CMSSignedData sigData = cmsSignedDataGenerator.generate(msg, false);
 
-        byte[] bytes = Base64.encodeBase64(sigData.getEncoded());
+        byte[] bytes = BaseEncoding.base64().encode(sigData.getEncoded()).getBytes();
         log.debug(new String(bytes));
 
     }

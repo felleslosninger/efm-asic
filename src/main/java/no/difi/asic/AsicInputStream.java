@@ -1,6 +1,6 @@
 package no.difi.asic;
 
-import org.apache.commons.io.IOUtils;
+import com.google.common.io.ByteStreams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +24,7 @@ class AsicInputStream extends ZipInputStream {
 
         if (zipEntry != null && zipEntry.getName().equals("mimetype")) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            IOUtils.copy(this, baos);
+            ByteStreams.copy(this, baos);
 
             log.debug(String.format("Content of mimetype: %s", baos.toString()));
             if (!AsicUtils.MIMETYPE_ASICE.equals(baos.toString()))

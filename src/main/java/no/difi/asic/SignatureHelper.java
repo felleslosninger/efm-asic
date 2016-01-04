@@ -1,6 +1,6 @@
 package no.difi.asic;
 
-import org.apache.commons.codec.binary.Base64;
+import com.google.common.io.BaseEncoding;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaCertStore;
 import org.bouncycastle.cms.*;
@@ -27,7 +27,7 @@ import java.util.Arrays;
 
 /**
  * Helper class to assist when creating a signature.
- *
+ * <p/>
  * Not thread safe
  *
  * @author steinar
@@ -53,16 +53,20 @@ public class SignatureHelper {
 
     private JcaContentSignerBuilder jcaContentSignerBuilder;
 
-    /** Loads the keystore and obtains the private key, the public key and the associated certificate */
+    /**
+     * Loads the keystore and obtains the private key, the public key and the associated certificate
+     */
     public SignatureHelper(File keyStoreFile, String keyStorePassword, String keyPassword) throws IOException {
         this(keyStoreFile, keyStorePassword, null, keyPassword);
     }
 
-    /** Loads the keystore and obtains the private key, the public key and the associated certificate referenced by the alias.
-     * @param keyStoreFile file holding the JKS keystore.
+    /**
+     * Loads the keystore and obtains the private key, the public key and the associated certificate referenced by the alias.
+     *
+     * @param keyStoreFile     file holding the JKS keystore.
      * @param keyStorePassword password of the key store itself
-     * @param keyAlias the alias referencing the private and public key pair.
-     * @param keyPassword password protecting the private key
+     * @param keyAlias         the alias referencing the private and public key pair.
+     * @param keyPassword      password protecting the private key
      * @throws IOException
      */
     public SignatureHelper(File keyStoreFile, String keyStorePassword, String keyAlias, String keyPassword) throws IOException {
@@ -71,10 +75,11 @@ public class SignatureHelper {
 
     /**
      * Loading keystore and fetching key
-     * @param keyStoreStream Stream for keystore
+     *
+     * @param keyStoreStream   Stream for keystore
      * @param keyStorePassword Password to open keystore
-     * @param keyAlias Key alias, uses first key if set to null
-     * @param keyPassword Key password
+     * @param keyAlias         Key alias, uses first key if set to null
+     * @param keyPassword      Key password
      */
     public SignatureHelper(InputStream keyStoreStream, String keyStorePassword, String keyAlias, String keyPassword) {
         try {
@@ -103,6 +108,7 @@ public class SignatureHelper {
 
     /**
      * Sign content
+     *
      * @param data Content to be signed
      * @return Signature
      */
@@ -117,7 +123,7 @@ public class SignatureHelper {
             cmsSignedDataGenerator.addCertificates(new JcaCertStore(Arrays.asList(x509Certificate)));
             CMSSignedData cmsSignedData = cmsSignedDataGenerator.generate(new CMSProcessableByteArray(data), false);
 
-            log.debug(new String(Base64.encodeBase64(cmsSignedData.getEncoded())));
+            log.debug(BaseEncoding.base64().encode(cmsSignedData.getEncoded()));
             return cmsSignedData.getEncoded();
         } catch (Exception e) {
             throw new IllegalStateException("Unable to sign " + e.getMessage(), e);

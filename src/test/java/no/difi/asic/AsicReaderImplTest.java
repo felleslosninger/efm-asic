@@ -1,6 +1,6 @@
 package no.difi.asic;
 
-import org.apache.commons.io.IOUtils;
+import com.google.common.io.ByteStreams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
@@ -101,7 +101,7 @@ public class AsicReaderImplTest {
             asicReader.writeFile(contentFile);
 
             fileStream = new ByteArrayOutputStream();
-            IOUtils.copy(Files.newInputStream(contentFile.toPath()), fileStream);
+            ByteStreams.copy(Files.newInputStream(contentFile.toPath()), fileStream);
             assertEquals(fileContent1, fileStream.toString());
 
             Files.delete(contentFile.toPath());
@@ -115,7 +115,7 @@ public class AsicReaderImplTest {
             asicReader.writeFile(contentFile);
 
             fileStream = new ByteArrayOutputStream();
-            IOUtils.copy(Files.newInputStream(contentFile.toPath()), fileStream);
+            ByteStreams.copy(Files.newInputStream(contentFile.toPath()), fileStream);
             assertEquals(fileContent2, fileStream.toString());
 
             Files.delete(contentFile.toPath());

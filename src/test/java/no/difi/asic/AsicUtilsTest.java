@@ -1,7 +1,7 @@
 package no.difi.asic;
 
 
-import org.apache.commons.io.IOUtils;
+import com.google.common.io.ByteStreams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
@@ -127,7 +127,7 @@ public class AsicUtilsTest {
         while ((zipEntry = source2input.getNextEntry()) != null) {
             if (!zipEntry.getName().equals("META-INF/manifest.xml")) {
                 source2output.putNextEntry(zipEntry);
-                IOUtils.copy(source2input, source2output);
+                ByteStreams.copy(source2input, source2output);
                 source2output.closeEntry();
                 source2input.closeEntry();
             }

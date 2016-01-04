@@ -1,6 +1,6 @@
 package no.difi.asic;
 
-import org.apache.commons.io.IOUtils;
+import com.google.common.io.ByteStreams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -112,7 +112,7 @@ abstract class AbstractAsicWriter implements AsicWriter {
         DigestOutputStream zipOutputStreamWithDigest = new DigestOutputStream(asicOutputStream, asicManifest.getMessageDigest());
 
         // Copy inputStream to zip output stream
-        IOUtils.copy(inputStream, zipOutputStreamWithDigest);
+        ByteStreams.copy(inputStream, zipOutputStreamWithDigest);
         zipOutputStreamWithDigest.flush();
 
         // Closes the zip entry

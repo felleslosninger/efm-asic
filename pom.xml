@@ -69,14 +69,6 @@
 
     <dependencies>
 
-        <!-- TestNG testing framework -->
-        <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-            <version>${testng.version}</version>
-            <scope>test</scope>
-        </dependency>
-
         <!-- Logging -->
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -88,12 +80,6 @@
             <artifactId>logback-classic</artifactId>
             <version>${logback.version}</version>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <!-- Commons -->
@@ -101,11 +87,7 @@
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
             <version>1.10</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.4</version>
+            <scope>test</scope>
         </dependency>
 
         <!-- Bouncy Castle is used for creating and verifying signatures -->
@@ -113,6 +95,21 @@
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcpkix-jdk15on</artifactId>
             <version>1.52</version>
+        </dependency>
+
+        <!-- Google -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>19.0</version>
+        </dependency>
+
+        <!-- TestNG testing framework -->
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>${testng.version}</version>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>

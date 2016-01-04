@@ -1,11 +1,10 @@
 package no.difi.asic;
 
-import org.apache.commons.codec.digest.DigestUtils;
+import com.google.common.hash.Hashing;
 import org.etsi.uri._01903.v1_3.*;
 import org.etsi.uri._02918.v1_2.ObjectFactory;
 import org.etsi.uri._02918.v1_2.XAdESSignaturesType;
 import org.w3._2000._09.xmldsig_.*;
-
 
 import javax.xml.bind.*;
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -16,6 +15,8 @@ import java.io.ByteArrayOutputStream;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.util.GregorianCalendar;
+
+import org.etsi.uri._02918.v1_2.ObjectFactory;
 
 class XadesAsicManifest extends AbstractAsicManifest {
 
@@ -163,7 +164,7 @@ class XadesAsicManifest extends AbstractAsicManifest {
         try {
             // \XAdESSignature\Signature\Object\QualifyingProperties\SignedProperties\SignedSignatureProperties\SigningCertificate\Cert\CertDigest
             DigestAlgAndValueType certDigest = new DigestAlgAndValueType();
-            certDigest.setDigestValue(DigestUtils.sha1(signatureHelper.getX509Certificate().getEncoded()));
+            certDigest.setDigestValue(Hashing.sha1().hashBytes(signatureHelper.getX509Certificate().getEncoded()).asBytes());
             cert.setCertDigest(certDigest);
 
             // \XAdESSignature\Signature\Object\QualifyingProperties\SignedProperties\SignedSignatureProperties\SigningCertificate\Cert\CertDigest\DigestMethod
@@ -245,8 +246,7 @@ class XadesAsicManifest extends AbstractAsicManifest {
         signature.sign(dsc);
         */
 
-        SignatureValueType signatureValue = new SignatureValueType();
-        return signatureValue;
+        return new SignatureValueType();
     }
 
     @SuppressWarnings("unchecked")

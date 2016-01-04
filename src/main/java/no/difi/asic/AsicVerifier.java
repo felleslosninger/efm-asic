@@ -1,6 +1,6 @@
 package no.difi.asic;
 
-import org.apache.commons.io.output.NullOutputStream;
+import com.google.common.io.ByteStreams;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,7 +11,7 @@ public class AsicVerifier extends AbstractAsicReader {
         super(messageDigestAlgorithm, inputStream);
 
         while (getNextFile() != null)
-            writeFile(new NullOutputStream());
+            writeFile(ByteStreams.nullOutputStream());
 
         close();
     }

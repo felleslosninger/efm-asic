@@ -1,10 +1,9 @@
 package no.difi.asic;
 
+import com.google.common.io.ByteStreams;
 import no.difi.xsd.asic.model._1.AsicManifest;
 import no.difi.xsd.asic.model._1.Certificate;
 import oasis.names.tc.opendocument.xmlns.manifest._1.Manifest;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.output.NullOutputStream;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +58,7 @@ abstract class AbstractAsicReader {
     public String getNextFile() throws IOException {
         // Read last file if the user didn't.
         if (!contentIsWritten)
-            writeFile(new NullOutputStream());
+            writeFile(ByteStreams.nullOutputStream());
 
         while ((currentZipEntry = zipInputStream.getNextEntry()) != null) {
             log.info(String.format("Found file: %s", currentZipEntry.getName()));
@@ -93,7 +92,7 @@ abstract class AbstractAsicReader {
         // Calculate digest while reading file
         messageDigest.reset();
         DigestOutputStream digestOutputStream = new DigestOutputStream(outputStream, messageDigest);
-        IOUtils.copy(zipInputStream, digestOutputStream);
+        ByteStreams.copy(zipInputStream, digestOutputStream);
 
         zipInputStream.closeEntry();
 
@@ -123,7 +122,7 @@ abstract class AbstractAsicReader {
 
         // Read content in file
         ByteArrayOutputStream contentsOfStream = new ByteArrayOutputStream();
-        IOUtils.copy(zipInputStream, contentsOfStream);
+        ByteStreams.copy(zipInputStream, contentsOfStream);
 
         if (AsicUtils.PATTERN_CADES_MANIFEST.matcher(currentZipEntry.getName()).matches()) {
             // Handling manifest in ASiC CAdES.

@@ -1,6 +1,6 @@
 package no.difi.asic;
 
-import org.apache.commons.io.IOUtils;
+import com.google.common.io.ByteStreams;
 
 import java.io.*;
 import java.net.URLConnection;
@@ -54,7 +54,7 @@ public class AsicUtils {
                 if (PATTERN_CADES_MANIFEST.matcher(zipEntry.getName()).matches()) {
                     // Fetch content
                     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                    IOUtils.copy(source, byteArrayOutputStream);
+                    ByteStreams.copy(source, byteArrayOutputStream);
 
                     // Read manifest
                     ManifestVerifier manifestVerifier = new ManifestVerifier(null);
@@ -69,15 +69,15 @@ public class AsicUtils {
 
                     // Write manifest to container
                     target.putNextEntry(new ZipEntry(String.format("META-INF/asicmanifest%s.xml", ++manifestCounter)));
-                    IOUtils.copy(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()), target);
+                    ByteStreams.copy(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()), target);
                 } else if (PATTERN_XADES_SIGNATURES.matcher(zipEntry.getName()).matches()) {
                     // Copy content to target container
                     target.putNextEntry(new ZipEntry(String.format("META-INF/signatures%s.xml", ++manifestCounter)));
-                    IOUtils.copy(source, target);
+                    ByteStreams.copy(source, target);
                 } else if (zipEntry.getName().equals("META-INF/manifest.xml")) {
                     // Fetch content
                     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                    IOUtils.copy(source, byteArrayOutputStream);
+                    ByteStreams.copy(source, byteArrayOutputStream);
 
                     // Copy entries
                     oasisManifest.append(new OasisManifest(new ByteArrayInputStream(byteArrayOutputStream.toByteArray())));
@@ -88,7 +88,7 @@ public class AsicUtils {
                 } else {
                     // Copy content to target container
                     target.putNextEntry(zipEntry);
-                    IOUtils.copy(source, target);
+                    ByteStreams.copy(source, target);
 
                     if (!zipEntry.getName().startsWith("META-INF/"))
                         fileCounter++;

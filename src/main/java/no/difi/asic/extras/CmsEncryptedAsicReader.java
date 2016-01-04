@@ -1,8 +1,8 @@
 package no.difi.asic.extras;
 
+import com.google.common.io.ByteStreams;
 import no.difi.asic.AsicReader;
 import no.difi.xsd.asic.model._1.AsicManifest;
-import org.apache.commons.io.IOUtils;
 import org.bouncycastle.cms.CMSEnvelopedDataParser;
 import org.bouncycastle.cms.RecipientInformation;
 import org.bouncycastle.cms.jcajce.JceKeyTransEnvelopedRecipient;
@@ -72,7 +72,7 @@ public class CmsEncryptedAsicReader implements AsicReader {
                 RecipientInformation recipient = (RecipientInformation) recipients.iterator().next();
                 byte[] decryptedData = recipient.getContent(new JceKeyTransEnvelopedRecipient(privateKey).setProvider(BC));
 
-                IOUtils.copy(new ByteArrayInputStream(decryptedData), outputStream);
+                ByteStreams.copy(new ByteArrayInputStream(decryptedData), outputStream);
             } catch (Exception e) {
                 throw new IOException(e.getMessage(), e);
             }

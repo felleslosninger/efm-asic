@@ -15,7 +15,7 @@ import java.nio.file.Path;
  */
 public class AsicWriterFactory {
 
-    private static Logger log = LoggerFactory.getLogger(AsicWriterFactory.class);
+    private static Logger logger = LoggerFactory.getLogger(AsicWriterFactory.class);
 
     /**
      * Creates an AsicWriterFactory, which utilises the default signature method, which is currently CAdES.
@@ -70,7 +70,7 @@ public class AsicWriterFactory {
     public AsicWriter newContainer(Path path) throws IOException {
         // Conformance to ETSI TS 102 918, 6.2.1 1)
         if (!AsicUtils.PATTERN_EXTENSION_ASICE.matcher(path.toString()).matches())
-            log.warn("ASiC-E files should use \"asice\" as file extension.");
+            logger.warn("ASiC-E files should use \"asice\" as file extension.");
 
         return newContainer(Files.newOutputStream(path), true);
     }

@@ -4,6 +4,7 @@ import no.difi.xsd.asic.model._1.AsicManifest;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Path;
 
@@ -37,6 +38,12 @@ public interface AsicReader {
      * @throws IOException
      */
     void writeFile(OutputStream outputStream) throws IOException;
+
+    /**
+     * Returns InputStream to read the content.
+     * @return Content
+     */
+    InputStream inputStream() throws IOException;
 
     /**
      * Closes the underlying zip input stream.

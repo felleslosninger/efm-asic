@@ -47,6 +47,11 @@ class AsicReaderImpl extends AbstractAsicReader implements AsicReader {
         super.writeFile(outputStream);
     }
 
+    @Override
+    public InputStream inputStream() {
+        return super.inputStream();
+    }
+
     /**
      * {@inheritDoc}
      * @throws IOException
@@ -55,5 +60,4 @@ class AsicReaderImpl extends AbstractAsicReader implements AsicReader {
     public void close() throws IOException {
         super.close();
     }
-
 }

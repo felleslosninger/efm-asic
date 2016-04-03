@@ -1,8 +1,5 @@
 package no.difi.asic;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.UUID;
@@ -17,8 +14,6 @@ import java.util.UUID;
  *         Time: 12.09
  */
 class CadesAsicWriter extends AbstractAsicWriter {
-
-    public static final Logger log = LoggerFactory.getLogger(CadesAsicWriter.class);
 
     /**
      * Prepares creation of a new container.

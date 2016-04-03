@@ -12,7 +12,7 @@ import java.util.zip.ZipInputStream;
 
 class AsicInputStream extends ZipInputStream {
 
-    public static final Logger log = LoggerFactory.getLogger(AsicInputStream.class);
+    public static final Logger logger = LoggerFactory.getLogger(AsicInputStream.class);
 
     public AsicInputStream(InputStream in) {
         super(in);
@@ -26,7 +26,7 @@ class AsicInputStream extends ZipInputStream {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ByteStreams.copy(this, baos);
 
-            log.debug(String.format("Content of mimetype: %s", baos.toString()));
+            logger.debug("Content of mimetype: {}", baos.toString());
             if (!AsicUtils.MIMETYPE_ASICE.equals(baos.toString()))
                 throw new IllegalStateException("Content is not ASiC-E container.");
 

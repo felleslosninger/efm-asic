@@ -15,7 +15,7 @@ import java.util.zip.ZipEntry;
 
 abstract class AbstractAsicWriter implements AsicWriter {
 
-    public static final Logger log = LoggerFactory.getLogger(AbstractAsicWriter.class);
+    public static final Logger logger = LoggerFactory.getLogger(AbstractAsicWriter.class);
 
     protected AsicOutputStream asicOutputStream;
     protected AbstractAsicManifest asicManifest;
@@ -105,7 +105,7 @@ abstract class AbstractAsicWriter implements AsicWriter {
             throw new IllegalStateException("Adding files to META-INF is not allowed.");
 
         // Creates new zip entry
-        log.debug(String.format("Writing file %s to container", filename));
+        logger.debug("Writing file '{}' to container", filename);
         asicOutputStream.putNextEntry(new ZipEntry(filename));
 
         // Prepare for calculation of message digest

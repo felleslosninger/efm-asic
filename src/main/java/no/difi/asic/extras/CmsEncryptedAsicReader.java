@@ -53,7 +53,6 @@ public class CmsEncryptedAsicReader implements AsicReader {
         OutputStream outputStream = Files.newOutputStream(path);
         writeFile(outputStream);
         outputStream.close();
-
     }
 
     public void writeFile(OutputStream outputStream) throws IOException {
@@ -79,6 +78,15 @@ public class CmsEncryptedAsicReader implements AsicReader {
         } else {
             asicReader.writeFile(outputStream);
         }
+    }
+
+    @Override
+    public InputStream inputStream() throws IOException {
+        PipedInputStream pipedInputStream = new PipedInputStream();
+        PipedOutputStream pipedOutputStream = new PipedOutputStream(pipedInputStream);
+
+        writeFile(pipedOutputStream);
+        return pipedInputStream;
     }
 
     public void close() throws IOException {

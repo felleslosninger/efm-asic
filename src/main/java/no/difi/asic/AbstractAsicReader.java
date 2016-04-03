@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.security.DigestInputStream;
 import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -23,7 +24,7 @@ import java.util.zip.ZipEntry;
  */
 abstract class AbstractAsicReader {
 
-    private static final Logger log = LoggerFactory.getLogger(AbstractAsicReader.class);
+    private static final Logger logger = LoggerFactory.getLogger(AbstractAsicReader.class);
 
     private MessageDigest messageDigest;
 
@@ -57,11 +58,17 @@ abstract class AbstractAsicReader {
 
     public String getNextFile() throws IOException {
         // Read last file if the user didn't.
-        if (!contentIsWritten)
+        if (!contentIsWritten) {
             writeFile(ByteStreams.nullOutputStream());
 
+            byte[] digest = messageDigest.digest();
+            logger.debug("Digest: {}", Base64.encode(digest));
+
+            manifestVerifier.update(currentZipEntry.getName(), digest, null);
+        }
+
         while ((currentZipEntry = zipInputStream.getNextEntry()) != null) {
-            log.info(String.format("Found file: %s", currentZipEntry.getName()));
+            logger.info("Found file: {}", currentZipEntry.getName());
 
             // Files used for validation are not exposed
             if (currentZipEntry.getName().startsWith("META-INF/"))
@@ -98,10 +105,18 @@ abstract class AbstractAsicReader {
 
         // Get digest
         byte[] digest = messageDigest.digest();
-        log.debug(String.format("Digest: %s", new String(Base64.encode(digest))));
+        logger.debug("Digest: {}", Base64.encode(digest));
 
         manifestVerifier.update(currentZipEntry.getName(), digest, null);
         contentIsWritten = true;
+    }
+
+    InputStream inputStream() {
+        if (currentZipEntry == null)
+            throw new IllegalStateException("No file to read.");
+
+        messageDigest.reset();
+        return new InputStreamWrapper(new DigestInputStream(zipInputStream, messageDigest));
     }
 
     public void close() throws IOException {

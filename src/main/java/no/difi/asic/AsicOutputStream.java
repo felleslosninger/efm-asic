@@ -14,7 +14,7 @@ import java.util.zip.ZipOutputStream;
  */
 class AsicOutputStream extends ZipOutputStream {
 
-    public static final Logger log = LoggerFactory.getLogger(AsicOutputStream.class);
+    public static final Logger logger = LoggerFactory.getLogger(AsicOutputStream.class);
 
     public static final String APPLICATION_VND_ETSI_ASIC_E_ZIP = "application/vnd.etsi.asic-e+zip";
 
@@ -44,7 +44,7 @@ class AsicOutputStream extends ZipOutputStream {
 
     protected void writeZipEntry(ZipEntry zipEntry, byte[] bytes) throws IOException {
         try {
-            log.debug(String.format("Writing entry %s to container", zipEntry.getName()));
+            logger.debug("Writing entry '{}' to container", zipEntry.getName());
             putNextEntry(zipEntry);
             write(bytes);
             closeEntry();

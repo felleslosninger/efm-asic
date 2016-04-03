@@ -1,6 +1,8 @@
 package no.difi.asic;
 
 import com.google.common.io.ByteStreams;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.URLConnection;
@@ -10,6 +12,8 @@ import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 
 public class AsicUtils {
+
+    private static Logger logger = LoggerFactory.getLogger(AsicUtils.class);
 
     /** The MIME type, which should be the very first entry in the container */
     public static final String MIMETYPE_ASICE = "application/vnd.etsi.asic-e+zip";
@@ -116,7 +120,7 @@ public class AsicUtils {
 
         // Use URLConnection to find content type
         if (mimeType == null) {
-            CadesAsicWriter.log.info("Unable to determine MIME type using Files.probeContentType(), trying URLConnection.getFileNameMap()");
+            logger.info("Unable to determine MIME type using Files.probeContentType(), trying URLConnection.getFileNameMap()");
             mimeType = URLConnection.getFileNameMap().getContentTypeFor(filename);
         }
 

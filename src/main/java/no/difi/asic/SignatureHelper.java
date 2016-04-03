@@ -27,7 +27,7 @@ import java.util.Arrays;
 
 /**
  * Helper class to assist when creating a signature.
- * <p/>
+ * <p>
  * Not thread safe
  *
  * @author steinar
@@ -36,7 +36,7 @@ import java.util.Arrays;
  */
 public class SignatureHelper {
 
-    private static final Logger log = LoggerFactory.getLogger(SignatureHelper.class);
+    private static final Logger logger = LoggerFactory.getLogger(SignatureHelper.class);
 
     private static JcaSimpleSignerInfoVerifierBuilder jcaSimpleSignerInfoVerifierBuilder =
             new JcaSimpleSignerInfoVerifierBuilder().setProvider(BouncyCastleProvider.PROVIDER_NAME);
@@ -123,7 +123,7 @@ public class SignatureHelper {
             cmsSignedDataGenerator.addCertificates(new JcaCertStore(Arrays.asList(x509Certificate)));
             CMSSignedData cmsSignedData = cmsSignedDataGenerator.generate(new CMSProcessableByteArray(data), false);
 
-            log.debug(BaseEncoding.base64().encode(cmsSignedData.getEncoded()));
+            logger.debug(BaseEncoding.base64().encode(cmsSignedData.getEncoded()));
             return cmsSignedData.getEncoded();
         } catch (Exception e) {
             throw new IllegalStateException("Unable to sign " + e.getMessage(), e);
@@ -141,7 +141,7 @@ public class SignatureHelper {
 
             for (SignerInformation signerInformation : signerInformationStore.getSigners()) {
                 X509CertificateHolder x509Certificate = (X509CertificateHolder) store.getMatches(signerInformation.getSID()).iterator().next();
-                log.info(x509Certificate.getSubject().toString());
+                logger.info(x509Certificate.getSubject().toString());
 
                 if (signerInformation.verify(jcaSimpleSignerInfoVerifierBuilder.build(x509Certificate))) {
                     certificate = new no.difi.xsd.asic.model._1.Certificate();
@@ -150,7 +150,7 @@ public class SignatureHelper {
                 }
             }
         } catch (Exception e) {
-            log.warn(e.getMessage());
+            logger.warn(e.getMessage());
             certificate = null;
         }
 

@@ -15,7 +15,7 @@ import java.io.ByteArrayOutputStream;
 
 class CadesAsicManifest extends AbstractAsicManifest {
 
-    public static final Logger log = LoggerFactory.getLogger(AbstractAsicManifest.class);
+    public static final Logger logger = LoggerFactory.getLogger(AbstractAsicManifest.class);
 
     private static JAXBContext jaxbContext; // Thread safe
     private static ObjectFactory objectFactory = new ObjectFactory();
@@ -48,7 +48,7 @@ class CadesAsicManifest extends AbstractAsicManifest {
         dataObject.setDigestMethod(digestMethodType);
 
         ASiCManifestType.getDataObjectReference().add(dataObject);
-        log.debug(String.format("Digest: %s", new String(Base64.encode(dataObject.getDigestValue()))));
+        logger.debug("Digest: {}", Base64.encode(dataObject.getDigestValue()));
     }
 
     /**

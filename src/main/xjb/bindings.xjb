@@ -4,11 +4,7 @@
           xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
           extensionBindingPrefixes="xjc">
 
-	<!-- <globalBindings>
-		<xjc:simple/>
-	</globalBindings> -->
     <bindings schemaLocation="../xsd/asic-model-1.0.xsd">
         <xjc:simple/>
     </bindings>
-
 </bindings>

@@ -64,7 +64,7 @@ public class CmsEncryptedAsicTest {
         Assert.assertNull(reader.getNextFile());
 
         // Verify certificate used for signing of ASiC is the same as the one used for signing
-        // Assert.assertEquals(reader.getAsicManifest().getCertificate().get(0).getCertificate(), certificate.getEncoded());
+        Assert.assertEquals(reader.getAsicManifest().getCertificate().get(0).getCertificate(), certificate.getEncoded());
     }
 
 }

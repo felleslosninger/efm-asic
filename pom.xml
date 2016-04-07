@@ -8,10 +8,7 @@
     <packaging>jar</packaging>
 
     <name>Associated Signature Container (ASiC)</name>
-    <description>
-        Generic implementation of ASiC archives in accordance with ETSI 102 918 v1.3.1
-        Only ASiC-E are supported. The much simpler ASiC-S is of no use.
-    </description>
+    <description>Generic implementation of ASiC-E archives in accordance with ETSI 102 918 v1.3.1.</description>
     <url>https://github.com/difi/asic</url>
 
     <scm>
@@ -69,7 +66,7 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.20</version>
+            <version>1.7.21</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>

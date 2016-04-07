@@ -57,13 +57,14 @@ abstract class AbstractAsicReader {
     }
 
     public String getNextFile() throws IOException {
-        // Read last file if the user didn't.
-        if (!contentIsWritten) {
+        // Read file if the user didn't.
+        if (!contentIsWritten)
             writeFile(ByteStreams.nullOutputStream());
 
+        // Write digest to manifest
+        if (currentZipEntry != null) {
             byte[] digest = messageDigest.digest();
             logger.debug("Digest: {}", Base64.encode(digest));
-
             manifestVerifier.update(currentZipEntry.getName(), digest, null);
         }
 
@@ -103,17 +104,15 @@ abstract class AbstractAsicReader {
 
         zipInputStream.closeEntry();
 
-        // Get digest
-        byte[] digest = messageDigest.digest();
-        logger.debug("Digest: {}", Base64.encode(digest));
-
-        manifestVerifier.update(currentZipEntry.getName(), digest, null);
         contentIsWritten = true;
     }
 
     InputStream inputStream() {
         if (currentZipEntry == null)
             throw new IllegalStateException("No file to read.");
+
+        // We must trust the user.
+        contentIsWritten = true;
 
         messageDigest.reset();
         return new InputStreamWrapper(new DigestInputStream(zipInputStream, messageDigest));

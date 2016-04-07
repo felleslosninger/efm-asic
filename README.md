@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/difi/asic.svg?branch=master)](https://travis-ci.org/difi/asic)
+[![Maven Central](https://img.shields.io/maven-central/v/no.difi.commons/commons-asic.svg)](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22no.difi.commons%22%20AND%20a%3A%22commons-asic%22)
 
 # Associated Signature Container (ASiC)
 
@@ -22,7 +23,7 @@ Conformance is claimed according to 7.2.1 (TBA) and 7.2.2 in
 <dependency>
 	<groupId>no.difi.commons</groupId>
 	<artifactId>commons-asic</artifactId>
-	<version>0.9.1</version>
+	<version>0.9.2</version>
 </dependency>
 ```
 

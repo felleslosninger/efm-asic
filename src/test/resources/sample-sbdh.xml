@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    The purpose of this "inner" SBDH is to allow routing at the receiving end, without
+    having to decrypt or parse any of the files constituting the payload.
+-->
+<StandardBusinessDocumentHeader xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                                xmlns="http://www.unece.org/cefact/namespaces/StandardBusinessDocumentHeader">
+    <HeaderVersion>1.0</HeaderVersion>
+    <Sender>
+        <Identifier Authority="iso6523-actorid-upis">9908:810018902</Identifier>
+    </Sender>
+    <Receiver>
+        <Identifier Authority="iso6523-actorid-upis">9908:810418052</Identifier>
+    </Receiver>
+
+    <DocumentIdentification>
+        <!-- The XML name space of the root element of the document -->
+        <Standard>urn:X-test:UBL:Pre-award:ExpressionOfInterest</Standard>
+        <!-- Version number of the XML root name space -->
+        <TypeVersion>2.1</TypeVersion>
+        <!-- Unique identifier of this message -->
+        <InstanceIdentifier>FA4A6819-6149-4134-95C3-C53A65338EB6</InstanceIdentifier>
+        <!-- Local name of the root XML element -->
+        <Type>ExpressionOfInterest</Type>
+        <!-- When was this SBDH created -->
+        <CreationDateAndTime>2016-04-29T10:12:00+01:00</CreationDateAndTime>
+    </DocumentIdentification>
+    <BusinessScope>
+        <!-- Business process -->
+        <Scope>
+            <Type>PROCESSID</Type>
+            <InstanceIdentifier>urn:www.cenbii.eu:profile:bii46:ver3.0</InstanceIdentifier>
+        </Scope>
+
+        <!-- The complete PEPPOL document type identificator
+
+            namespace :: root local name ## customization id :: version
+
+            -->
+        <Scope>
+            <Type>DOCUMENTID</Type>
+            <InstanceIdentifier>
+                urn:X-test:UBL:Pre-award:ExpressionOfInterest::ExpressionOfInterest##urn:www.cenbii.eu:transaction:BiiTrns081:ver2.0::2.1
+            </InstanceIdentifier>
+        </Scope>
+    </BusinessScope>
+</StandardBusinessDocumentHeader>

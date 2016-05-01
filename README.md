@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/difi/asic.svg?branch=master)](https://travis-ci.org/difi/asic)
+[![CodeCov](https://codecov.io/gh/difi/asic/branch/master/graph/badge.svg)](https://codecov.io/gh/difi/asic)
 [![Maven Central](https://img.shields.io/maven-central/v/no.difi.commons/commons-asic.svg)](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22no.difi.commons%22%20AND%20a%3A%22commons-asic%22)
 
 # Associated Signature Container (ASiC)

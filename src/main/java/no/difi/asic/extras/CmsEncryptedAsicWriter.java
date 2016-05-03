@@ -37,7 +37,7 @@ public class CmsEncryptedAsicWriter implements AsicWriter {
     private ASN1ObjectIdentifier cmsAlgorithm;
 
     public CmsEncryptedAsicWriter(AsicWriter asicWriter, X509Certificate certificate) {
-        this(asicWriter, certificate,  CMSAlgorithm.AES128_CBC);
+        this(asicWriter, certificate,  CMSAlgorithm.AES256_GCM);
     }
 
     public CmsEncryptedAsicWriter(AsicWriter asicWriter, X509Certificate certificate, ASN1ObjectIdentifier cmsAlgorithm) {

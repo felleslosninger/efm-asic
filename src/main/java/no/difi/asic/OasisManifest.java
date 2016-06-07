@@ -66,12 +66,6 @@ class OasisManifest {
         try {
             Marshaller marshaller = jaxbContext.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-            /* marshaller.setProperty("com.sun.xml.internal.bind.namespacePrefixMapper", new NamespacePrefixMapper() {
-                @Override
-                public String getPreferredPrefix(String namespaceUri, String suggestion, boolean requirePrefix) {
-                    return "manifest";
-                }
-            }); */
 
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             marshaller.marshal(manifest, byteArrayOutputStream);

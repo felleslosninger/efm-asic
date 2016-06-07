@@ -50,9 +50,9 @@ public class CmsEncryptedAsicReader implements AsicReader {
     }
 
     public void writeFile(Path path) throws IOException {
-        OutputStream outputStream = Files.newOutputStream(path);
-        writeFile(outputStream);
-        outputStream.close();
+        try (OutputStream outputStream = Files.newOutputStream(path)) {
+            writeFile(outputStream);
+        }
     }
 
     public void writeFile(OutputStream outputStream) throws IOException {

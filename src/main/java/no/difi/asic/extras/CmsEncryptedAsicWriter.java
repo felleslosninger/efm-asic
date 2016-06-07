@@ -71,9 +71,9 @@ public class CmsEncryptedAsicWriter implements AsicWriter {
      * {@inheritDoc}
      */
     public AsicWriter add(Path path, String entryName) throws IOException {
-        InputStream inputStream = Files.newInputStream(path);
-        add(inputStream, entryName);
-        inputStream.close();
+        try (InputStream inputStream = Files.newInputStream(path)) {
+            add(inputStream, entryName);
+        }
         return this;
     }
 
@@ -95,9 +95,9 @@ public class CmsEncryptedAsicWriter implements AsicWriter {
      * {@inheritDoc}
      */
     public AsicWriter add(Path path, String entryName, MimeType mimeType) throws IOException {
-        InputStream inputStream = Files.newInputStream(path);
-        add(inputStream, entryName, mimeType);
-        inputStream.close();
+        try (InputStream inputStream = Files.newInputStream(path)) {
+            add(inputStream, entryName, mimeType);
+        }
         return this;
     }
 
@@ -118,9 +118,9 @@ public class CmsEncryptedAsicWriter implements AsicWriter {
     }
 
     public AsicWriter addEncrypted(Path path, String entryName) throws IOException {
-        InputStream inputStream = Files.newInputStream(path);
-        addEncrypted(inputStream, entryName);
-        inputStream.close();
+        try (InputStream inputStream = Files.newInputStream(path)) {
+            addEncrypted(inputStream, entryName);
+        }
         return this;
     }
 
@@ -133,9 +133,9 @@ public class CmsEncryptedAsicWriter implements AsicWriter {
     }
 
     public AsicWriter addEncrypted(Path path, String entryName, MimeType mimeType) throws IOException {
-        InputStream inputStream = Files.newInputStream(path);
-        addEncrypted(inputStream, entryName, mimeType);
-        inputStream.close();
+        try (InputStream inputStream = Files.newInputStream(path)) {
+            addEncrypted(inputStream, entryName, mimeType);
+        }
         return this;
     }
 

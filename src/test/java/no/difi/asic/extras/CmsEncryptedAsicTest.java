@@ -1,10 +1,12 @@
 package no.difi.asic.extras;
 
 import no.difi.asic.*;
+import org.bouncycastle.cms.CMSAlgorithm;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.*;
+import java.nio.file.Paths;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -29,9 +31,11 @@ public class CmsEncryptedAsicTest {
         // Create a new ASiC archive
         AsicWriter asicWriter = AsicWriterFactory.newFactory().newContainer(byteArrayOutputStream);
         // Encapsulate ASiC archive to enable writing encrypted content
-        CmsEncryptedAsicWriter writer = new CmsEncryptedAsicWriter(asicWriter, certificate);
+        CmsEncryptedAsicWriter writer = new CmsEncryptedAsicWriter(asicWriter, certificate, CMSAlgorithm.AES128_GCM);
         writer.add(getClass().getResourceAsStream("/image.bmp"), "simple.bmp", MimeType.forString("image/bmp"));
         writer.addEncrypted(getClass().getResourceAsStream("/image.bmp"), "encrypted.bmp", MimeType.forString("image/bmp"));
+        writer.addEncrypted(Paths.get(getClass().getResource("/image.bmp").toURI()), "encrypted2.bmp", MimeType.forString("image/bmp"));
+        writer.addEncrypted(Paths.get(getClass().getResource("/image.bmp").toURI()).toFile(), "encrypted3.xml");
         writer.sign(new SignatureHelper(getClass().getResourceAsStream("/keystore.jks"), "changeit", "selfsigned", "changeit"));
         // ByteArrayOutputStream now contains a signed ASiC archive containing one encrypted file
 
@@ -55,6 +59,16 @@ public class CmsEncryptedAsicTest {
         Assert.assertEquals(reader.getNextFile(), "encrypted.bmp");
         ByteArrayOutputStream file2 = new ByteArrayOutputStream();
         reader.writeFile(file2);
+
+        // Read encrypted file 2
+        Assert.assertEquals(reader.getNextFile(), "encrypted2.bmp");
+        ByteArrayOutputStream file3 = new ByteArrayOutputStream();
+        reader.writeFile(file3);
+
+        // Read encrypted file 3
+        Assert.assertEquals(reader.getNextFile(), "encrypted3.xml");
+        ByteArrayOutputStream file4 = new ByteArrayOutputStream();
+        reader.writeFile(file4);
 
         // Verify both files contain the same data
         Assert.assertEquals(file2.toByteArray(), file1.toByteArray());
@@ -81,7 +95,7 @@ public class CmsEncryptedAsicTest {
         return keyStore;
     }
 
-    @Test
+    @Test(enabled = false)
     public void createSampleForBits() throws Exception {
 
         // Obtains the keystore

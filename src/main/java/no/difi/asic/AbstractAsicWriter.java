@@ -66,9 +66,9 @@ abstract class AbstractAsicWriter implements AsicWriter {
     /** {@inheritDoc} */
     @Override
     public AsicWriter add(Path path, String entryName) throws IOException {
-        InputStream inputStream = Files.newInputStream(path);
-        add(inputStream, entryName);
-        inputStream.close();
+        try (InputStream inputStream = Files.newInputStream(path)) {
+            add(inputStream, entryName);
+        }
         return this;
     }
 
@@ -88,9 +88,9 @@ abstract class AbstractAsicWriter implements AsicWriter {
     /** {@inheritDoc} */
     @Override
     public AsicWriter add(Path path, String entryName, MimeType mimeType) throws IOException {
-        InputStream inputStream = Files.newInputStream(path);
-        add(inputStream, entryName, mimeType);
-        inputStream.close();
+        try (InputStream inputStream = Files.newInputStream(path)) {
+            add(inputStream, entryName, mimeType);
+        }
         return this;
     }
 

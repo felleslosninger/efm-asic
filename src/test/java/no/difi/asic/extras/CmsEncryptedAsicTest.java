@@ -79,9 +79,11 @@ public class CmsEncryptedAsicTest {
         // Verify certificate used for signing of ASiC is the same as the one used for signing
         Assert.assertEquals(reader.getAsicManifest().getCertificate().get(0).getCertificate(), certificate.getEncoded());
 
+        asicReader.close();
+
         // Writes the ASiC file to temporary directory
         File sample = File.createTempFile("sample", ".asice");
-        try (FileOutputStream fileOutputStream = new FileOutputStream(sample);) {
+        try (FileOutputStream fileOutputStream = new FileOutputStream(sample)) {
             fileOutputStream.write(byteArrayOutputStream.toByteArray());
         }
         System.out.println("Wrote sample ASiC to " + sample);
@@ -106,7 +108,7 @@ public class CmsEncryptedAsicTest {
 
         // Store result in outputfile
         File sample = File.createTempFile("sample-bits", ".asice");
-        try (FileOutputStream fileOutputStream = new FileOutputStream(sample);) {
+        try (FileOutputStream fileOutputStream = new FileOutputStream(sample)) {
 
             // Create a new ASiC archive
             AsicWriter asicWriter = AsicWriterFactory.newFactory().newContainer(fileOutputStream);

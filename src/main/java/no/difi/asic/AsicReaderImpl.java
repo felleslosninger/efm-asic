@@ -51,13 +51,4 @@ class AsicReaderImpl extends AbstractAsicReader implements AsicReader {
     public InputStream inputStream() {
         return super.inputStream();
     }
-
-    /**
-     * {@inheritDoc}
-     * @throws IOException
-     */
-    @Override
-    public void close() throws IOException {
-        super.close();
-    }
 }

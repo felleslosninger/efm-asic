@@ -2,13 +2,10 @@ package no.difi.asic;
 
 import no.difi.xsd.asic.model._1.AsicManifest;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.file.Path;
 
-public interface AsicReader {
+public interface AsicReader extends Closeable{
 
     /**
      * Provides the name of the next entry in the ASiC archive and positions the inputstream at the beginning of the data.
@@ -44,13 +41,6 @@ public interface AsicReader {
      * @return Content
      */
     InputStream inputStream() throws IOException;
-
-    /**
-     * Closes the underlying zip input stream.
-     *
-     * @throws IOException
-     */
-    void close() throws IOException;
 
     AsicManifest getAsicManifest();
 }

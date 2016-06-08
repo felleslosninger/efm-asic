@@ -22,7 +22,7 @@ import java.util.zip.ZipEntry;
  *
  * @author Erlend Klakegg Bergheim
  */
-abstract class AbstractAsicReader {
+abstract class AbstractAsicReader implements Closeable {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractAsicReader.class);
 
@@ -118,6 +118,7 @@ abstract class AbstractAsicReader {
         return new InputStreamWrapper(new DigestInputStream(zipInputStream, messageDigest));
     }
 
+    @Override
     public void close() throws IOException {
         if (zipInputStream != null) {
             zipInputStream.close();

@@ -89,6 +89,7 @@ public class CmsEncryptedAsicReader implements AsicReader {
         return pipedInputStream;
     }
 
+    @Override
     public void close() throws IOException {
         asicReader.close();
     }

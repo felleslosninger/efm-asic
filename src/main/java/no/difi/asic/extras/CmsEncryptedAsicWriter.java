@@ -12,29 +12,24 @@ import org.bouncycastle.cms.CMSEnvelopedDataGenerator;
 import org.bouncycastle.cms.CMSProcessableByteArray;
 import org.bouncycastle.cms.jcajce.JceCMSContentEncryptorBuilder;
 import org.bouncycastle.cms.jcajce.JceKeyTransRecipientInfoGenerator;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.Security;
 import java.security.cert.X509Certificate;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Wrapper to seamlessly encode specific files.
  */
-public class CmsEncryptedAsicWriter implements AsicWriter {
-
-    private static final String BC = BouncyCastleProvider.PROVIDER_NAME;
-
-    static {
-        if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null)
-            Security.addProvider(new BouncyCastleProvider());
-    }
+public class CmsEncryptedAsicWriter extends CmsEncryptedAsicAbstract implements AsicWriter {
 
     private AsicWriter asicWriter;
     private X509Certificate certificate;
     private ASN1ObjectIdentifier cmsAlgorithm;
+
+    private Set<String> entryNeames = new TreeSet<>();
 
     public CmsEncryptedAsicWriter(AsicWriter asicWriter, X509Certificate certificate) {
         this(asicWriter, certificate,  CMSAlgorithm.AES256_GCM);
@@ -49,6 +44,7 @@ public class CmsEncryptedAsicWriter implements AsicWriter {
     /**
      * {@inheritDoc}
      */
+    @Override
     public AsicWriter add(File file) throws IOException {
         return add(file.toPath());
     }
@@ -56,6 +52,7 @@ public class CmsEncryptedAsicWriter implements AsicWriter {
     /**
      * {@inheritDoc}
      */
+    @Override
     public AsicWriter add(File file, String entryName) throws IOException {
         return add(file.toPath(), entryName);
     }
@@ -63,6 +60,7 @@ public class CmsEncryptedAsicWriter implements AsicWriter {
     /**
      * {@inheritDoc}
      */
+    @Override
     public AsicWriter add(Path path) throws IOException {
         return add(path, path.toFile().getName());
     }
@@ -70,6 +68,7 @@ public class CmsEncryptedAsicWriter implements AsicWriter {
     /**
      * {@inheritDoc}
      */
+    @Override
     public AsicWriter add(Path path, String entryName) throws IOException {
         try (InputStream inputStream = Files.newInputStream(path)) {
             add(inputStream, entryName);
@@ -80,6 +79,7 @@ public class CmsEncryptedAsicWriter implements AsicWriter {
     /**
      * {@inheritDoc}
      */
+    @Override
     public AsicWriter add(InputStream inputStream, String filename) throws IOException {
         return add(inputStream, filename, AsicUtils.detectMime(filename));
     }
@@ -87,6 +87,7 @@ public class CmsEncryptedAsicWriter implements AsicWriter {
     /**
      * {@inheritDoc}
      */
+    @Override
     public AsicWriter add(File file, String entryName, MimeType mimeType) throws IOException {
         return add(file.toPath(), entryName, mimeType);
     }
@@ -94,6 +95,7 @@ public class CmsEncryptedAsicWriter implements AsicWriter {
     /**
      * {@inheritDoc}
      */
+    @Override
     public AsicWriter add(Path path, String entryName, MimeType mimeType) throws IOException {
         try (InputStream inputStream = Files.newInputStream(path)) {
             add(inputStream, entryName, mimeType);
@@ -101,6 +103,10 @@ public class CmsEncryptedAsicWriter implements AsicWriter {
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public AsicWriter add(InputStream inputStream, String filename, MimeType mimeType) throws IOException {
         return asicWriter.add(inputStream, filename, mimeType);
     }
@@ -151,24 +157,33 @@ public class CmsEncryptedAsicWriter implements AsicWriter {
                     new JceCMSContentEncryptorBuilder(cmsAlgorithm).setProvider(BC).build()
             );
 
+            this.entryNeames.add(filename);
+
             return asicWriter.add(new ByteArrayInputStream(data.getEncoded()), filename + ".p7m", mimeType);
         } catch (Exception e) {
             throw new IOException(e.getMessage(), e);
         }
     }
 
+    @Override
     public AsicWriter setRootEntryName(String name) {
+        if (this.entryNeames.contains(name))
+            name = String.format("%s.p7m", name);
+
         return asicWriter.setRootEntryName(name);
     }
 
+    @Override
     public AsicWriter sign(File keyStoreFile, String keyStorePassword, String keyPassword) throws IOException {
         return asicWriter.sign(keyStoreFile, keyStorePassword, keyPassword);
     }
 
+    @Override
     public AsicWriter sign(File keyStoreFile, String keyStorePassword, String keyAlias, String keyPassword) throws IOException {
         return asicWriter.sign(keyStoreFile, keyStorePassword, keyAlias, keyPassword);
     }
 
+    @Override
     public AsicWriter sign(SignatureHelper signatureHelper) throws IOException {
         return asicWriter.sign(signatureHelper);
     }

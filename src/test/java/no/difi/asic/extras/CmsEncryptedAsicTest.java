@@ -36,6 +36,7 @@ public class CmsEncryptedAsicTest {
         writer.addEncrypted(getClass().getResourceAsStream("/image.bmp"), "encrypted.bmp", MimeType.forString("image/bmp"));
         writer.addEncrypted(Paths.get(getClass().getResource("/image.bmp").toURI()), "encrypted2.bmp", MimeType.forString("image/bmp"));
         writer.addEncrypted(Paths.get(getClass().getResource("/image.bmp").toURI()).toFile(), "encrypted3.xml");
+        writer.setRootEntryName("encrypted.bmp");
         writer.sign(new SignatureHelper(getClass().getResourceAsStream("/keystore.jks"), "changeit", "selfsigned", "changeit"));
         // ByteArrayOutputStream now contains a signed ASiC archive containing one encrypted file
 
@@ -78,6 +79,8 @@ public class CmsEncryptedAsicTest {
 
         // Verify certificate used for signing of ASiC is the same as the one used for signing
         Assert.assertEquals(reader.getAsicManifest().getCertificate().get(0).getCertificate(), certificate.getEncoded());
+
+        Assert.assertEquals(reader.getAsicManifest().getRootfile(), "encrypted.bmp");
 
         asicReader.close();
 

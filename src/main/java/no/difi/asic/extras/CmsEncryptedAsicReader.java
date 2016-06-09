@@ -6,26 +6,17 @@ import no.difi.xsd.asic.model._1.AsicManifest;
 import org.bouncycastle.cms.CMSEnvelopedDataParser;
 import org.bouncycastle.cms.RecipientInformation;
 import org.bouncycastle.cms.jcajce.JceKeyTransEnvelopedRecipient;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.PrivateKey;
-import java.security.Security;
 import java.util.Collection;
 
 /**
  * Wrapper to seamlessly decode encoded files.
  */
-public class CmsEncryptedAsicReader implements AsicReader {
-
-    private static final String BC = BouncyCastleProvider.PROVIDER_NAME;
-
-    static {
-        if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null)
-            Security.addProvider(new BouncyCastleProvider());
-    }
+public class CmsEncryptedAsicReader extends CmsEncryptedAsicAbstract implements AsicReader {
 
     private AsicReader asicReader;
     private PrivateKey privateKey;
@@ -37,6 +28,7 @@ public class CmsEncryptedAsicReader implements AsicReader {
         this.privateKey = privateKey;
     }
 
+    @Override
     public String getNextFile() throws IOException {
         currentFile = asicReader.getNextFile();
         if (currentFile == null)
@@ -45,16 +37,19 @@ public class CmsEncryptedAsicReader implements AsicReader {
         return currentFile.endsWith(".p7m") ? currentFile.substring(0, currentFile.length() - 4) : currentFile;
     }
 
+    @Override
     public void writeFile(File file) throws IOException {
         writeFile(file.toPath());
     }
 
+    @Override
     public void writeFile(Path path) throws IOException {
         try (OutputStream outputStream = Files.newOutputStream(path)) {
             writeFile(outputStream);
         }
     }
 
+    @Override
     public void writeFile(OutputStream outputStream) throws IOException {
         if (currentFile.endsWith(".p7m")) {
             try {
@@ -94,7 +89,14 @@ public class CmsEncryptedAsicReader implements AsicReader {
         asicReader.close();
     }
 
+    @Override
     public AsicManifest getAsicManifest() {
-        return asicReader.getAsicManifest();
+        AsicManifest asicManifest = asicReader.getAsicManifest();
+
+        String rootfile = asicManifest.getRootfile();
+        if (rootfile != null && rootfile.endsWith(".p7m"))
+            asicManifest.setRootfile(rootfile.substring(0, rootfile.length() - 4));
+
+        return asicManifest;
     }
 }

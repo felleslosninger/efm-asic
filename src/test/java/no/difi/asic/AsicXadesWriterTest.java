@@ -1,10 +1,10 @@
 package no.difi.asic;
 
+import no.difi.commons.asic.jaxb.xmldsig.ReferenceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-import org.w3._2000._09.xmldsig_.ReferenceType;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

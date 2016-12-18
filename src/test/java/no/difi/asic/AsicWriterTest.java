@@ -1,7 +1,7 @@
 package no.difi.asic;
 
+import no.difi.commons.asic.jaxb.cades.DataObjectReferenceType;
 import no.difi.xsd.asic.model._1.AsicManifest;
-import org.etsi.uri._02918.v1_2.DataObjectReferenceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeMethod;

@@ -7,4 +7,27 @@
     <bindings schemaLocation="../xsd/asic-model-1.0.xsd">
         <xjc:simple/>
     </bindings>
+
+    <bindings schemaLocation="../xsd/OpenDocument_manifest.xsd">
+        <schemaBindings>
+            <package name="no.difi.commons.asic.jaxb.opendocument.manifest"/>
+        </schemaBindings>
+    </bindings>
+
+    <bindings schemaLocation="../xsd/ts_102918v010201.xsd">
+        <schemaBindings>
+            <package name="no.difi.commons.asic.jaxb.cades"/>
+        </schemaBindings>
+    </bindings>
+    <bindings schemaLocation="../xsd/XAdES.xsd">
+        <schemaBindings>
+            <package name="no.difi.commons.asic.jaxb.xades"/>
+        </schemaBindings>
+    </bindings>
+    <bindings schemaLocation="../xsd/xmldsig-core-schema.xsd">
+        <schemaBindings>
+            <package name="no.difi.commons.asic.jaxb.xmldsig"/>
+        </schemaBindings>
+    </bindings>
+
 </bindings>

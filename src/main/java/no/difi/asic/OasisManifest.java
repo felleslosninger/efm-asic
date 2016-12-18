@@ -1,7 +1,7 @@
 package no.difi.asic;
 
-import oasis.names.tc.opendocument.xmlns.manifest._1.FileEntry;
-import oasis.names.tc.opendocument.xmlns.manifest._1.Manifest;
+import no.difi.commons.asic.jaxb.opendocument.manifest.FileEntry;
+import no.difi.commons.asic.jaxb.opendocument.manifest.Manifest;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;

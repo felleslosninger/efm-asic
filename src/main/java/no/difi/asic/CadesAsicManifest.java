@@ -1,13 +1,13 @@
 package no.difi.asic;
 
+import no.difi.commons.asic.jaxb.cades.ASiCManifestType;
+import no.difi.commons.asic.jaxb.cades.DataObjectReferenceType;
+import no.difi.commons.asic.jaxb.cades.ObjectFactory;
+import no.difi.commons.asic.jaxb.cades.SigReferenceType;
+import no.difi.commons.asic.jaxb.xmldsig.DigestMethodType;
 import org.bouncycastle.util.encoders.Base64;
-import org.etsi.uri._02918.v1_2.ASiCManifestType;
-import org.etsi.uri._02918.v1_2.DataObjectReferenceType;
-import org.etsi.uri._02918.v1_2.ObjectFactory;
-import org.etsi.uri._02918.v1_2.SigReferenceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3._2000._09.xmldsig_.DigestMethodType;
 
 import javax.xml.bind.*;
 import java.io.ByteArrayInputStream;

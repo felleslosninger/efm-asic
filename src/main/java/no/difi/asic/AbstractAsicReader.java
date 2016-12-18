@@ -1,9 +1,9 @@
 package no.difi.asic;
 
 import com.google.common.io.ByteStreams;
+import no.difi.commons.asic.jaxb.opendocument.manifest.Manifest;
 import no.difi.xsd.asic.model._1.AsicManifest;
 import no.difi.xsd.asic.model._1.Certificate;
-import oasis.names.tc.opendocument.xmlns.manifest._1.Manifest;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,10 +1,11 @@
 package no.difi.asic;
 
 import com.google.common.hash.Hashing;
-import org.etsi.uri._01903.v1_3.*;
-import org.etsi.uri._02918.v1_2.ObjectFactory;
-import org.etsi.uri._02918.v1_2.XAdESSignaturesType;
-import org.w3._2000._09.xmldsig_.*;
+import no.difi.commons.asic.jaxb.cades.XAdESSignaturesType;
+import no.difi.commons.asic.jaxb.xades.*;
+import no.difi.commons.asic.jaxb.xades.ObjectFactory;
+import no.difi.commons.asic.jaxb.xmldsig.*;
+
 
 import javax.xml.bind.*;
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -16,13 +17,11 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.util.GregorianCalendar;
 
-import org.etsi.uri._02918.v1_2.ObjectFactory;
-
 class XadesAsicManifest extends AbstractAsicManifest {
 
     private static JAXBContext jaxbContext; // Thread safe
     private static ObjectFactory objectFactory1_2 = new ObjectFactory();
-    private static org.etsi.uri._01903.v1_3.ObjectFactory objectFactory1_3 = new org.etsi.uri._01903.v1_3.ObjectFactory();
+    private static no.difi.commons.asic.jaxb.cades.ObjectFactory objectFactory1_3 = new no.difi.commons.asic.jaxb.cades.ObjectFactory();
 
     static {
         try {
@@ -117,7 +116,7 @@ class XadesAsicManifest extends AbstractAsicManifest {
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             // TODO
-            marshaller.marshal(objectFactory1_2.createXAdESSignatures(getCreateXAdESSignatures(signatureHelper)), baos);
+            marshaller.marshal(objectFactory1_3.createXAdESSignatures(getCreateXAdESSignatures(signatureHelper)), baos);
             return baos.toByteArray();
         } catch (JAXBException e) {
             throw new IllegalStateException("Unable to marshall the XAdESSignature into string output", e);
@@ -126,7 +125,7 @@ class XadesAsicManifest extends AbstractAsicManifest {
     }
 
     private JAXBElement<X509DataType> getX509Data(SignatureHelper signatureHelper) {
-        org.w3._2000._09.xmldsig_.ObjectFactory objectFactory = new org.w3._2000._09.xmldsig_.ObjectFactory();
+        no.difi.commons.asic.jaxb.xmldsig.ObjectFactory objectFactory = new no.difi.commons.asic.jaxb.xmldsig.ObjectFactory();
 
         // \XAdESSignature\Signature\KeyInfo\X509Data
         X509DataType x509DataType = new X509DataType();
@@ -217,7 +216,7 @@ class XadesAsicManifest extends AbstractAsicManifest {
             signedInfo.getReference().add(reference);
         }
 
-        return objectFactory1_3.createQualifyingProperties(qualifyingPropertiesType);
+        return objectFactory1_2.createQualifyingProperties(qualifyingPropertiesType);
     }
 
     protected SignatureValueType getSignature() {

@@ -1,7 +1,6 @@
 package no.difi.asic;
 
 import com.google.common.io.BaseEncoding;
-import org.apache.commons.codec.binary.Base64;
 import org.bouncycastle.asn1.x500.X500NameBuilder;
 import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.cert.jcajce.JcaCertStore;

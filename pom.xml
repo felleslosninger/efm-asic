@@ -49,8 +49,13 @@
 
     <licenses>
         <license>
-            <name>GNU Lesser General Public License (LGPL), Version 3.0</name>
-            <url>http://www.gnu.org/licenses/lgpl-3.0.txt</url>
+            <name>European Union Public Licence (EUPL v.1.1)</name>
+            <url>https://joinup.ec.europa.eu/community/eupl/og_page/european-union-public-licence-eupl-v11</url>
+            <distribution>repo</distribution>
+        </license>
+        <license>
+            <name>Mozilla Public License, Version 2.0</name>
+            <url>https://www.mozilla.org/en-US/MPL/2.0/</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
@@ -189,9 +194,7 @@
                 </executions>
                 <configuration>
                     <excludes>
-                        <exclude>org/etsi/**</exclude>
-                        <exclude>org/w3/**</exclude>
-                        <exclude>oasis/names/**</exclude>
+                        <exclude>no/difi/commons/asic/jaxb/**</exclude>
                         <exclude>no/difi/xsd/**</exclude>
                     </excludes>
                 </configuration>

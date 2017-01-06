@@ -2,7 +2,7 @@ package no.difi.asic.extras;
 
 import com.google.common.io.ByteStreams;
 import no.difi.asic.AsicReader;
-import no.difi.xsd.asic.model._1.AsicManifest;
+import no.difi.commons.asic.jaxb.asic.AsicManifest;
 import org.bouncycastle.cms.CMSEnvelopedDataParser;
 import org.bouncycastle.cms.RecipientInformation;
 import org.bouncycastle.cms.jcajce.JceKeyTransEnvelopedRecipient;

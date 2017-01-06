@@ -1,7 +1,7 @@
 package no.difi.asic;
 
+import no.difi.commons.asic.jaxb.asic.AsicManifest;
 import no.difi.commons.asic.jaxb.cades.DataObjectReferenceType;
-import no.difi.xsd.asic.model._1.AsicManifest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeMethod;
@@ -147,7 +147,7 @@ public class AsicWriterTest {
         URL brochureUrl = AsicWriterTest.class.getClassLoader().getResource("e-Delivery_target_architecture.pdf");
         assertNotNull(brochureUrl, "Unable to locate brochure in class path");
         File brochurePdfFile = new File(brochureUrl.toURI());
-        assertTrue(brochurePdfFile.canRead(),"Brochure found in class path, but not readable as File object");
+        assertTrue(brochurePdfFile.canRead(), "Brochure found in class path, but not readable as File object");
 
         // Name of the file to hold the the ASiC archive
         File archiveOutputFile = new File(System.getProperty("java.io.tmpdir"), "asic-sample-default.zip");
@@ -159,9 +159,9 @@ public class AsicWriterTest {
         asicWriterFactory.newContainer(archiveOutputFile)
                 // Adds file, explicitly naming the entry and specifying the MIME type
                 .add(biiMessageFile, BII_MESSAGE_XML, MimeType.forString("application/xml"))
-                // Indicates which file is the root file
+                        // Indicates which file is the root file
                 .setRootEntryName(BII_MESSAGE_XML)
-                // Adds a PDF attachment, using the name of the file, i.e. with path removed, as the entry name
+                        // Adds a PDF attachment, using the name of the file, i.e. with path removed, as the entry name
                 .add(brochurePdfFile)
                         // Signing the contents of the archive, closes it for further changes.
                 .sign(keystoreFile, TestUtil.keyStorePassword(), TestUtil.privateKeyPassword());

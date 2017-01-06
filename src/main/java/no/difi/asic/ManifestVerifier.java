@@ -1,8 +1,8 @@
 package no.difi.asic;
 
-import no.difi.xsd.asic.model._1.AsicFile;
-import no.difi.xsd.asic.model._1.AsicManifest;
-import no.difi.xsd.asic.model._1.Certificate;
+import no.difi.commons.asic.jaxb.asic.AsicFile;
+import no.difi.commons.asic.jaxb.asic.AsicManifest;
+import no.difi.commons.asic.jaxb.asic.Certificate;
 
 import java.util.Arrays;
 import java.util.HashMap;

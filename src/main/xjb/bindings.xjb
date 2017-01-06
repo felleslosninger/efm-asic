@@ -6,6 +6,9 @@
 
     <bindings schemaLocation="../xsd/asic-model-1.0.xsd">
         <xjc:simple/>
+        <schemaBindings>
+            <package name="no.difi.commons.asic.jaxb.asic"/>
+        </schemaBindings>
     </bindings>
 
     <bindings schemaLocation="../xsd/OpenDocument_manifest.xsd">

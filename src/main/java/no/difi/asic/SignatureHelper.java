@@ -131,8 +131,8 @@ public class SignatureHelper {
     }
 
     @SuppressWarnings("unchecked")
-    static no.difi.xsd.asic.model._1.Certificate validate(byte[] data, byte[] signature) {
-        no.difi.xsd.asic.model._1.Certificate certificate = null;
+    static no.difi.commons.asic.jaxb.asic.Certificate validate(byte[] data, byte[] signature) {
+        no.difi.commons.asic.jaxb.asic.Certificate certificate = null;
 
         try {
             CMSSignedData cmsSignedData = new CMSSignedData(new CMSProcessableByteArray(data), signature);
@@ -144,7 +144,7 @@ public class SignatureHelper {
                 logger.info(x509Certificate.getSubject().toString());
 
                 if (signerInformation.verify(jcaSimpleSignerInfoVerifierBuilder.build(x509Certificate))) {
-                    certificate = new no.difi.xsd.asic.model._1.Certificate();
+                    certificate = new no.difi.commons.asic.jaxb.asic.Certificate();
                     certificate.setCertificate(x509Certificate.getEncoded());
                     certificate.setSubject(x509Certificate.getSubject().toString());
                 }

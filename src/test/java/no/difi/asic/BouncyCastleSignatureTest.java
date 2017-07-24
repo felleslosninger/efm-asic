@@ -132,7 +132,7 @@ public class BouncyCastleSignatureTest {
     KeyPair getKeyPair() throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException, UnrecoverableKeyException {
         KeyStore keyStore = KeyStore.getInstance("JKS");
 
-        FileInputStream fileInputStream = new FileInputStream(new File("src/test/resources/kontaktinfo-client-test.jks"));
+        FileInputStream fileInputStream = new FileInputStream(new File("src/test/resources/keystore.jks"));
 
 
         keyStore.load(fileInputStream, "changeit".toCharArray());

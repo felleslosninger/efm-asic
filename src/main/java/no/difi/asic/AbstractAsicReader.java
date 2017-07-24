@@ -164,7 +164,7 @@ abstract class AbstractAsicReader implements Closeable {
             byte[] data = o instanceof String ? ((String) o).getBytes() : ((String) signingContent.get(sigReference)).getBytes();
             byte[] sign = o instanceof ByteArrayOutputStream ? ((ByteArrayOutputStream) o).toByteArray() : ((ByteArrayOutputStream) signingContent.get(sigReference)).toByteArray();
 
-            Certificate certificate = SignatureHelper.validate(data, sign);
+            Certificate certificate = SignatureVerifier.validate(data, sign);
             certificate.setCert(currentZipEntry.getName());
             manifestVerifier.addCertificate(certificate);
 

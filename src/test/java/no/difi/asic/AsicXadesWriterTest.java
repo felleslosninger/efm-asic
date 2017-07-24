@@ -42,7 +42,7 @@ public class AsicXadesWriterTest {
         messageUrl = AsicXadesWriterTest.class.getClassLoader().getResource(BII_MESSAGE_XML);
         assertNotNull(messageUrl);
 
-        keystoreFile = new File("src/test/resources/kontaktinfo-client-test.jks");
+        keystoreFile = new File("src/test/resources/keystore.jks");
         assertTrue(keystoreFile.canRead(), "Expected to find your private key and certificate in " + keystoreFile);
 
         asicContainerWriterFactory = AsicWriterFactory.newFactory(SignatureMethod.XAdES);
@@ -61,7 +61,7 @@ public class AsicXadesWriterTest {
 
     @Test
     public void createSampleContainer() throws Exception {
-        SignatureHelper signatureHelper = new SignatureHelper(keystoreFile, "changeit", "client_alias", "changeit");
+        SignatureHelper signatureHelper = new SignatureHelper(keystoreFile, "changeit", "selfsigned", "changeit");
 
         AsicWriter asicWriter = asicContainerWriterFactory.newContainer(new File(System.getProperty("java.io.tmpdir")), "asic-sample-xades.zip")
                 .add(new File(envelopeUrl.toURI()))

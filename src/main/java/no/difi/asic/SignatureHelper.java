@@ -1,17 +1,16 @@
 package no.difi.asic;
 
 import com.google.common.io.BaseEncoding;
-import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaCertStore;
-import org.bouncycastle.cms.*;
+import org.bouncycastle.cms.CMSProcessableByteArray;
+import org.bouncycastle.cms.CMSSignedData;
+import org.bouncycastle.cms.CMSSignedDataGenerator;
+import org.bouncycastle.cms.SignerInfoGenerator;
 import org.bouncycastle.cms.jcajce.JcaSignerInfoGeneratorBuilder;
-import org.bouncycastle.cms.jcajce.JcaSimpleSignerInfoVerifierBuilder;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.DigestCalculatorProvider;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
-import org.bouncycastle.util.Store;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +21,7 @@ import java.nio.file.Files;
 import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
-import java.util.Arrays;
+import java.util.Collections;
 
 
 /**
@@ -38,20 +37,17 @@ public class SignatureHelper {
 
     private static final Logger logger = LoggerFactory.getLogger(SignatureHelper.class);
 
-    private static JcaSimpleSignerInfoVerifierBuilder jcaSimpleSignerInfoVerifierBuilder =
-            new JcaSimpleSignerInfoVerifierBuilder().setProvider(BouncyCastleProvider.PROVIDER_NAME);
-    private static JcaDigestCalculatorProviderBuilder jcaDigestCalculatorProviderBuilder =
-            new JcaDigestCalculatorProviderBuilder().setProvider(BouncyCastleProvider.PROVIDER_NAME);
+    protected final Provider provider;
 
-    static {
-        Security.addProvider(new BouncyCastleProvider());
-    }
+    protected final JcaDigestCalculatorProviderBuilder jcaDigestCalculatorProviderBuilder;
 
-    private X509Certificate x509Certificate;
-    private java.security.cert.Certificate[] certificateChain;
-    private KeyPair keyPair;
+    protected X509Certificate x509Certificate;
 
-    private JcaContentSignerBuilder jcaContentSignerBuilder;
+    protected java.security.cert.Certificate[] certificateChain;
+
+    protected KeyPair keyPair;
+
+    protected JcaContentSignerBuilder jcaContentSignerBuilder;
 
     /**
      * Loads the keystore and obtains the private key, the public key and the associated certificate
@@ -67,10 +63,12 @@ public class SignatureHelper {
      * @param keyStorePassword password of the key store itself
      * @param keyAlias         the alias referencing the private and public key pair.
      * @param keyPassword      password protecting the private key
-     * @throws IOException
      */
     public SignatureHelper(File keyStoreFile, String keyStorePassword, String keyAlias, String keyPassword) throws IOException {
-        this(Files.newInputStream(keyStoreFile.toPath()), keyStorePassword, keyAlias, keyPassword);
+        this(BCHelper.getProvider());
+        try (InputStream inputStream = Files.newInputStream(keyStoreFile.toPath())) {
+            loadCertificate(loadKeyStore(inputStream, keyStorePassword), keyAlias, keyPassword);
+        }
     }
 
     /**
@@ -82,12 +80,31 @@ public class SignatureHelper {
      * @param keyPassword      Key password
      */
     public SignatureHelper(InputStream keyStoreStream, String keyStorePassword, String keyAlias, String keyPassword) {
+        this(BCHelper.getProvider());
+        loadCertificate(loadKeyStore(keyStoreStream, keyStorePassword), keyAlias, keyPassword);
+    }
+
+    protected SignatureHelper(Provider provider) {
+        this.provider = provider;
+
+        jcaDigestCalculatorProviderBuilder = new JcaDigestCalculatorProviderBuilder();
+        if (provider != null)
+            jcaDigestCalculatorProviderBuilder.setProvider(provider);
+    }
+
+    protected KeyStore loadKeyStore(InputStream keyStoreStream, String keyStorePassword) {
         try {
             KeyStore keyStore = KeyStore.getInstance("JKS");
             keyStore.load(keyStoreStream, keyStorePassword.toCharArray()); // TODO: find password of keystore
 
-            keyStoreStream.close();
+            return keyStore;
+        } catch (Exception e) {
+            throw new IllegalStateException(String.format("Load keystore; %s", e.getMessage()), e);
+        }
+    }
 
+    protected void loadCertificate(KeyStore keyStore, String keyAlias, String keyPassword) {
+        try {
             if (keyAlias == null)
                 keyAlias = keyStore.aliases().nextElement();
             x509Certificate = (X509Certificate) keyStore.getCertificate(keyAlias);
@@ -99,8 +116,9 @@ public class SignatureHelper {
 
             keyPair = new KeyPair(x509Certificate.getPublicKey(), privateKey);
 
-            jcaContentSignerBuilder = new JcaContentSignerBuilder(String.format("SHA1with%s", privateKey.getAlgorithm()))
-                    .setProvider(BouncyCastleProvider.PROVIDER_NAME);
+            jcaContentSignerBuilder = new JcaContentSignerBuilder(String.format("SHA1with%s", privateKey.getAlgorithm()));
+            if (provider != null)
+                jcaContentSignerBuilder.setProvider(provider);
         } catch (Exception e) {
             throw new IllegalStateException(String.format("Unable to retrieve private key from keystore: %s", e.getMessage()), e);
         }
@@ -120,45 +138,16 @@ public class SignatureHelper {
 
             CMSSignedDataGenerator cmsSignedDataGenerator = new CMSSignedDataGenerator();
             cmsSignedDataGenerator.addSignerInfoGenerator(signerInfoGenerator);
-            cmsSignedDataGenerator.addCertificates(new JcaCertStore(Arrays.asList(x509Certificate)));
+            cmsSignedDataGenerator.addCertificates(new JcaCertStore(Collections.singletonList(x509Certificate)));
             CMSSignedData cmsSignedData = cmsSignedDataGenerator.generate(new CMSProcessableByteArray(data), false);
 
             logger.debug(BaseEncoding.base64().encode(cmsSignedData.getEncoded()));
             return cmsSignedData.getEncoded();
         } catch (Exception e) {
-            throw new IllegalStateException("Unable to sign " + e.getMessage(), e);
+            throw new IllegalStateException(String.format("Unable to sign: %s", e.getMessage()), e);
         }
     }
 
-    @SuppressWarnings("unchecked")
-    static no.difi.commons.asic.jaxb.asic.Certificate validate(byte[] data, byte[] signature) {
-        no.difi.commons.asic.jaxb.asic.Certificate certificate = null;
-
-        try {
-            CMSSignedData cmsSignedData = new CMSSignedData(new CMSProcessableByteArray(data), signature);
-            Store store = cmsSignedData.getCertificates();
-            SignerInformationStore signerInformationStore = cmsSignedData.getSignerInfos();
-
-            for (SignerInformation signerInformation : signerInformationStore.getSigners()) {
-                X509CertificateHolder x509Certificate = (X509CertificateHolder) store.getMatches(signerInformation.getSID()).iterator().next();
-                logger.info(x509Certificate.getSubject().toString());
-
-                if (signerInformation.verify(jcaSimpleSignerInfoVerifierBuilder.build(x509Certificate))) {
-                    certificate = new no.difi.commons.asic.jaxb.asic.Certificate();
-                    certificate.setCertificate(x509Certificate.getEncoded());
-                    certificate.setSubject(x509Certificate.getSubject().toString());
-                }
-            }
-        } catch (Exception e) {
-            logger.warn(e.getMessage());
-            certificate = null;
-        }
-
-        if (certificate == null)
-            throw new IllegalStateException("Unable to verify signature.");
-
-        return certificate;
-    }
 
     X509Certificate getX509Certificate() {
         return x509Certificate;

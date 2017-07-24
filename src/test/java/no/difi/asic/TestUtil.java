@@ -12,7 +12,7 @@ import java.net.URL;
  */
 public class TestUtil {
 
-    public static final String KEY_STORE_RESOURCE_NAME = "kontaktinfo-client-test.jks";
+    public static final String KEY_STORE_RESOURCE_NAME = "keystore.jks";
     public static final String BII_SAMPLE_MESSAGE_XML = "bii-trns081.xml";
 
     /**
@@ -21,7 +21,7 @@ public class TestUtil {
      * The key store provides a private key and a certificate, which is used for testing purposes.
      */
     public static File keyStoreFile() {
-        String pathname = "src/test/resources/kontaktinfo-client-test.jks";
+        String pathname = "src/test/resources/keystore.jks";
 
 
         URL keyStoreResourceURL = TestUtil.class.getClassLoader().getResource(KEY_STORE_RESOURCE_NAME);
@@ -48,6 +48,6 @@ public class TestUtil {
     }
 
     public static String keyPairAlias() {
-        return "client_alias";
+        return "selfsigned";
     }
 }

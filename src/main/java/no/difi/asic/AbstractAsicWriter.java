@@ -1,9 +1,5 @@
 package no.difi.asic;
 
-import com.google.common.io.ByteStreams;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,6 +8,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.DigestOutputStream;
 import java.util.zip.ZipEntry;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.io.ByteStreams;
 
 abstract class AbstractAsicWriter implements AsicWriter {
 
@@ -136,7 +137,13 @@ abstract class AbstractAsicWriter implements AsicWriter {
     /** {@inheritDoc} */
     @Override
     public AsicWriter sign(File keyStoreFile, String keyStorePassword, String keyAlias, String keyPassword) throws IOException {
-        return sign(new SignatureHelper(keyStoreFile, keyStorePassword, keyAlias, keyPassword));
+        return sign(keyStoreFile, keyStorePassword, SignatureHelper.DEFAULT_KEY_STORE_TYPE, keyAlias, keyPassword);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public AsicWriter sign (File keyStoreFile, String keyStorePassword, KeyStoreType keyStoreType, String keyAlias, String keyPassword) throws IOException {
+        return sign(new SignatureHelper(keyStoreFile, keyStorePassword, keyStoreType, keyAlias, keyPassword));
     }
 
     /** {@inheritDoc} */

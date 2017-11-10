@@ -41,7 +41,7 @@ import com.google.common.io.BaseEncoding;
 public class SignatureHelper {
 
     private static final Logger logger = LoggerFactory.getLogger(SignatureHelper.class);
-    private static final KeyStoreType DEFAULT_KEY_STORE_TYPE = KeyStoreType.JKS;
+    public static final KeyStoreType DEFAULT_KEY_STORE_TYPE = KeyStoreType.JKS;
 
     protected final Provider provider;
 

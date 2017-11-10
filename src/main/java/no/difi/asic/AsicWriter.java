@@ -112,6 +112,24 @@ public interface AsicWriter {
     AsicWriter sign(File keyStoreFile, String keyStorePassword, String keyAlias, String keyPassword) throws IOException;
 
     /**
+     * Signs and closes the ASiC archive using the private and public key stored in the supplied key store under the supplied alias name.
+     *
+     * @param keyStoreFile
+     *            the file holding the keystore file.
+     * @param keyStorePassword
+     *            password for the keystore
+     * @param keyStoreType
+     *            Type of keyStore
+     * @param keyAlias
+     *            the alias of the keystore entry holding the private and the public key.
+     * @param keyPassword
+     *            password protecting the private key.
+     * @return reference to this AsicWriter
+     * @throws IOException
+     */
+    AsicWriter sign (File keyStoreFile, String keyStorePassword, KeyStoreType keyStoreType, String keyAlias, String keyPassword) throws IOException;
+
+    /**
      * Allows re-use of the same SignatureHelper object when creating multiple ASiC archive and hence the need to create multiple signatures.
      *
      * @param signatureHelper instantiated SignatureHelper

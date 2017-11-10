@@ -1,6 +1,18 @@
 package no.difi.asic;
 
-import com.google.common.io.BaseEncoding;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.security.Key;
+import java.security.KeyPair;
+import java.security.KeyStore;
+import java.security.PrivateKey;
+import java.security.Provider;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
+import java.util.Collections;
+
 import org.bouncycastle.cert.jcajce.JcaCertStore;
 import org.bouncycastle.cms.CMSProcessableByteArray;
 import org.bouncycastle.cms.CMSSignedData;
@@ -14,14 +26,7 @@ import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.security.*;
-import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
-import java.util.Collections;
+import com.google.common.io.BaseEncoding;
 
 
 /**
@@ -36,6 +41,7 @@ import java.util.Collections;
 public class SignatureHelper {
 
     private static final Logger logger = LoggerFactory.getLogger(SignatureHelper.class);
+    private static final KeyStoreType DEFAULT_KEY_STORE_TYPE = KeyStoreType.JKS;
 
     protected final Provider provider;
 
@@ -65,23 +71,63 @@ public class SignatureHelper {
      * @param keyPassword      password protecting the private key
      */
     public SignatureHelper(File keyStoreFile, String keyStorePassword, String keyAlias, String keyPassword) throws IOException {
+        this(keyStoreFile, keyStorePassword, DEFAULT_KEY_STORE_TYPE, keyAlias, keyPassword);
+    }
+
+    /**
+     * Loading keystore and fetching key
+     *
+     * @param keyStoreStream
+     *            Stream for keystore
+     * @param keyStorePassword
+     *            Password to open keystore
+     * @param keyAlias
+     *            Key alias, uses first key if set to null
+     * @param keyPassword
+     *            Key password
+     */
+    public SignatureHelper(InputStream keyStoreStream, String keyStorePassword, String keyAlias, String keyPassword) {
+        this(keyStoreStream, keyStorePassword, DEFAULT_KEY_STORE_TYPE, keyAlias, keyPassword);
+    }
+
+    /**
+     * Loads the keystore and obtains the private key, the public key and the associated certificate referenced by the alias.
+     *
+     * @param keyStoreFile
+     *            file holding the JKS keystore.
+     * @param keyStorePassword
+     *            password of the key store itself
+     * @param keyStoreType
+     *            key store type
+     * @param keyAlias
+     *            the alias referencing the private and public key pair.
+     * @param keyPassword
+     *            password protecting the private key
+     */
+    public SignatureHelper(File keyStoreFile, String keyStorePassword, KeyStoreType keyStoreType, String keyAlias, String keyPassword) throws IOException {
         this(BCHelper.getProvider());
         try (InputStream inputStream = Files.newInputStream(keyStoreFile.toPath())) {
-            loadCertificate(loadKeyStore(inputStream, keyStorePassword), keyAlias, keyPassword);
+            loadCertificate(loadKeyStore(inputStream, keyStorePassword, keyStoreType), keyAlias, keyPassword);
         }
     }
 
     /**
      * Loading keystore and fetching key
      *
-     * @param keyStoreStream   Stream for keystore
-     * @param keyStorePassword Password to open keystore
-     * @param keyAlias         Key alias, uses first key if set to null
-     * @param keyPassword      Key password
+     * @param keyStoreStream
+     *            Stream for keystore
+     * @param keyStorePassword
+     *            Password to open keystore
+     * @param keyStoreType
+     *            key store type
+     * @param keyAlias
+     *            Key alias, uses first key if set to null
+     * @param keyPassword
+     *            Key password
      */
-    public SignatureHelper(InputStream keyStoreStream, String keyStorePassword, String keyAlias, String keyPassword) {
+    public SignatureHelper(InputStream keyStoreStream, String keyStorePassword, KeyStoreType keyStoreType, String keyAlias, String keyPassword) {
         this(BCHelper.getProvider());
-        loadCertificate(loadKeyStore(keyStoreStream, keyStorePassword), keyAlias, keyPassword);
+        loadCertificate(loadKeyStore(keyStoreStream, keyStorePassword, keyStoreType), keyAlias, keyPassword);
     }
 
     protected SignatureHelper(Provider provider) {
@@ -92,9 +138,9 @@ public class SignatureHelper {
             jcaDigestCalculatorProviderBuilder.setProvider(provider);
     }
 
-    protected KeyStore loadKeyStore(InputStream keyStoreStream, String keyStorePassword) {
+    protected KeyStore loadKeyStore (InputStream keyStoreStream, String keyStorePassword, KeyStoreType keyStoreType) {
         try {
-            KeyStore keyStore = KeyStore.getInstance("JKS");
+            KeyStore keyStore = KeyStore.getInstance(keyStoreType.name());
             keyStore.load(keyStoreStream, keyStorePassword.toCharArray()); // TODO: find password of keystore
 
             return keyStore;

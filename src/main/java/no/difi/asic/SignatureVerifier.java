@@ -1,5 +1,6 @@
 package no.difi.asic;
 
+import org.bouncycastle.asn1.oiw.OIWObjectIdentifiers;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cms.CMSProcessableByteArray;
 import org.bouncycastle.cms.CMSSignedData;
@@ -21,7 +22,7 @@ public class SignatureVerifier {
             new JcaSimpleSignerInfoVerifierBuilder().setProvider(BCHelper.getProvider());
 
     @SuppressWarnings("unchecked")
-    public static no.difi.commons.asic.jaxb.asic.Certificate validate(byte[] data, byte[] signature) {
+    public final no.difi.commons.asic.jaxb.asic.Certificate validate(byte[] data, byte[] signature) {
         no.difi.commons.asic.jaxb.asic.Certificate certificate = null;
 
         try {
@@ -33,7 +34,7 @@ public class SignatureVerifier {
                 X509CertificateHolder x509Certificate = (X509CertificateHolder) store.getMatches(signerInformation.getSID()).iterator().next();
                 logger.info(x509Certificate.getSubject().toString());
 
-                if (signerInformation.verify(jcaSimpleSignerInfoVerifierBuilder.build(x509Certificate))) {
+                if (verifySigner(signerInformation) && signerInformation.verify(jcaSimpleSignerInfoVerifierBuilder.build(x509Certificate))) {
                     certificate = new no.difi.commons.asic.jaxb.asic.Certificate();
                     certificate.setCertificate(x509Certificate.getEncoded());
                     certificate.setSubject(x509Certificate.getSubject().toString());
@@ -48,5 +49,14 @@ public class SignatureVerifier {
             throw new IllegalStateException("Unable to verify signature.");
 
         return certificate;
+    }
+
+    protected boolean verifySigner(SignerInformation signerInformation) {
+        // Example, extend as needed
+        if(OIWObjectIdentifiers.md5WithRSA.equals(signerInformation.getDigestAlgorithmID())) {
+            logger.warn("Signer algorithm "+signerInformation.getDigestAlgOID()+" is not allowed.");
+            return false;
+        }
+        return true;
     }
 }

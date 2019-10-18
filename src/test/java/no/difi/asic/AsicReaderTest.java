@@ -1,10 +1,15 @@
 package no.difi.asic;
 
 import com.google.common.io.ByteStreams;
+import org.bouncycastle.asn1.oiw.OIWObjectIdentifiers;
+import org.bouncycastle.cms.SignerInformation;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Testing functionality.
@@ -42,6 +47,29 @@ public class AsicReaderTest {
         }
         asicReader.close();
         Assert.assertEquals(1, asicReader.getAsicManifest().getCertificate().size());
+    }
+
+    @Test
+    public void readingContentWithSigAlgCheck() throws IOException {
+        // Testing using no functionality to read content.
+        final AtomicBoolean wasHere = new AtomicBoolean(false);
+        SignatureVerifier verifier = new SignatureVerifier() {
+            @Override
+            protected boolean verifySigner(SignerInformation signerInformation) {
+                // Example, extend as needed
+                System.out.println("Verifying signature algorithm "+signerInformation.getDigestAlgOID());
+                wasHere.set(true);
+                return true;
+            }
+        };
+        AsicReader asicReader = AsicReaderFactory.newFactory(SignatureMethod.CAdES, verifier).open(getClass().getResourceAsStream("/asic-cades-test-valid.asice"));
+        while (asicReader.getNextFile() != null) {
+            asicReader.writeFile(ByteStreams.nullOutputStream());
+        }
+        asicReader.close();
+        Assert.assertEquals(1, asicReader.getAsicManifest().getCertificate().size());
+
+        Assert.assertTrue(wasHere.get());
     }
 
     @Test(expectedExceptions = IllegalStateException.class)

@@ -84,6 +84,17 @@ public class SignatureHelper {
         loadCertificate(loadKeyStore(keyStoreStream, keyStorePassword), keyAlias, keyPassword);
     }
 
+    /**
+     * Loading keystore
+     *
+     * @param certificate      Public part of signing key
+     * @param privateKey       Private signing key
+     */
+    public SignatureHelper(X509Certificate certificate, PrivateKey privateKey, String signatureAlgorithm) {
+        this(BCHelper.getProvider());
+        loadCertificate(certificate, privateKey, signatureAlgorithm);
+    }
+
     protected SignatureHelper(Provider provider) {
         this.provider = provider;
 
@@ -95,7 +106,7 @@ public class SignatureHelper {
     protected KeyStore loadKeyStore(InputStream keyStoreStream, String keyStorePassword) {
         try {
             KeyStore keyStore = KeyStore.getInstance("JKS");
-            keyStore.load(keyStoreStream, keyStorePassword.toCharArray()); // TODO: find password of keystore
+            keyStore.load(keyStoreStream, keyStorePassword.toCharArray());
 
             return keyStore;
         } catch (Exception e) {
@@ -107,21 +118,24 @@ public class SignatureHelper {
         try {
             if (keyAlias == null)
                 keyAlias = keyStore.aliases().nextElement();
-            x509Certificate = (X509Certificate) keyStore.getCertificate(keyAlias);
-
             certificateChain = keyStore.getCertificateChain(keyAlias);
 
             Key key = keyStore.getKey(keyAlias, keyPassword.toCharArray());
             PrivateKey privateKey = (PrivateKey) key;
 
-            keyPair = new KeyPair(x509Certificate.getPublicKey(), privateKey);
-
-            jcaContentSignerBuilder = new JcaContentSignerBuilder(String.format("SHA1with%s", privateKey.getAlgorithm()));
-            if (provider != null)
-                jcaContentSignerBuilder.setProvider(provider);
+            loadCertificate((X509Certificate) keyStore.getCertificate(keyAlias), privateKey, String.format("SHA1with%s", privateKey.getAlgorithm()));
         } catch (Exception e) {
             throw new IllegalStateException(String.format("Unable to retrieve private key from keystore: %s", e.getMessage()), e);
         }
+    }
+
+    protected void loadCertificate(X509Certificate x509Certificate, PrivateKey privateKey, String signatureAlgorithm) {
+        this.keyPair = new KeyPair(x509Certificate.getPublicKey(), privateKey);
+        this.x509Certificate = x509Certificate;
+        this.jcaContentSignerBuilder = new JcaContentSignerBuilder(signatureAlgorithm);
+
+        if (provider != null)
+            jcaContentSignerBuilder.setProvider(provider);
     }
 
     /**
@@ -141,7 +155,9 @@ public class SignatureHelper {
             cmsSignedDataGenerator.addCertificates(new JcaCertStore(Collections.singletonList(x509Certificate)));
             CMSSignedData cmsSignedData = cmsSignedDataGenerator.generate(new CMSProcessableByteArray(data), false);
 
-            logger.debug(BaseEncoding.base64().encode(cmsSignedData.getEncoded()));
+            if(logger.isDebugEnabled()) {
+                logger.debug(BaseEncoding.base64().encode(cmsSignedData.getEncoded()));
+            }
             return cmsSignedData.getEncoded();
         } catch (Exception e) {
             throw new IllegalStateException(String.format("Unable to sign: %s", e.getMessage()), e);

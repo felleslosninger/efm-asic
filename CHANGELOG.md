@@ -2,7 +2,8 @@
 
 ## Next release
 
-*Currently empty*
+* Made verification of signatures extendable
+* Made signature hash algorithm configurable
 
 ## 0.9.2
 

@@ -16,14 +16,24 @@ public class AsicReaderFactory {
         return newFactory(signatureMethod.getMessageDigestAlgorithm());
     }
 
+    public static AsicReaderFactory newFactory(SignatureMethod signatureMethod, SignatureVerifier signatureVerifier) {
+        return new AsicReaderFactory(signatureMethod.getMessageDigestAlgorithm(), signatureVerifier);
+    }
+
     static AsicReaderFactory newFactory(MessageDigestAlgorithm messageDigestAlgorithm) {
         return new AsicReaderFactory(messageDigestAlgorithm);
     }
 
     private MessageDigestAlgorithm messageDigestAlgorithm;
+    private SignatureVerifier signatureVerifier = null;
 
     private AsicReaderFactory(MessageDigestAlgorithm messageDigestAlgorithm) {
         this.messageDigestAlgorithm = messageDigestAlgorithm;
+    }
+
+    public AsicReaderFactory(MessageDigestAlgorithm messageDigestAlgorithm, SignatureVerifier signatureVerifier) {
+        this.messageDigestAlgorithm = messageDigestAlgorithm;
+        this.signatureVerifier = signatureVerifier;
     }
 
     public AsicReader open(File file) throws IOException {
@@ -35,6 +45,10 @@ public class AsicReaderFactory {
     }
 
     public AsicReader open(InputStream inputStream) throws IOException {
-        return new AsicReaderImpl(messageDigestAlgorithm, inputStream);
+        AsicReaderImpl reader = new AsicReaderImpl(messageDigestAlgorithm, inputStream);
+        if(signatureVerifier != null) {
+            reader.setSignatureVerifier(signatureVerifier);
+        }
+        return reader;
     }
 }

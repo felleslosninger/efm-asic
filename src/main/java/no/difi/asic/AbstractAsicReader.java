@@ -37,6 +37,8 @@ abstract class AbstractAsicReader implements Closeable {
     // Initiated with 'true' as the first file should not do anything.
     private boolean contentIsWritten = true;
 
+    private SignatureVerifier signatureVerifier = new SignatureVerifier();
+
     /**
      * Used to hold signature or manifest for CAdES as they are not in the same file.
      */
@@ -164,7 +166,7 @@ abstract class AbstractAsicReader implements Closeable {
             byte[] data = o instanceof String ? ((String) o).getBytes() : ((String) signingContent.get(sigReference)).getBytes();
             byte[] sign = o instanceof ByteArrayOutputStream ? ((ByteArrayOutputStream) o).toByteArray() : ((ByteArrayOutputStream) signingContent.get(sigReference)).toByteArray();
 
-            Certificate certificate = SignatureVerifier.validate(data, sign);
+            Certificate certificate = signatureVerifier.validate(data, sign);
             certificate.setCert(currentZipEntry.getName());
             manifestVerifier.addCertificate(certificate);
 
@@ -190,4 +192,7 @@ abstract class AbstractAsicReader implements Closeable {
         return manifest;
     }
 
+    public void setSignatureVerifier(SignatureVerifier verifier) {
+        this.signatureVerifier = verifier;
+    }
 }

@@ -25,7 +25,7 @@ Conformance is claimed according to 7.2.1 (TBA) and 7.2.2 in
 <dependency>
 	<groupId>no.difi.commons</groupId>
 	<artifactId>commons-asic</artifactId>
-	<version>0.9.2</version>
+	<version>0.9.3</version>
 </dependency>
 ```
 

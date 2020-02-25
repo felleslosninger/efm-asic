@@ -18,7 +18,12 @@ public class AsicUtils {
     /** The MIME type, which should be the very first entry in the container */
     public static final String MIMETYPE_ASICE = "application/vnd.etsi.asic-e+zip";
 
-    static final Pattern PATTERN_CADES_MANIFEST = Pattern.compile("META-INF/asicmanifest(.*)\\.xml", Pattern.CASE_INSENSITIVE);
+    public static final String ASIC_MANIFEST_BASENAME = "ASiCManifest";
+    public static final Pattern PATTERN_CADES_MANIFEST = Pattern.compile ("META-INF/" +
+          ASIC_MANIFEST_BASENAME +
+          "(.*)\\.xml",
+        Pattern.CASE_INSENSITIVE);
+
     static final Pattern PATTERN_CADES_SIGNATURE = Pattern.compile("META-INF/signature(.*)\\.p7s", Pattern.CASE_INSENSITIVE);
     static final Pattern PATTERN_XADES_SIGNATURES = Pattern.compile("META-INF/signatures(.*)\\.xml", Pattern.CASE_INSENSITIVE);
 
@@ -72,7 +77,7 @@ public class AsicUtils {
                     }
 
                     // Write manifest to container
-                    target.putNextEntry(new ZipEntry(String.format("META-INF/asicmanifest%s.xml", ++manifestCounter)));
+                    target.putNextEntry(new ZipEntry("META-INF/" + ASIC_MANIFEST_BASENAME + ++manifestCounter + ".xml"));
                     ByteStreams.copy(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()), target);
                 } else if (PATTERN_XADES_SIGNATURES.matcher(zipEntry.getName()).matches()) {
                     // Copy content to target container

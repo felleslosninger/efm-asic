@@ -1,10 +1,16 @@
 package no.difi.asic.extras;
 
-import com.google.common.io.ByteStreams;
-import no.difi.asic.AsicUtils;
-import no.difi.asic.AsicWriter;
-import no.difi.asic.MimeType;
-import no.difi.asic.SignatureHelper;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.security.cert.X509Certificate;
+import java.util.Set;
+import java.util.TreeSet;
+
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.cms.CMSAlgorithm;
 import org.bouncycastle.cms.CMSEnvelopedData;
@@ -13,12 +19,13 @@ import org.bouncycastle.cms.CMSProcessableByteArray;
 import org.bouncycastle.cms.jcajce.JceCMSContentEncryptorBuilder;
 import org.bouncycastle.cms.jcajce.JceKeyTransRecipientInfoGenerator;
 
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.security.cert.X509Certificate;
-import java.util.Set;
-import java.util.TreeSet;
+import com.google.common.io.ByteStreams;
+
+import no.difi.asic.AsicUtils;
+import no.difi.asic.AsicWriter;
+import no.difi.asic.KeyStoreType;
+import no.difi.asic.MimeType;
+import no.difi.asic.SignatureHelper;
 
 /**
  * Wrapper to seamlessly encode specific files.
@@ -186,5 +193,10 @@ public class CmsEncryptedAsicWriter extends CmsEncryptedAsicAbstract implements 
     @Override
     public AsicWriter sign(SignatureHelper signatureHelper) throws IOException {
         return asicWriter.sign(signatureHelper);
+    }
+
+    @Override
+    public AsicWriter sign (File keyStoreFile, String keyStorePassword, KeyStoreType keyStoreType, String keyAlias, String keyPassword) throws IOException {
+        return asicWriter.sign(keyStoreFile, keyStorePassword, keyStoreType, keyAlias, keyPassword);
     }
 }

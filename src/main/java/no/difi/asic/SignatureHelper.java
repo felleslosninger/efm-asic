@@ -11,7 +11,7 @@ import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
-import java.util.Collections;
+import java.util.Arrays;
 
 import org.bouncycastle.cert.jcajce.JcaCertStore;
 import org.bouncycastle.cms.CMSProcessableByteArray;
@@ -184,7 +184,7 @@ public class SignatureHelper {
 
             CMSSignedDataGenerator cmsSignedDataGenerator = new CMSSignedDataGenerator();
             cmsSignedDataGenerator.addSignerInfoGenerator(signerInfoGenerator);
-            cmsSignedDataGenerator.addCertificates(new JcaCertStore(Collections.singletonList(x509Certificate)));
+            cmsSignedDataGenerator.addCertificates(new JcaCertStore(Arrays.asList(certificateChain)));
             CMSSignedData cmsSignedData = cmsSignedDataGenerator.generate(new CMSProcessableByteArray(data), false);
 
             logger.debug(BaseEncoding.base64().encode(cmsSignedData.getEncoded()));

@@ -23,27 +23,12 @@
         <system>GitHub Issues</system>
     </issueManagement>
 
-    <organization>
-        <name>Norwegian Agency for Public Management and eGovernment (Difi)</name>
-        <url>http://www.difi.no/</url>
-    </organization>
-
     <developers>
         <developer>
-            <name>Steinar Overbeck Cook</name>
-            <email>soc@difi.no</email>
-            <organization>Difi</organization>
-            <roles>
-                <role>Author</role>
-            </roles>
-        </developer>
-        <developer>
-            <name>Erlend Klakegg Bergheim</name>
-            <email>erlend.klakegg.bergheim@difi.no</email>
-            <organization>Difi</organization>
-            <roles>
-                <role>Author</role>
-            </roles>
+            <name>Digdir</name>
+            <email>servicedesk@digdir.no</email>
+            <organization>Digdir</organization>
+            <organizationUrl>https://www.digdir.no</organizationUrl>
         </developer>
     </developers>
 
@@ -71,7 +56,7 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.25</version>
+            <version>1.7.31</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
@@ -84,7 +69,7 @@
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
-            <version>1.10</version>
+            <version>1.15</version>
             <scope>test</scope>
         </dependency>
 
@@ -92,21 +77,21 @@
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcpkix-jdk15on</artifactId>
-            <version>1.57</version>
+            <version>1.69</version>
         </dependency>
 
         <!-- Google -->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>20.0</version>
+            <version>30.1.1-jre</version>
         </dependency>
 
         <!-- TestNG testing framework -->
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <version>6.10</version>
+            <version>7.4.0</version>
             <scope>test</scope>
         </dependency>
 
@@ -127,7 +112,7 @@
                 <!-- Explicitly declares which version of Java to use -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.3</version>
+                <version>3.8.1</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
@@ -137,7 +122,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>2.7</version>
+                <version>3.2.0</version>
                 <configuration>
                     <encoding>${java.encoding}</encoding>
                 </configuration>
@@ -145,7 +130,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.18.1</version>
+                <version>2.22.2</version>
                 <configuration>
                     <failIfNoTests>true</failIfNoTests>
                     <!-- Seems this will alleviate the problem of out-of-memory -->
@@ -158,7 +143,7 @@
                 <!-- Documentation at https://github.com/highsource/maven-jaxb2-plugin/wiki -->
                 <groupId>org.jvnet.jaxb2.maven2</groupId>
                 <artifactId>maven-jaxb2-plugin</artifactId>
-                <version>0.12.3</version>
+                <version>0.14.0</version>
                 <executions>
                     <execution>
                         <id>xsd</id>
@@ -198,7 +183,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.7.5.201505241946</version>
+                <version>0.8.7</version>
                 <executions>
                     <execution>
                         <goals>
@@ -236,7 +221,7 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>2.10.3</version>
+                    <version>3.3.0</version>
                     <executions>
                         <execution>
                             <id>package-javadoc</id>
@@ -267,7 +252,6 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
                         <version>1.6</version>
                         <executions>
@@ -282,7 +266,7 @@
                     </plugin>
                     <plugin>
                         <artifactId>maven-source-plugin</artifactId>
-                        <version>2.4</version>
+                        <version>3.2.1</version>
                         <executions>
                             <execution>
                                 <id>package-sources</id>
@@ -294,7 +278,7 @@
                     </plugin>
                     <plugin>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>2.10.3</version>
+                        <version>3.3.0</version>
                     </plugin>
                 </plugins>
             </build>

@@ -3,6 +3,7 @@ package no.difi.asic.extras;
 import com.google.common.io.ByteStreams;
 import no.difi.asic.AsicReader;
 import no.difi.commons.asic.jaxb.asic.AsicManifest;
+import no.difi.commons.asic.jaxb.asic.Certificate;
 import org.bouncycastle.cms.CMSEnvelopedDataParser;
 import org.bouncycastle.cms.RecipientInformation;
 import org.bouncycastle.cms.jcajce.JceKeyTransEnvelopedRecipient;
@@ -12,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.PrivateKey;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Wrapper to seamlessly decode encoded files.
@@ -98,5 +100,10 @@ public class CmsEncryptedAsicReader extends CmsEncryptedAsicAbstract implements 
             asicManifest.setRootfile(rootfile.substring(0, rootfile.length() - 4));
 
         return asicManifest;
+    }
+
+    @Override
+    public List<Certificate> getCertificateChain() {
+        return asicReader.getCertificateChain();
     }
 }

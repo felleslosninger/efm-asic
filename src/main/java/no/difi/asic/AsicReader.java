@@ -1,9 +1,11 @@
 package no.difi.asic;
 
 import no.difi.commons.asic.jaxb.asic.AsicManifest;
+import no.difi.commons.asic.jaxb.asic.Certificate;
 
 import java.io.*;
 import java.nio.file.Path;
+import java.util.List;
 
 public interface AsicReader extends Closeable {
 
@@ -47,4 +49,6 @@ public interface AsicReader extends Closeable {
     InputStream inputStream() throws IOException;
 
     AsicManifest getAsicManifest();
+
+    List<Certificate> getCertificateChain();
 }

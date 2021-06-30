@@ -13,9 +13,11 @@ import java.security.DigestInputStream;
 import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.ZipEntry;
+import java.util.List;
 
 /**
  * Skeleton implementation of ASiC archive reader.
@@ -33,6 +35,8 @@ abstract class AbstractAsicReader implements Closeable {
 
     private ManifestVerifier manifestVerifier;
     private Manifest manifest;
+
+    private List<Certificate> certificateChain = new ArrayList<>();
 
     // Initiated with 'true' as the first file should not do anything.
     private boolean contentIsWritten = true;
@@ -164,9 +168,10 @@ abstract class AbstractAsicReader implements Closeable {
             byte[] data = o instanceof String ? ((String) o).getBytes() : ((String) signingContent.get(sigReference)).getBytes();
             byte[] sign = o instanceof ByteArrayOutputStream ? ((ByteArrayOutputStream) o).toByteArray() : ((ByteArrayOutputStream) signingContent.get(sigReference)).toByteArray();
 
-            Certificate certificate = SignatureVerifier.validate(data, sign);
-            certificate.setCert(currentZipEntry.getName());
-            manifestVerifier.addCertificate(certificate);
+            certificateChain = SignatureVerifier.validate(data, sign);
+            Certificate signingCertificate = certificateChain.get(0);
+            signingCertificate.setCert(currentZipEntry.getName());
+            manifestVerifier.addCertificate(signingCertificate);
 
             signingContent.remove(sigReference);
         }
@@ -188,6 +193,10 @@ abstract class AbstractAsicReader implements Closeable {
      */
     public Manifest getOasisManifest() {
         return manifest;
+    }
+
+    public List<Certificate> getCertificateChain() {
+        return certificateChain;
     }
 
 }

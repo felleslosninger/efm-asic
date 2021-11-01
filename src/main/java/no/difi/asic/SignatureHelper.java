@@ -131,7 +131,7 @@ public class SignatureHelper {
     }
 
     /**
-     * Loading keystore and fetching key
+     * Obtains the private key, the public key and the associated certificate referenced by the alias from the given keystore
      *
      * @param keyStore
      *            Loaded keystore

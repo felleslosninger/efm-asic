@@ -1,19 +1,23 @@
 package no.difi.asic;
 
 import com.google.common.io.ByteStreams;
+import org.apache.tika.Tika;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.net.URLConnection;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 
 public class AsicUtils {
 
-    private static Logger logger = LoggerFactory.getLogger(AsicUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(AsicUtils.class);
+
+    private static final String TIKA_FALLBACK_MIME = "application/octet-stream";
+    private static final Tika TIKA = new Tika();
 
     /** The MIME type, which should be the very first entry in the container */
     public static final String MIMETYPE_ASICE = "application/vnd.etsi.asic-e+zip";
@@ -120,21 +124,20 @@ public class AsicUtils {
     }
 
     public static MimeType detectMime(String filename) throws IOException {
-        // Use Files to find content type
-        String mimeType = Files.probeContentType(Paths.get(filename));
-
-        // Use URLConnection to find content type
-        if (mimeType == null) {
-            logger.info("Unable to determine MIME type using Files.probeContentType(), trying URLConnection.getFileNameMap()");
-            mimeType = URLConnection.getFileNameMap().getContentTypeFor(filename);
+        String mimeType = null;
+        final Path path = Paths.get(filename);
+        if (Files.exists(path)) {
+            mimeType = TIKA.detect(path);
         }
 
-        // Throw exception if content type is not detected
         if (mimeType == null) {
-            throw new IllegalStateException(String.format("Unable to determine MIME type of %s", filename));
+            logger.info("Unable to determine MIME type using tika.detect(Path), trying tika.detect(String)");
+            mimeType = TIKA.detect(filename);
+            if (mimeType == null || TIKA_FALLBACK_MIME.equals(mimeType)) {
+                throw new IllegalStateException(String.format("Unable to determine MIME type of %s", filename));
+            }
         }
 
         return MimeType.forString(mimeType);
     }
-
 }

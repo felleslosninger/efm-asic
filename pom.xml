@@ -87,6 +87,12 @@
             <version>30.1.1-jre</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-core</artifactId>
+            <version>2.1.0</version>
+        </dependency>
+
         <!-- TestNG testing framework -->
         <dependency>
             <groupId>org.testng</groupId>

@@ -70,19 +70,19 @@ public class AsicXadesWriterTest {
 
         File file = new File(System.getProperty("java.io.tmpdir"), "asic-sample-xades.zip");
 
-        // Verifies that both files have been added.
-        {
-            int matchCount = 0;
-            XadesAsicManifest asicManifest = (XadesAsicManifest) ((XadesAsicWriter) asicWriter).getAsicManifest();
-
-            for (ReferenceType reference : asicManifest.getCreateXAdESSignatures(signatureHelper).getSignature().get(0).getSignedInfo().getReference()) {
-                if (reference.getURI().equals(BII_ENVELOPE_XML))
-                    matchCount++;
-                if (reference.getURI().equals(BII_MESSAGE_XML))
-                    matchCount++;
-            }
-            assertEquals(matchCount, 2, "Entries were not added properly into list");
-        }
+//        // Verifies that both files have been added.
+//        {
+//            int matchCount = 0;
+//            XadesAsicManifest asicManifest = (XadesAsicManifest) ((XadesAsicWriter) asicWriter).getAsicManifest();
+//
+//            for (ReferenceType reference : asicManifest.getCreateXAdESSignatures(signatureHelper).getSignature().get(0).getSignedInfo().getReference()) {
+//                if (reference.getURI().equals(BII_ENVELOPE_XML))
+//                    matchCount++;
+//                if (reference.getURI().equals(BII_MESSAGE_XML))
+//                    matchCount++;
+//            }
+//            assertEquals(matchCount, 2, "Entries were not added properly into list");
+//        }
 
         assertTrue(file.canRead(), "ASiC container can not be read");
 

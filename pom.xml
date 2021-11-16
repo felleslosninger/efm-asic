@@ -4,7 +4,7 @@
 
     <groupId>no.difi.commons</groupId>
     <artifactId>commons-asic</artifactId>
-    <version>0.9.5-SNAPSHOT</version>
+    <version>0.10.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Associated Signature Container (ASiC)</name>
@@ -47,7 +47,7 @@
 
     <properties>
         <java.encoding>UTF-8</java.encoding>
-        <java.version>1.7</java.version>
+        <java.version>1.8</java.version>
     </properties>
 
     <dependencies>
@@ -56,12 +56,12 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.31</version>
+            <version>1.7.32</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.2.3</version>
+            <version>1.2.6</version>
             <scope>test</scope>
         </dependency>
 
@@ -169,16 +169,16 @@
                         <goals>
                             <goal>set-system-properties</goal>
                         </goals>
+                        <configuration>
+                            <properties>
+                                <property>
+                                    <name>javax.xml.accessExternalSchema</name>
+                                    <value>all</value>
+                                </property>
+                            </properties>
+                        </configuration>
                     </execution>
                 </executions>
-                <configuration>
-                    <properties>
-                        <property>
-                            <name>javax.xml.accessExternalSchema</name>
-                            <value>all</value>
-                        </property>
-                    </properties>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.jacoco</groupId>

@@ -36,6 +36,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -144,12 +145,16 @@ class XadesAsicManifest extends AbstractAsicManifest {
         try {
             xmlSignature.sign(signContext);
         } catch (MarshalException e) {
-            throw new IllegalStateException("Klarte ikke å lese ASiC-E XML for signering", e);
+            throw new IllegalStateException("Could not marshal ASiC-E signature.xml", e);
         } catch (XMLSignatureException e) {
-            throw new IllegalStateException("Klarte ikke å signere ASiC-E element.", e);
+            throw new IllegalStateException("Could not sign ASiC-E", e);
         }
 
         return DomUtils.serializeToXml(signedDocument);
+    }
+
+    public List<Reference> getReferences() {
+        return Collections.unmodifiableList(references);
     }
 
     private URIDereferencer signedPropertiesURIDereferencer(XadesArtifacts xadesArtifacts) {
@@ -169,7 +174,7 @@ class XadesAsicManifest extends AbstractAsicManifest {
         try {
             return xmlSignatureFactory.newSignatureMethod("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256", null);
         } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException e) {
-            throw new IllegalStateException("Kunne ikke initialisere xml-signering", e);
+            throw new IllegalStateException("Could not get signature method", e);
         }
     }
 
@@ -183,15 +188,15 @@ class XadesAsicManifest extends AbstractAsicManifest {
         try {
             return XMLSignatureFactory.getInstance("DOM", "XMLDSig");
         } catch (NoSuchProviderException e) {
-            throw new IllegalStateException("Fant ikke XML Digital Signature-provider. Biblioteket avhenger av default Java-provider.");
+            throw new IllegalStateException("Could not find provider for DOM:XMLDSig", e);
         }
     }
 
     public static void extractAndVerify(String xml, ManifestVerifier manifestVerifier) {
         // Updating namespace
-        xml = xml.replace("http://uri.etsi.org/02918/v1.1.1#", "http://uri.etsi.org/02918/v1.2.1#");
-        xml = xml.replace("http://uri.etsi.org/2918/v1.2.1#", "http://uri.etsi.org/02918/v1.2.1#");
-        xml = xml.replaceAll("http://www.w3.org/2000/09/xmldsig#sha", "http://www.w3.org/2001/04/xmlenc#sha");
+        xml = xml.replace("http://uri.etsi.org/02918/v1.1.1#", ASIC_NAMESPACE)
+                .replace("http://uri.etsi.org/2918/v1.2.1#", ASIC_NAMESPACE)
+                .replaceAll("http://www.w3.org/2000/09/xmldsig#sha", "http://www.w3.org/2001/04/xmlenc#sha");
 
         XAdESSignaturesType manifest;
 

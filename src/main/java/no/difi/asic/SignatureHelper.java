@@ -130,6 +130,21 @@ public class SignatureHelper {
         loadCertificate(loadKeyStore(keyStoreStream, keyStorePassword, keyStoreType), keyAlias, keyPassword);
     }
 
+    /**
+     * Obtains the private key, the public key and the associated certificate referenced by the alias from the given keystore
+     *
+     * @param keyStore
+     *            Loaded keystore
+     * @param keyAlias
+     *            Key alias, uses first key if set to null
+     * @param keyPassword
+     *            Key password
+     */
+    public SignatureHelper(KeyStore keyStore, String keyAlias, String keyPassword) {
+        this(BCHelper.getProvider());
+        loadCertificate(keyStore, keyAlias, keyPassword);
+    }
+
     protected SignatureHelper(Provider provider) {
         this.provider = provider;
 

@@ -6,6 +6,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
+import java.io.IOException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+
 public class SignatureHelperTest {
 
     private static Logger log = LoggerFactory.getLogger(SignatureHelperTest.class);
@@ -13,6 +19,14 @@ public class SignatureHelperTest {
     @Test
     public void loadNoProblems() {
         new SignatureHelper(getClass().getResourceAsStream("/keystore.jks"), "changeit", null, "changeit");
+    }
+
+    @Test
+    public void loadNoProblemsWithKeyStore() throws KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException {
+        KeyStore keyStore = KeyStore.getInstance(KeyStoreType.JKS.name());
+        keyStore.load(getClass().getResourceAsStream("/keystore.jks"), "changeit".toCharArray());
+
+        new SignatureHelper(keyStore, null, "changeit");
     }
 
 

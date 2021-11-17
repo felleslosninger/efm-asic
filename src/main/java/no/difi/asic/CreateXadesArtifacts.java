@@ -103,7 +103,7 @@ public class CreateXadesArtifacts {
         try {
             jaxbContext.createMarshaller().marshal(new ObjectFactory().createQualifyingProperties(qualifyingProperties), domResult);
         } catch (JAXBException e) {
-            throw new IllegalStateException("Kunne ikke lage opprette XML", e);
+            throw new IllegalStateException("Could not marshal QualifyingProperties", e);
         }
         return from((Document) domResult.getNode());
     }

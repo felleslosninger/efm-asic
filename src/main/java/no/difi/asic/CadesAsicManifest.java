@@ -22,7 +22,7 @@ class CadesAsicManifest extends AbstractAsicManifest {
 
     static {
         try {
-            jaxbContext = JAXBContext.newInstance(ASiCManifestType.class);
+            jaxbContext = JAXBContext.newInstance("no.difi.commons.asic.jaxb.cades");
         } catch (JAXBException e) {
             throw new IllegalStateException(String.format("Unable to create JAXBContext: %s ", e.getMessage()), e);
         }

@@ -12,9 +12,9 @@ import static org.testng.Assert.fail;
 
 public class AsicXadesReferenceTest {
 
-    private static Logger log = LoggerFactory.getLogger(AsicXadesReferenceTest.class);
+    private static final Logger log = LoggerFactory.getLogger(AsicXadesReferenceTest.class);
 
-    private AsicVerifierFactory asicVerifierFactory = AsicVerifierFactory.newFactory(SignatureMethod.XAdES);
+    private final AsicVerifierFactory asicVerifierFactory = AsicVerifierFactory.newFactory(SignatureMethod.XAdES);
 
     // Fetched from http://begrep.difi.no/SikkerDigitalPost/1.2.0/eksempler/post.asice.zip
     @Test

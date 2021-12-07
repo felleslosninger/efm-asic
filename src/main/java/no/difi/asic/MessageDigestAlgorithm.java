@@ -5,8 +5,8 @@ enum MessageDigestAlgorithm {
     SHA384("SHA-384", "http://www.w3.org/2001/04/xmlenc#sha384"),
     SHA512("SHA-512", "http://www.w3.org/2001/04/xmlenc#sha512");
 
-    private String algorithm;
-    private String uri;
+    private final String algorithm;
+    private final String uri;
 
     MessageDigestAlgorithm(String algorithm, String uri) {
         this.algorithm = algorithm;

@@ -1,11 +1,11 @@
 package no.difi.asic;
 
-import no.difi.commons.asic.jaxb.xmldsig.ReferenceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import javax.xml.crypto.dsig.Reference;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -19,8 +19,8 @@ import static org.testng.Assert.*;
 
 /**
  * @author steinar
- *         Date: 02.07.15
- *         Time: 12.08
+ * Date: 02.07.15
+ * Time: 12.08
  */
 public class AsicXadesWriterTest {
 
@@ -75,7 +75,7 @@ public class AsicXadesWriterTest {
             int matchCount = 0;
             XadesAsicManifest asicManifest = (XadesAsicManifest) ((XadesAsicWriter) asicWriter).getAsicManifest();
 
-            for (ReferenceType reference : asicManifest.getCreateXAdESSignatures(signatureHelper).getSignature().get(0).getSignedInfo().getReference()) {
+            for (Reference reference : asicManifest.getReferences()) {
                 if (reference.getURI().equals(BII_ENVELOPE_XML))
                     matchCount++;
                 if (reference.getURI().equals(BII_MESSAGE_XML))

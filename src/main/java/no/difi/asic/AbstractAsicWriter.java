@@ -111,7 +111,6 @@ abstract class AbstractAsicWriter implements AsicWriter {
 
         // Prepare for calculation of message digest
         DigestOutputStream zipOutputStreamWithDigest = new DigestOutputStream(asicOutputStream, asicManifest.getMessageDigest());
-
         // Copy inputStream to zip output stream
         ByteStreams.copy(inputStream, zipOutputStreamWithDigest);
         zipOutputStreamWithDigest.flush();

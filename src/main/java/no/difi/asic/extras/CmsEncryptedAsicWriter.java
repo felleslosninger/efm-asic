@@ -52,7 +52,7 @@ public class CmsEncryptedAsicWriter extends CmsEncryptedAsicAbstract implements 
      * {@inheritDoc}
      */
     @Override
-    public AsicWriter add(File file) throws IOException {
+    public CmsEncryptedAsicWriter add(File file) throws IOException {
         return add(file.toPath());
     }
 
@@ -60,7 +60,7 @@ public class CmsEncryptedAsicWriter extends CmsEncryptedAsicAbstract implements 
      * {@inheritDoc}
      */
     @Override
-    public AsicWriter add(File file, String entryName) throws IOException {
+    public CmsEncryptedAsicWriter add(File file, String entryName) throws IOException {
         return add(file.toPath(), entryName);
     }
 
@@ -68,7 +68,7 @@ public class CmsEncryptedAsicWriter extends CmsEncryptedAsicAbstract implements 
      * {@inheritDoc}
      */
     @Override
-    public AsicWriter add(Path path) throws IOException {
+    public CmsEncryptedAsicWriter add(Path path) throws IOException {
         return add(path, path.toFile().getName());
     }
 
@@ -76,7 +76,7 @@ public class CmsEncryptedAsicWriter extends CmsEncryptedAsicAbstract implements 
      * {@inheritDoc}
      */
     @Override
-    public AsicWriter add(Path path, String entryName) throws IOException {
+    public CmsEncryptedAsicWriter add(Path path, String entryName) throws IOException {
         try (InputStream inputStream = Files.newInputStream(path)) {
             add(inputStream, entryName);
         }
@@ -87,7 +87,7 @@ public class CmsEncryptedAsicWriter extends CmsEncryptedAsicAbstract implements 
      * {@inheritDoc}
      */
     @Override
-    public AsicWriter add(InputStream inputStream, String filename) throws IOException {
+    public CmsEncryptedAsicWriter add(InputStream inputStream, String filename) throws IOException {
         return add(inputStream, filename, AsicUtils.detectMime(filename));
     }
 
@@ -95,7 +95,7 @@ public class CmsEncryptedAsicWriter extends CmsEncryptedAsicAbstract implements 
      * {@inheritDoc}
      */
     @Override
-    public AsicWriter add(File file, String entryName, MimeType mimeType) throws IOException {
+    public CmsEncryptedAsicWriter add(File file, String entryName, MimeType mimeType) throws IOException {
         return add(file.toPath(), entryName, mimeType);
     }
 
@@ -103,7 +103,7 @@ public class CmsEncryptedAsicWriter extends CmsEncryptedAsicAbstract implements 
      * {@inheritDoc}
      */
     @Override
-    public AsicWriter add(Path path, String entryName, MimeType mimeType) throws IOException {
+    public CmsEncryptedAsicWriter add(Path path, String entryName, MimeType mimeType) throws IOException {
         try (InputStream inputStream = Files.newInputStream(path)) {
             add(inputStream, entryName, mimeType);
         }
@@ -114,45 +114,46 @@ public class CmsEncryptedAsicWriter extends CmsEncryptedAsicAbstract implements 
      * {@inheritDoc}
      */
     @Override
-    public AsicWriter add(InputStream inputStream, String filename, MimeType mimeType) throws IOException {
-        return asicWriter.add(inputStream, filename, mimeType);
+    public CmsEncryptedAsicWriter add(InputStream inputStream, String filename, MimeType mimeType) throws IOException {
+        asicWriter.add(inputStream, filename, mimeType);
+        return this;
     }
 
-    public AsicWriter addEncrypted(File file) throws IOException {
+    public CmsEncryptedAsicWriter addEncrypted(File file) throws IOException {
         return addEncrypted(file.toPath());
     }
 
-    public AsicWriter addEncrypted(File file, String entryName) throws IOException {
+    public CmsEncryptedAsicWriter addEncrypted(File file, String entryName) throws IOException {
         return addEncrypted(file.toPath(), entryName);
     }
 
-    public AsicWriter addEncrypted(Path path) throws IOException {
+    public CmsEncryptedAsicWriter addEncrypted(Path path) throws IOException {
         return addEncrypted(path, path.toFile().getName());
     }
 
-    public AsicWriter addEncrypted(Path path, String entryName) throws IOException {
+    public CmsEncryptedAsicWriter addEncrypted(Path path, String entryName) throws IOException {
         try (InputStream inputStream = Files.newInputStream(path)) {
             addEncrypted(inputStream, entryName);
         }
         return this;
     }
 
-    public AsicWriter addEncrypted(InputStream inputStream, String filename) throws IOException {
+    public CmsEncryptedAsicWriter addEncrypted(InputStream inputStream, String filename) throws IOException {
         return addEncrypted(inputStream, filename, AsicUtils.detectMime(filename));
     }
 
-    public AsicWriter addEncrypted(File file, String entryName, MimeType mimeType) throws IOException {
+    public CmsEncryptedAsicWriter addEncrypted(File file, String entryName, MimeType mimeType) throws IOException {
         return addEncrypted(file.toPath(), entryName, mimeType);
     }
 
-    public AsicWriter addEncrypted(Path path, String entryName, MimeType mimeType) throws IOException {
+    public CmsEncryptedAsicWriter addEncrypted(Path path, String entryName, MimeType mimeType) throws IOException {
         try (InputStream inputStream = Files.newInputStream(path)) {
             addEncrypted(inputStream, entryName, mimeType);
         }
         return this;
     }
 
-    public AsicWriter addEncrypted(InputStream inputStream, String filename, MimeType mimeType) throws IOException {
+    public CmsEncryptedAsicWriter addEncrypted(InputStream inputStream, String filename, MimeType mimeType) throws IOException {
         try {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             ByteStreams.copy(inputStream, byteArrayOutputStream);
@@ -166,37 +167,43 @@ public class CmsEncryptedAsicWriter extends CmsEncryptedAsicAbstract implements 
 
             this.entryNeames.add(filename);
 
-            return asicWriter.add(new ByteArrayInputStream(data.getEncoded()), filename + ".p7m", mimeType);
+            asicWriter.add(new ByteArrayInputStream(data.getEncoded()), filename + ".p7m", mimeType);
+            return this;
         } catch (Exception e) {
             throw new IOException(e.getMessage(), e);
         }
     }
 
     @Override
-    public AsicWriter setRootEntryName(String name) {
+    public CmsEncryptedAsicWriter setRootEntryName(String name) {
         if (this.entryNeames.contains(name))
             name = String.format("%s.p7m", name);
 
-        return asicWriter.setRootEntryName(name);
+        asicWriter.setRootEntryName(name);
+        return this;
     }
 
     @Override
-    public AsicWriter sign(File keyStoreFile, String keyStorePassword, String keyPassword) throws IOException {
-        return asicWriter.sign(keyStoreFile, keyStorePassword, keyPassword);
+    public CmsEncryptedAsicWriter sign(File keyStoreFile, String keyStorePassword, String keyPassword) throws IOException {
+        asicWriter.sign(keyStoreFile, keyStorePassword, keyPassword);
+        return this;
     }
 
     @Override
-    public AsicWriter sign(File keyStoreFile, String keyStorePassword, String keyAlias, String keyPassword) throws IOException {
-        return asicWriter.sign(keyStoreFile, keyStorePassword, keyAlias, keyPassword);
+    public CmsEncryptedAsicWriter sign(File keyStoreFile, String keyStorePassword, String keyAlias, String keyPassword) throws IOException {
+        asicWriter.sign(keyStoreFile, keyStorePassword, keyAlias, keyPassword);
+        return this;
     }
 
     @Override
-    public AsicWriter sign(SignatureHelper signatureHelper) throws IOException {
-        return asicWriter.sign(signatureHelper);
+    public CmsEncryptedAsicWriter sign(SignatureHelper signatureHelper) throws IOException {
+        asicWriter.sign(signatureHelper);
+        return this;
     }
 
     @Override
-    public AsicWriter sign (File keyStoreFile, String keyStorePassword, KeyStoreType keyStoreType, String keyAlias, String keyPassword) throws IOException {
-        return asicWriter.sign(keyStoreFile, keyStorePassword, keyStoreType, keyAlias, keyPassword);
+    public CmsEncryptedAsicWriter sign (File keyStoreFile, String keyStorePassword, KeyStoreType keyStoreType, String keyAlias, String keyPassword) throws IOException {
+        asicWriter.sign(keyStoreFile, keyStorePassword, keyStoreType, keyAlias, keyPassword);
+        return this;
     }
 }

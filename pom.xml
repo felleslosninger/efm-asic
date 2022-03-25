@@ -4,7 +4,7 @@
 
     <groupId>no.difi.commons</groupId>
     <artifactId>commons-asic</artifactId>
-    <version>0.11.0-SNAPSHOT</version>
+    <version>0.11.0</version>
     <packaging>jar</packaging>
 
     <name>Associated Signature Container (ASiC)</name>

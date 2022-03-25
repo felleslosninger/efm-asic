@@ -50,10 +50,6 @@ class XadesAsicManifest extends AbstractAsicManifest {
 
     private static final JAXBContext jaxbContext; // Thread safe
     private static final CreateXadesArtifacts createXAdESArtifacts = new CreateXadesArtifacts();
-    private static final XMLSignatureFactory xmlSignatureFactory = getSignatureFactory();
-    private static final SignatureMethod signatureMethod = getSignatureMethod();
-    private static final CanonicalizationMethod canonicalizationMethod;
-    private static final Transform canonicalXmlTransform;
 
     static {
         try {
@@ -61,15 +57,12 @@ class XadesAsicManifest extends AbstractAsicManifest {
         } catch (JAXBException e) {
             throw new IllegalStateException(String.format("Unable to create JAXBContext: %s ", e.getMessage()), e);
         }
-
-        try {
-            canonicalizationMethod = xmlSignatureFactory.newCanonicalizationMethod(C14V1, (C14NMethodParameterSpec) null);
-            canonicalXmlTransform = xmlSignatureFactory.newTransform(C14V1, (TransformParameterSpec) null);
-        } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException e) {
-            throw new IllegalStateException("Kunne ikke initialisere xml-signering", e);
-        }
     }
 
+    private final XMLSignatureFactory xmlSignatureFactory;
+    private final SignatureMethod signatureMethod;
+    private final CanonicalizationMethod canonicalizationMethod;
+    private final Transform canonicalXmlTransform;
     private final DigestMethod digestMethod;
     private final List<Reference> references = new ArrayList<>();
     // \XAdESSignature\Signature\Object\QualifyingProperties\SignedProperties\SignedDataObjectProperties
@@ -77,7 +70,34 @@ class XadesAsicManifest extends AbstractAsicManifest {
 
     public XadesAsicManifest(MessageDigestAlgorithm messageDigestAlgorithm) {
         super(messageDigestAlgorithm);
+
+        xmlSignatureFactory = getSignatureFactory();
+        signatureMethod = getSignatureMethod(xmlSignatureFactory);
+
+        try {
+            canonicalizationMethod = xmlSignatureFactory.newCanonicalizationMethod(C14V1, (C14NMethodParameterSpec) null);
+            canonicalXmlTransform = xmlSignatureFactory.newTransform(C14V1, (TransformParameterSpec) null);
+        } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException e) {
+            throw new IllegalStateException("Kunne ikke initialisere xml-signering", e);
+        }
+
         digestMethod = getDigestMethod(messageDigestAlgorithm);
+    }
+
+    private XMLSignatureFactory getSignatureFactory() {
+        try {
+            return XMLSignatureFactory.getInstance("DOM", "XMLDSig");
+        } catch (NoSuchProviderException e) {
+            throw new IllegalStateException("Could not find provider for DOM:XMLDSig", e);
+        }
+    }
+
+    private SignatureMethod getSignatureMethod(XMLSignatureFactory xmlSignatureFactory) {
+        try {
+            return xmlSignatureFactory.newSignatureMethod("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256", null);
+        } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException e) {
+            throw new IllegalStateException("Could not get signature method", e);
+        }
     }
 
     private DigestMethod getDigestMethod(MessageDigestAlgorithm messageDigestAlgorithm) {
@@ -170,26 +190,10 @@ class XadesAsicManifest extends AbstractAsicManifest {
         return (Element) doc.appendChild(doc.createElementNS(ASIC_NAMESPACE, "XAdESSignatures"));
     }
 
-    private static SignatureMethod getSignatureMethod() {
-        try {
-            return xmlSignatureFactory.newSignatureMethod("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256", null);
-        } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException e) {
-            throw new IllegalStateException("Could not get signature method", e);
-        }
-    }
-
-    private static KeyInfo keyInfo(final Certificate[] sertifikater) {
+    private KeyInfo keyInfo(final Certificate[] sertifikater) {
         KeyInfoFactory keyInfoFactory = xmlSignatureFactory.getKeyInfoFactory();
         X509Data x509Data = keyInfoFactory.newX509Data(asList(sertifikater));
         return keyInfoFactory.newKeyInfo(singletonList(x509Data));
-    }
-
-    private static XMLSignatureFactory getSignatureFactory() {
-        try {
-            return XMLSignatureFactory.getInstance("DOM", "XMLDSig");
-        } catch (NoSuchProviderException e) {
-            throw new IllegalStateException("Could not find provider for DOM:XMLDSig", e);
-        }
     }
 
     public static void extractAndVerify(String xml, ManifestVerifier manifestVerifier) {

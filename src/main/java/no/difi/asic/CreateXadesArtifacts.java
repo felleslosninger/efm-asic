@@ -9,8 +9,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -48,7 +48,7 @@ public class CreateXadesArtifacts {
         certificateDigest.setDigestValue(certificateDigestValue);
 
         X509IssuerSerialType certificateIssuer = new X509IssuerSerialType();
-        certificateIssuer.setX509IssuerName(certificate.getIssuerDN().getName());
+        certificateIssuer.setX509IssuerName(certificate.getIssuerX500Principal().getName());
         certificateIssuer.setX509SerialNumber(certificate.getSerialNumber());
 
         CertIDType certID = new CertIDType();

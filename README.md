@@ -61,41 +61,41 @@ Here is a rough sketch on how to do it:
 File archiveOutputFile=new File(System.getProperty("java.io.tmpdir"),"asic-sample-default.zip");
 
 // Creates an AsicWriterFactory with default signature method
-        AsicWriterFactory asicWriterFactory=AsicWriterFactory.newFactory();
+AsicWriterFactory asicWriterFactory = AsicWriterFactory.newFactory();
 
 // the following variables are needed:
 // keyStore, keyStorePassword, keyAlias, privateKeyPassword
 
 // Creates the actual container with all the data objects (files) and signs it.
-        AsicWriter asicWriter=asicWriterFactory.newContainer(archiveOutputFile)
-        // Adds an ordinary file, using the file name as the entry name
-        .add(biiEnvelopeFile)
-        // Adds another file, explicitly naming the entry and specifying the MIME type
-        .add(biiMessageFile,BII_MESSAGE_XML,MimeType.forString("application/xml"))
-        // Signing the contents of the archive, closes it for further changes.
-        .sign(keyStore,keyStorePassword,keyAlias,privateKeyPassword);
+AsicWriter asicWriter = asicWriterFactory.newContainer(archiveOutputFile)
+    // Adds an ordinary file, using the file name as the entry name
+    .add(biiEnvelopeFile)
+    // Adds another file, explicitly naming the entry and specifying the MIME type
+    .add(biiMessageFile,BII_MESSAGE_XML,MimeType.forString("application/xml"))
+    // Signing the contents of the archive, closes it for further changes.
+    .sign(keyStore,keyStorePassword,keyAlias,privateKeyPassword);
 
 // Opens the generated archive and reads each entry
-        AsicReader asicReader=AsicReaderFactory.newFactory().open(archiveOutputFile);
+AsicReader asicReader = AsicReaderFactory.newFactory().open(archiveOutputFile);
 
-        String entryName;
+String entryName;
 
 // Iterates over each entry and writes the contents into a file having same name as the entry
-        while((entryName=asicReader.getNextFile())!=null){
-        log.debug("Read entry "+entryName);
-
-        // Creates file with same name as entry
-        File file=new File(entryName);
-        // Ensures we don't overwrite anything
-        if(file.exists()){
+while((entryName = asicReader.getNextFile()) != null){
+    log.debug("Read entry "+entryName);
+    
+    // Creates file with same name as entry
+    File file = new File(entryName);
+    // Ensures we don't overwrite anything
+    if(file.exists()){
         throw new IllegalStateException("File already exists");
-        }
-        asicReader.writeFile(file);
-
-        // Removes file immediately, since this is just a test 
-        file.delete();
-        }
-        asicReader.close(); 
+    }
+    asicReader.writeFile(file);
+    
+    // Removes file immediately, since this is just a test 
+    file.delete();
+}
+asicReader.close(); 
 ```
 
 ## Creating an encoded container
@@ -108,39 +108,39 @@ If you want to CMS-encode the container in memory as a byte stream this can be d
 ByteArrayOutputStream byteArrayOutputStream=new ByteArrayOutputStream();
 
 // create an asic writer
-        AsicWriter asicWriter=AsicWriterFactory.newFactory().newContainer(byteArrayOutputStream);
+AsicWriter asicWriter = AsicWriterFactory.newFactory().newContainer(byteArrayOutputStream);
 
 
 // get the certificate of the recipient
-        X509Certificate recipientCertificate=...
+X509Certificate recipientCertificate =...
 
 // create an encoded writer for the given recipient
-        CmsEncryptedAsicWriter writer=new CmsEncryptedAsicWriter(asicWriter,recipientCertificate);
+CmsEncryptedAsicWriter writer  =new CmsEncryptedAsicWriter(asicWriter,recipientCertificate);
 
 
 // add a "file" from another byte stream to the container
-        String message=...
-        String fileName=...
-        InputStream fileStream=new ByteArrayInputStream(message.getBytes(StandardCharsets.UTF_8));
+String message = ...
+String fileName = ...
+InputStream fileStream = new ByteArrayInputStream(message.getBytes(StandardCharsets.UTF_8));
 
-        writer.addEncrypted(fileStream,fileName);
+writer.addEncrypted(fileStream,fileName);
 
 // set the root file if there is a root / major file and the rest are attachments
-        writer.setRootEntryName(fileName);
+writer.setRootEntryName(fileName);
 
 // the following variables are needed:
 // keyStore, keyStorePassword, keyAlias, privateKeyPassword
-        writer.sign(new SignatureHelper(keyStore,keyStorePassword,keyAlias,privateKeyPassword));
+writer.sign(new SignatureHelper(keyStore,keyStorePassword,keyAlias,privateKeyPassword));
 ```
 
 To read such an encrypted container:
 
 ```java
-AsicReader asicReader=AsicReaderFactory.newFactory().open(asicContainerByteArrayInputStream);
+AsicReader asicReader = AsicReaderFactory.newFactory().open(asicContainerByteArrayInputStream);
 
-        PrivateKey receiverPrivateKey=...
+PrivateKey receiverPrivateKey = ...
 
-        CmsEncryptedAsicReader reader=new CmsEncryptedAsicReader(asicReader,receiverPrivateKey);
+CmsEncryptedAsicReader reader = new CmsEncryptedAsicReader(asicReader,receiverPrivateKey);
 ```
 
 From here on you have a "normal" reader an can continue like seen above.

@@ -1,5 +1,8 @@
 package no.difi.asic;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
 import no.difi.commons.asic.jaxb.cades.XAdESSignaturesType;
 import no.difi.commons.asic.jaxb.xades.DataObjectFormatType;
 import no.difi.commons.asic.jaxb.xades.QualifyingPropertiesType;
@@ -11,9 +14,6 @@ import no.difi.commons.asic.jaxb.xmldsig.X509DataType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.Unmarshaller;
 import javax.xml.crypto.MarshalException;
 import javax.xml.crypto.NodeSetData;
 import javax.xml.crypto.URIDereferencer;
@@ -28,7 +28,6 @@ import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayInputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
@@ -128,11 +127,7 @@ class XadesAsicManifest extends AbstractAsicManifest {
     }
 
     private String encodeFilename(String filename) {
-        try {
-            return URLEncoder.encode(filename, StandardCharsets.UTF_8.name());
-        } catch (UnsupportedEncodingException e) {
-            throw new IllegalStateException(String.format("Could not URL encode filename = '%s'", filename), e);
-        }
+        return URLEncoder.encode(filename, StandardCharsets.UTF_8);
     }
 
     public byte[] toBytes(SignatureHelper signatureHelper) {

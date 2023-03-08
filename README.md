@@ -25,7 +25,7 @@ Conformance is claimed according to 7.2.1 (TBA) and 7.2.2 in
 <dependency>
 	<groupId>no.difi.commons</groupId>
 	<artifactId>commons-asic</artifactId>
-	<version>0.9.2</version>
+	<version>[newest version]</version>
 </dependency>
 ```
 
@@ -56,11 +56,14 @@ Here is a rough sketch on how to do it:
 ```java
 // Creates an ASiC archive after which every entry is read back from the archive.
 
-// Name of the file to hold the the ASiC archive
+// Name of the file to hold the ASiC archive
 File archiveOutputFile = new File(System.getProperty("java.io.tmpdir"), "asic-sample-default.zip");
 
 // Creates an AsicWriterFactory with default signature method
 AsicWriterFactory asicWriterFactory = AsicWriterFactory.newFactory();
+
+// the following variables are needed:
+// keyStore, keyStorePassword, keyAlias, privateKeyPassword
 
 // Creates the actual container with all the data objects (files) and signs it.
 AsicWriter asicWriter = asicWriterFactory.newContainer(archiveOutputFile)
@@ -69,7 +72,7 @@ AsicWriter asicWriter = asicWriterFactory.newContainer(archiveOutputFile)
                 // Adds another file, explicitly naming the entry and specifying the MIME type
         .add(biiMessageFile, BII_MESSAGE_XML, MimeType.forString("application/xml"))
                 // Signing the contents of the archive, closes it for further changes.
-        .sign(keystoreFile, TestUtil.keyStorePassword(), TestUtil.privateKeyPassword());
+        .sign(keyStore, keyStorePassword, keyAlias, privateKeyPassword);
 
 // Opens the generated archive and reads each entry
 AsicReader asicReader = AsicReaderFactory.newFactory().open(archiveOutputFile);
@@ -94,6 +97,52 @@ while ((entryName = asicReader.getNextFile()) != null) {
 asicReader.close(); 
 ```
 
+## Creating an encoded container
+
+If you want to CMS-encode the container in memory as a byte stream this can be done in one step.
+`byteArrayOutputStream` holds all data in the end and can be converted to a ByteArray.
+
+```java
+// create a byte stream to hold the data
+ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+// create an asic writer
+AsicWriter asicWriter = AsicWriterFactory.newFactory().newContainer(byteArrayOutputStream);
+
+
+// get the certificate of the recipient
+X509Certificate recipientCertificate = ...
+
+// create an encoded writer for the given recipient
+CmsEncryptedAsicWriter writer = new CmsEncryptedAsicWriter(asicWriter, recipientCertificate);
+
+
+// add a "file" from another byte stream to the container
+String message = ...
+String fileName = ...
+InputStream fileStream = new ByteArrayInputStream(message.getBytes(StandardCharsets.UTF_8));
+
+writer.addEncrypted(fileStream, fileName);
+
+// set the root file if there is a root / major file and the rest are attachments
+writer.setRootEntryName(fileName);
+
+// the following variables are needed:
+// keyStore, keyStorePassword, keyAlias, privateKeyPassword
+writer.sign(new SignatureHelper(keyStore, keyStorePassword, keyAlias, privateKeyPassword));
+```
+
+To read such an encrypted container:
+
+```java
+AsicReader asicReader = AsicReaderFactory.newFactory().open(asicContainerByteArrayInputStream);
+ 
+PrivateKey receiverPrivateKey = ...
+ 
+CmsEncryptedAsicReader reader = new CmsEncryptedAsicReader(asicReader, receiverPrivateKey);
+```
+
+From here on you have a "normal" reader an can continue like seen above. 
 
 ## Security
 

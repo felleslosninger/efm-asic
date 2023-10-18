@@ -1,12 +1,12 @@
 package no.difi.asic;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
 import no.difi.commons.asic.jaxb.opendocument.manifest.FileEntry;
 import no.difi.commons.asic.jaxb.opendocument.manifest.Manifest;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 

@@ -1,5 +1,8 @@
 package no.difi.asic;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
 import no.difi.commons.asic.jaxb.cades.XAdESSignaturesType;
 import no.difi.commons.asic.jaxb.xades.DataObjectFormatType;
 import no.difi.commons.asic.jaxb.xades.QualifyingPropertiesType;
@@ -11,9 +14,6 @@ import no.difi.commons.asic.jaxb.xmldsig.X509DataType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.crypto.MarshalException;
 import javax.xml.crypto.NodeSetData;
 import javax.xml.crypto.URIDereferencer;

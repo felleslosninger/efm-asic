@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bindings version="2.1"
-          xmlns="http://java.sun.com/xml/ns/jaxb"
+<bindings
+          xmlns="https://jakarta.ee/xml/ns/jaxb"
+          xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb"
           xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
-          extensionBindingPrefixes="xjc">
+          jaxb:extensionBindingPrefixes="xjc"
+          jaxb:version="3.0"
+>
 
     <bindings schemaLocation="../xsd/asic-model-1.0.xsd">
         <xjc:simple/>

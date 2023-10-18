@@ -1,6 +1,16 @@
-[![Build Status](https://travis-ci.org/difi/asic.svg?branch=master)](https://travis-ci.org/difi/asic)
-[![CodeCov](https://codecov.io/gh/difi/asic/branch/master/graph/badge.svg)](https://codecov.io/gh/difi/asic)
-[![Maven Central](https://img.shields.io/maven-central/v/no.difi.commons/commons-asic.svg)](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22no.difi.commons%22%20AND%20a%3A%22commons-asic%22)
+> [!WARNING]
+> Please note that this project is in maintenance mode.
+> 
+> It is currently being maintained for the purpose of eFormidlings use of the advanced signature container (ASiC) format.
+>
+> Bugs will be fixed and dependencies kept up to date, but no new features will be added.
+>
+> eFormidling is looking into alternatives and might archive the project in the future.
+>
+> Alternatives to this project include:
+>
+> - KS FIKS is maintaining a fork of this libarary at https://github.com/ks-no/asic (also for .NET at https://github.com/ks-no/fiks-asice-dotnet)
+> - The Digital Signature Service (part of the Digital Europe eSignature building block) is maintaining a set of libraries for building and validating ASiC (and more) at https://github.com/esig/dss
 
 # Associated Signature Container (ASiC)
 

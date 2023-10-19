@@ -1,6 +1,8 @@
 package no.difi.asic;
 
 import com.google.common.hash.Hashing;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
 import no.difi.commons.asic.jaxb.xades.*;
 import no.difi.commons.asic.jaxb.xmldsig.DigestMethodType;
 import no.difi.commons.asic.jaxb.xmldsig.X509IssuerSerialType;
@@ -9,8 +11,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;

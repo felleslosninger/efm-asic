@@ -1,0 +1,28 @@
+pool:
+  vmImage: 'ubuntu-latest'
+
+resources:
+  repositories:
+    - repository: efm-eproc-pipeline
+      type: github
+      name: felleslosninger/efm-eproc-pipeline
+      endpoint: felleslosninger
+      ref: development
+
+extends:
+  template: build-and-deploy-template.yml@efm-eproc-pipeline
+  parameters:
+    environmentRepository: git://eformidling/eformidling
+    jdkVersion: 1.8
+    buildDockerArtifact: false
+    mavenGoals: deploy
+    jiraVersionPrefix: ASiC
+    deployOssrh: true
+
+trigger:
+  batch: true
+  branches:
+    include:
+      - '*'
+
+pr: none

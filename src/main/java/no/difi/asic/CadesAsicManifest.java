@@ -1,6 +1,5 @@
 package no.difi.asic;
 
-import jakarta.xml.bind.*;
 import no.difi.commons.asic.jaxb.cades.ASiCManifestType;
 import no.difi.commons.asic.jaxb.cades.DataObjectReferenceType;
 import no.difi.commons.asic.jaxb.cades.ObjectFactory;
@@ -10,6 +9,7 @@ import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.bind.*;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 

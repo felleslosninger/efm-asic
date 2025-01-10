@@ -33,7 +33,7 @@ Build with Java 21 and a recent Maven 3 version like this :
 ```
 mvn clean install
 
-# For reference these are my Java an maven versions
+# For reference - these were my Java and Maven versions
 
 java -version
 # openjdk version "21.0.5" 2024-10-15 LTS
@@ -49,8 +49,8 @@ Latest `1.x.y` series is for Java 21+, while the older series based on Java 8 en
 
 <table>
 <tr>
-<th>Java 21 (in maintenance mode)</th>
-<th>Java 8 (no longer maintained)</th>
+<th>1.x.y for Java 21 (in maintenance mode)</th>
+<th>0.x.y for Java 8 (no longer maintained)</th>
 </tr>
 <tr>
 <td>
@@ -81,11 +81,11 @@ Latest `1.x.y` series is for Java 21+, while the older series based on Java 8 en
 ## Important Note about ZipBomb prevention
 Starting with version 1.0.0 we have added simple protection against [ZipBomb](https://github.com/felleslosninger/efm-asic/security/advisories/GHSA-rc4q-523c-3qmm).
 
-This has been implemented by using a custom `ByteArrayOutputStream` that limits decoded files in `META-INF` to 1 MiB (see [MaxSizeProtectedOutputStream](src/main/java/no/difi/asic/zipbomb/MaxSizeProtectedOutputStream.java).
+This has been implemented with a custom `ByteArrayOutputStream` that limits decoding of files in `META-INF` to 1 MiB (see [MaxSizeProtectedOutputStream](src/main/java/no/difi/asic/zipbomb/MaxSizeProtectedOutputStream.java)).
 
-The only use of this is in the `handleMetadataEntry()` method in [AbstractAsicReader](src/main/java/no/difi/asic/AbstractAsicReader.java).
+The only use of `MaxSizeProtectedOutputStream` is in the `handleMetadataEntry()` method in [AbstractAsicReader](src/main/java/no/difi/asic/AbstractAsicReader.java).
 
-To change the 1 MiB limit we can specify a more exact limit in `handleMetadataEntry()`, or changing the default inside the `MaxSizeProtectedOutputStream` implementation.
+To change the 1 MiB limit we can specify a more exact limit in `handleMetadataEntry()` or set another default inside the `MaxSizeProtectedOutputStream` implementation.
 
 ## What does it look like?
 

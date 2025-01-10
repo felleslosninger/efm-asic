@@ -78,6 +78,15 @@ Latest `1.x.y` series is for Java 21+, while the older series based on Java 8 en
 </tr>
 </table>
 
+## Important Note about ZipBomb prevention
+Starting with version 1.0.0 we have added simple protection against [ZipBomb](https://github.com/felleslosninger/efm-asic/security/advisories/GHSA-rc4q-523c-3qmm).
+
+This has been implemented by using a custom `ByteArrayOutputStream` that limits decoded files in `META-INF` to 1 MiB (see [MaxSizeProtectedOutputStream](src/main/java/no/difi/asic/zipbomb/MaxSizeProtectedOutputStream.java).
+
+The only use of this is in the `handleMetadataEntry()` method in [AbstractAsicReader](src/main/java/no/difi/asic/AbstractAsicReader.java).
+
+To change the 1 MiB limit we can specify a more exact limit in `handleMetadataEntry()`, or changing the default inside the `MaxSizeProtectedOutputStream` implementation.
+
 ## What does it look like?
 
 In general the archive looks something like depicted below 
@@ -141,7 +150,6 @@ while ((entryName = asicReader.getNextFile()) != null) {
 }
 asicReader.close(); 
 ```
-
 
 ## Security
 

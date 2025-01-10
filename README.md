@@ -30,15 +30,38 @@ Conformance is claimed according to 7.2.1 (TBA) and 7.2.2 in
 
 
 ## Maven
+Latest `1.x.y` series is for Java 21+, while the older series based on Java 8 ended with version `0.12.0` release on `19 Oct 2023`.
+
+<table>
+<tr>
+<th>Java 21 (in maintenance mode)</th>
+<th>Java 8 (no longer maintained)</th>
+</tr>
+<tr>
+<td>
 
 ```xml
 <dependency>
-	<groupId>no.difi.commons</groupId>
-	<artifactId>commons-asic</artifactId>
-	<version>0.9.2</version>
+    <groupId>no.difi.commons</groupId>
+    <artifactId>commons-asic</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
 </dependency>
 ```
 
+</td>
+<td>
+
+```xml
+<dependency>
+    <groupId>no.difi.commons</groupId>
+    <artifactId>commons-asic</artifactId>
+    <version>0.12.0</version>
+</dependency>
+```
+
+</td>
+</tr>
+</table>
 
 ## What does it look like?
 

@@ -1,13 +1,16 @@
 package no.difi.asic;
 
-import no.difi.commons.asic.jaxb.cades.*;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.Marshaller;
+import no.difi.commons.asic.jaxb.cades.ASiCManifestType;
+import no.difi.commons.asic.jaxb.cades.DataObjectReferenceType;
+import no.difi.commons.asic.jaxb.cades.ObjectFactory;
+import no.difi.commons.asic.jaxb.cades.SigReferenceType;
 import no.difi.commons.asic.jaxb.xmldsig.DigestMethodType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
 import java.io.ByteArrayOutputStream;
 
 /**
@@ -70,6 +73,5 @@ public class AsicManifestReferenceTest {
         marshaller.marshal(objectFactory.createASiCManifest(asicManifest), byteArrayOutputStream);
         log.info(byteArrayOutputStream.toString());
     }
-
 
 }

@@ -28,8 +28,23 @@ This component provides an easy-to-use factory for creating ASiC-E containers.
 Conformance is claimed according to 7.2.1 (TBA) and 7.2.2 in
 [ETSI TS 102 918 V1.3.1](http://webapp.etsi.org/workprogram/Report_WorkItem.asp?WKI_ID=42455).
 
+## To build from source
+Build with Java 21 and a recent Maven 3 version like this :
+```
+mvn clean install
 
-## Maven
+# For reference these are my Java an maven versions
+
+java -version
+# openjdk version "21.0.5" 2024-10-15 LTS
+# OpenJDK Runtime Environment Temurin-21.0.5+11 (build 21.0.5+11-LTS)
+# OpenJDK 64-Bit Server VM Temurin-21.0.5+11 (build 21.0.5+11-LTS, mixed mode, sharing)
+
+mvn -version
+# Apache Maven 3.9.9 (8e8579a9e76f7d015ee5ec7bfcdc97d260186937)
+```
+
+## Maven Releases
 Latest `1.x.y` series is for Java 21+, while the older series based on Java 8 ended with version `0.12.0` release on `19 Oct 2023`.
 
 <table>
@@ -190,17 +205,3 @@ openssl cms -verify -in META-INF/signature.p7s -inform der -content META-INF/asi
 ```
 
 The `-noverify` option will allow self signed certificates, and should normally be omitted :-).
-
-
-## Programmers notes
-
-You might encounter memory problems when using Java 1.7. This is due to the memory consumption of JAXB.
-
-Try this before you run maven, you might need to increase this even further (your mileage may vary):
-```
-export MAVEN_OPTS="-Xmx1024m -XX:MaxPermSize=512m"
-```
-or on Windows:
-```
-set MAVEN_OPTS=-Xmx1024m -XX:MaxPermSize=512m
-```

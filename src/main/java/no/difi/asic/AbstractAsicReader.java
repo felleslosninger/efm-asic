@@ -1,6 +1,7 @@
 package no.difi.asic;
 
 import com.google.common.io.ByteStreams;
+import no.difi.asic.zipbomb.MaxSizeProtectedOutputStream;
 import no.difi.commons.asic.jaxb.asic.AsicManifest;
 import no.difi.commons.asic.jaxb.asic.Certificate;
 import no.difi.commons.asic.jaxb.opendocument.manifest.Manifest;
@@ -136,7 +137,7 @@ abstract class AbstractAsicReader implements Closeable {
         String filename = currentZipEntry.getName().substring(9).toLowerCase();
 
         // Read content in file
-        ByteArrayOutputStream contentsOfStream = new ByteArrayOutputStream();
+        MaxSizeProtectedOutputStream contentsOfStream = new MaxSizeProtectedOutputStream();
         ByteStreams.copy(zipInputStream, contentsOfStream);
 
         if (AsicUtils.PATTERN_CADES_MANIFEST.matcher(currentZipEntry.getName()).matches()) {

@@ -28,17 +28,64 @@ This component provides an easy-to-use factory for creating ASiC-E containers.
 Conformance is claimed according to 7.2.1 (TBA) and 7.2.2 in
 [ETSI TS 102 918 V1.3.1](http://webapp.etsi.org/workprogram/Report_WorkItem.asp?WKI_ID=42455).
 
+## To build from source
+Build with Java 21 and a recent Maven 3 version like this :
+```
+mvn clean install
 
-## Maven
+# For reference - these were my Java and Maven versions
+
+java -version
+# openjdk version "21.0.5" 2024-10-15 LTS
+# OpenJDK Runtime Environment Temurin-21.0.5+11 (build 21.0.5+11-LTS)
+# OpenJDK 64-Bit Server VM Temurin-21.0.5+11 (build 21.0.5+11-LTS, mixed mode, sharing)
+
+mvn -version
+# Apache Maven 3.9.9 (8e8579a9e76f7d015ee5ec7bfcdc97d260186937)
+```
+
+## Maven Releases
+Latest `1.x.y` series is for Java 21+, while the older series based on Java 8 ended with version `0.12.0` release on `19 Oct 2023`.
+
+<table>
+<tr>
+<th>1.x.y for Java 21 (in maintenance mode)</th>
+<th>0.x.y for Java 8 (no longer maintained)</th>
+</tr>
+<tr>
+<td>
 
 ```xml
 <dependency>
-	<groupId>no.difi.commons</groupId>
-	<artifactId>commons-asic</artifactId>
-	<version>0.9.2</version>
+    <groupId>no.difi.commons</groupId>
+    <artifactId>commons-asic</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
 </dependency>
 ```
 
+</td>
+<td>
+
+```xml
+<dependency>
+    <groupId>no.difi.commons</groupId>
+    <artifactId>commons-asic</artifactId>
+    <version>0.12.0</version>
+</dependency>
+```
+
+</td>
+</tr>
+</table>
+
+## Important Note about ZipBomb prevention
+Starting with version 1.0.0 we have added simple protection against [ZipBomb](https://github.com/felleslosninger/efm-asic/security/advisories/GHSA-rc4q-523c-3qmm).
+
+This has been implemented with a custom `ByteArrayOutputStream` that limits decoding of files in `META-INF` to 1 MiB (see [MaxSizeProtectedOutputStream](src/main/java/no/difi/asic/zipbomb/MaxSizeProtectedOutputStream.java)).
+
+The only use of `MaxSizeProtectedOutputStream` is in the `handleMetadataEntry()` method in [AbstractAsicReader](src/main/java/no/difi/asic/AbstractAsicReader.java).
+
+To change the 1 MiB limit we can specify a more exact limit in `handleMetadataEntry()` or set another default inside the `MaxSizeProtectedOutputStream` implementation.
 
 ## What does it look like?
 
@@ -104,7 +151,6 @@ while ((entryName = asicReader.getNextFile()) != null) {
 asicReader.close(); 
 ```
 
-
 ## Security
 
 This library validate signatures, but does not validate the certificate. It's up to the implementer using the library
@@ -167,17 +213,3 @@ openssl cms -verify -in META-INF/signature.p7s -inform der -content META-INF/asi
 ```
 
 The `-noverify` option will allow self signed certificates, and should normally be omitted :-).
-
-
-## Programmers notes
-
-You might encounter memory problems when using Java 1.7. This is due to the memory consumption of JAXB.
-
-Try this before you run maven, you might need to increase this even further (your mileage may vary):
-```
-export MAVEN_OPTS="-Xmx1024m -XX:MaxPermSize=512m"
-```
-or on Windows:
-```
-set MAVEN_OPTS=-Xmx1024m -XX:MaxPermSize=512m
-```

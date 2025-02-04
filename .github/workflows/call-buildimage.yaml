@@ -2,7 +2,6 @@ name: CI Workflow
 
 on:
   workflow_dispatch:
-
   push:
     branches: [main]
 
@@ -10,9 +9,8 @@ on:
     types: [] # Empty list ensures PRs are not triggered.
 
 jobs:
-
   build-install-and-deploy-libs:
-    uses: felleslosninger/github-workflows/.github/workflows/ci-maven-install-deploy-lib.yml@main
+    uses: felleslosninger/github-workflows/.github/workflows/ci-maven-install-deploy-lib.yml@efm-tilpasninger-3
     with:
       java-version: 21
       sbom-path: efm-asic/target

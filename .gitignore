@@ -5,3 +5,6 @@
 .project
 .classpath
 /*.iml
+
+# maven backup files
+pom.xml.versionsBackup

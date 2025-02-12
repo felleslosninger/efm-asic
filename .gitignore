@@ -6,5 +6,6 @@
 .classpath
 /*.iml
 
-# maven backup files
+# maven specific files
 pom.xml.versionsBackup
+release.properties

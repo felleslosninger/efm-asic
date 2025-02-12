@@ -301,7 +301,6 @@
         <profile>
             <id>ossrh</id>
             <activation>
-                <activeByDefault>false</activeByDefault>
                 <property>
                     <name>performRelease</name>
                 </property>

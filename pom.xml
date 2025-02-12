@@ -4,7 +4,7 @@
 
     <groupId>no.difi.commons</groupId>
     <artifactId>commons-asic</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Associated Signature Container (ASiC)</name>
@@ -300,6 +300,12 @@
     <profiles>
         <profile>
             <id>ossrh</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>performRelease</name>
+                </property>
+            </activation>
             <build>
                 <plugins>
                     <plugin>

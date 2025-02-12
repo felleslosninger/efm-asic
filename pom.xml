@@ -4,7 +4,7 @@
 
     <groupId>no.difi.commons</groupId>
     <artifactId>commons-asic</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Associated Signature Container (ASiC)</name>
@@ -12,7 +12,7 @@
     <url>https://github.com/difi/asic</url>
 
     <scm>
-        <tag>commons-asic-1.0.0</tag>
+        <tag>HEAD</tag>
         <url>https://github.com/difi/asic</url>
         <connection>scm:git:https://github.com/difi/asic.git</connection>
         <developerConnection>scm:git:git@github.com:difi/asic.git</developerConnection>

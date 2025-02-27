@@ -59,7 +59,7 @@ Latest `1.x.y` series is for Java 21+, while the older series based on Java 8 en
 <dependency>
     <groupId>no.difi.commons</groupId>
     <artifactId>commons-asic</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
 </dependency>
 ```
 
@@ -213,3 +213,19 @@ openssl cms -verify -in META-INF/signature.p7s -inform der -content META-INF/asi
 ```
 
 The `-noverify` option will allow self signed certificates, and should normally be omitted :-).
+
+## Release
+See documentation for the [maven-release-plugin](https://maven.apache.org/maven-release/maven-release-plugin/) and [guide for maven-release-plugin](https://maven.apache.org/guides/mini/guide-releasing.html).
+
+```bash
+# local repo must be in sync with origin/GitHub
+git push
+
+mvn release:prepare
+# answer three questions (set the tag equal to the release version)
+# What is the release version for "Associated Signature Container (ASiC)"? (commons-asic) 1.0: : 1.0.0
+# What is SCM release tag or label for "Associated Signature Container (ASiC)"? (commons-asic) 1.0.0: :
+# What is the new development version for "Associated Signature Container (ASiC)"? (commons-asic) 1.0.1-SNAPSHOT: :
+
+mvn release:perform
+```

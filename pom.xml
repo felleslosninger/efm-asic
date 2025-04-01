@@ -183,7 +183,7 @@
                 <!-- mcs org.codehaus.mojo:jaxb2-maven-plugin -->
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>jaxb2-maven-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.3.0</version>
                 <executions>
                     <execution>
                         <id>xsd</id>

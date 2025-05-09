@@ -59,7 +59,7 @@ Latest `1.x.y` series is for Java 21+, while the older series based on Java 8 en
 <dependency>
     <groupId>no.difi.commons</groupId>
     <artifactId>commons-asic</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 </dependency>
 ```
 
@@ -81,11 +81,11 @@ Latest `1.x.y` series is for Java 21+, while the older series based on Java 8 en
 ## Important Note about ZipBomb prevention
 Starting with version 1.0.0 we have added simple protection against [ZipBomb](https://github.com/felleslosninger/efm-asic/security/advisories/GHSA-rc4q-523c-3qmm).
 
-This has been implemented with a custom `ByteArrayOutputStream` that limits decoding of files in `META-INF` to 1 MiB (see [MaxSizeProtectedOutputStream](src/main/java/no/difi/asic/zipbomb/MaxSizeProtectedOutputStream.java)).
+This has been implemented with a custom `ByteArrayOutputStream` that limits decoding of files in `META-INF` to 1 GiB (see [MaxSizeProtectedOutputStream](src/main/java/no/difi/asic/zipbomb/MaxSizeProtectedOutputStream.java), was 1 MiB in v 1.0.0).
 
 The only use of `MaxSizeProtectedOutputStream` is in the `handleMetadataEntry()` method in [AbstractAsicReader](src/main/java/no/difi/asic/AbstractAsicReader.java).
 
-To change the 1 MiB limit we can specify a more exact limit in `handleMetadataEntry()` or set another default inside the `MaxSizeProtectedOutputStream` implementation.
+To change the limit we can specify a more exact size in `handleMetadataEntry()` or set another default inside the `MaxSizeProtectedOutputStream` implementation.
 
 ## What does it look like?
 

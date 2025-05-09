@@ -3,6 +3,10 @@
 
 # Java 21 releases
 
+# 1.0.1
+
+* ZipBomb protection was upped to 1 GiB pr META-INF entry (see [MOVE-3770](https://digdir.atlassian.net/browse/MOVE-3770))
+
 # 1.0.0
 
 * Java 21

@@ -1,0 +1,13 @@
+name: Build Maven Java
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  call-workflow-maven-build:
+    uses: felleslosninger/github-workflows/.github/workflows/ci-maven-build-lib.yml@main
+    with:
+      java-version: 21
+      sbom-path: .
+    secrets: inherit

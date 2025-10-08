@@ -172,7 +172,7 @@
                 <!-- mcs org.apache.maven.plugins:maven-surefire-plugin -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.5.3</version>
+                <version>3.5.4</version>
                 <configuration>
                     <failIfNoTests>true</failIfNoTests>
                     <!-- Seems this will alleviate the problem of out-of-memory -->

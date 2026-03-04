@@ -5,8 +5,23 @@
 
 version: 2
 updates:
-  - package-ecosystem: "maven" # See documentation for possible values
-    directory: "/" # Location of package manifests
+  - package-ecosystem: maven
+    groups:
+      fiks-deps:
+        patterns:
+          - "no.ks.fiks*"
+        update-types:
+          - "minor"
+          - "patch"
+      other-deps:
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "no.ks.fiks*"
+        update-types:
+          - "minor"
+          - "patch"
+    directory: "/"
     open-pull-requests-limit: 15
     schedule:
       interval: daily

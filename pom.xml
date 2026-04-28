@@ -172,7 +172,7 @@
                 <!-- mcs org.apache.maven.plugins:maven-surefire-plugin -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.5.3</version>
+                <version>3.5.4</version>
                 <configuration>
                     <failIfNoTests>true</failIfNoTests>
                     <!-- Seems this will alleviate the problem of out-of-memory -->
@@ -278,7 +278,7 @@
                     <!-- mcs org.apache.maven.plugins:maven-javadoc-plugin -->
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.11.2</version>
+                    <version>3.12.0</version>
                     <executions>
                         <execution>
                             <id>package-javadoc</id>
@@ -341,7 +341,7 @@
                         <!-- mcs org.apache.maven.plugins:maven-javadoc-plugin -->
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.11.2</version>
+                        <version>3.12.0</version>
                     </plugin>
                 </plugins>
             </build>

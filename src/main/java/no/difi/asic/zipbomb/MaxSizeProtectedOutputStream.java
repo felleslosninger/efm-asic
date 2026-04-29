@@ -11,10 +11,10 @@ public class MaxSizeProtectedOutputStream extends ByteArrayOutputStream {
     private final long MAX_SIZE_DECOMPRESSED;
 
     /**
-     * Default limit is set to 1 MiB
+     * The default limit is set to 1 GiB
      */
     public MaxSizeProtectedOutputStream() {
-        this(1024L * 1024); // defaults to 1 MiB
+        this(1024L * 1024L * 1024L); // defaults to 1 GiB
     }
 
     /**

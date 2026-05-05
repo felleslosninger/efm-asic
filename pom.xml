@@ -297,65 +297,11 @@
         </pluginManagement>
     </build>
 
-    <profiles>
-        <profile>
-            <id>ossrh</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <!-- mcs org.apache.maven.plugins:maven-gpg-plugin -->
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <version>3.2.8</version>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                                <configuration>
-                                    <gpgArguments>
-                                        <arg>--pinentry-mode</arg>
-                                        <arg>loopback</arg>
-                                    </gpgArguments>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <!-- mcs org.apache.maven.plugins:maven-source-plugin -->
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-source-plugin</artifactId>
-                        <version>3.3.1</version>
-                        <executions>
-                            <execution>
-                                <id>package-sources</id>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <!-- mcs org.apache.maven.plugins:maven-javadoc-plugin -->
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.12.0</version>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
-
     <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
         <repository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+            <id>github</id>
+            <name>GitHub felleslosninger Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/felleslosninger/efm-asic</url>
         </repository>
     </distributionManagement>
 

@@ -46,6 +46,7 @@ mvn -version
 
 ## Maven Releases
 Latest `1.x.y` series is for Java 21+, while the older series based on Java 8 ended with version `0.12.0` release on `19 Oct 2023`.
+Newer versions are published to GitHub Packages rather than Maven Central.
 
 <table>
 <tr>
@@ -215,17 +216,6 @@ openssl cms -verify -in META-INF/signature.p7s -inform der -content META-INF/asi
 The `-noverify` option will allow self signed certificates, and should normally be omitted :-).
 
 ## Release
-See documentation for the [maven-release-plugin](https://maven.apache.org/maven-release/maven-release-plugin/) and [guide for maven-release-plugin](https://maven.apache.org/guides/mini/guide-releasing.html).
 
-```bash
-# local repo must be in sync with origin/GitHub
-git push
-
-mvn release:prepare
-# answer three questions (set the tag equal to the release version)
-# What is the release version for "Associated Signature Container (ASiC)"? (commons-asic) 1.0: : 1.0.0
-# What is SCM release tag or label for "Associated Signature Container (ASiC)"? (commons-asic) 1.0.0: :
-# What is the new development version for "Associated Signature Container (ASiC)"? (commons-asic) 1.0.1-SNAPSHOT: :
-
-mvn release:perform
-```
+For maintainers: create and manage releases in GitHub at
+https://github.com/felleslosninger/efm-asic/releases

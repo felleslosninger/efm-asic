@@ -3,6 +3,7 @@ name: CI PR Checks
 on:
   pull_request:
     branches: [main]
+    types: [ opened, edited, synchronize, reopened ]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

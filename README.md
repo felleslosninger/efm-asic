@@ -219,3 +219,7 @@ The `-noverify` option will allow self signed certificates, and should normally 
 
 For maintainers: create and manage releases in GitHub at
 https://github.com/felleslosninger/efm-asic/releases
+
+## License
+
+This project is licensed under the BSD 3-Clause License. See the [LICENSE](LICENSE) file for details.

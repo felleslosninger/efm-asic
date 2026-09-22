@@ -1,0 +1,26 @@
+name: Call Release
+
+on:
+  release:
+    types: [created]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  repository-projects: read
+  packages: write
+
+jobs:
+  call-workflow-ci-build-publish-lib:
+    uses: felleslosninger/github-workflows/.github/workflows/ci-build-publish-lib.yml@main
+    with:
+      package-version: ${{ github.event.release.tag_name }}
+      deployment-repository: ${{ github.repository }}
+      java-version: 21
+      sbom-path: ./
+    secrets: inherit

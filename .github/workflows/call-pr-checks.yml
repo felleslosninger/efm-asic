@@ -1,0 +1,26 @@
+name: CI PR Checks
+
+on:
+  pull_request:
+    branches: [main]
+    types: [ opened, edited, synchronize, reopened ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  repository-projects: read
+
+jobs:
+  run-pr-checks:
+    uses: felleslosninger/github-workflows/.github/workflows/ci-pr-checks-lib.yml@main
+    with:
+      java-version: 21
+      pull-request-title: ${{ github.event.pull_request.title }}
+      pull-request-allowed-prefixes: "MOVE-,Bump,PF-"
+      maven-lifecycle: 'verify'
+    secrets: inherit

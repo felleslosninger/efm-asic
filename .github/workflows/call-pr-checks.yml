@@ -3,6 +3,7 @@ name: CI PR Checks
 on:
   pull_request:
     branches: [main]
+    types: [ opened, edited, synchronize, reopened ]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -16,12 +17,10 @@ permissions:
 
 jobs:
   run-pr-checks:
-    uses: felleslosninger/github-workflows/.github/workflows/ci-pr-checks.yml@main
+    uses: felleslosninger/github-workflows/.github/workflows/ci-pr-checks-lib.yml@main
     with:
-      application-type: spring-boot
       java-version: 21
       pull-request-title: ${{ github.event.pull_request.title }}
-      pull-request-allowed-prefixes: "MOVE-,Bump"
-      enable-trivy-image-scan: false
+      pull-request-allowed-prefixes: "MOVE-,Bump,PF-"
       maven-lifecycle: 'verify'
     secrets: inherit

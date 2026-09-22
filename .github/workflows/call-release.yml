@@ -16,8 +16,8 @@ permissions:
   packages: write
 
 jobs:
-  call-workflow-maven-install-deploy:
-    uses: felleslosninger/github-workflows/.github/workflows/ci-maven-install-deploy-lib.yml@main
+  call-workflow-ci-build-publish-lib:
+    uses: felleslosninger/github-workflows/.github/workflows/ci-build-publish-lib.yml@main
     with:
       package-version: ${{ github.event.release.tag_name }}
       deployment-repository: ${{ github.repository }}

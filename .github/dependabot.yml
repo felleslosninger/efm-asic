@@ -8,8 +8,8 @@ registries:
   maven-github:
     type: maven-repository
     url: https://maven.pkg.github.com/felleslosninger
-    username: ${{secrets.MAVEN_USER}}
-    password: ${{secrets.MAVEN_PASSWORD}}
+    username: ${{secrets.GH_PACKAGES_READ_USER}}
+    password: ${{secrets.GH_PACKAGES_READ_PAT}}
 updates:
   - package-ecosystem: "maven" # See documentation for possible values
     directory: "/" # Location of package manifests

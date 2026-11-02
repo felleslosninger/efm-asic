@@ -3,6 +3,10 @@
 
 # Java 21 releases
 
+# 1.0.3
+
+* `AsicReader.inputStream()` now reads in bulk instead of one byte at a time, which made large entries very slow to read (see [MOVE-5350](https://digdir.atlassian.net/browse/MOVE-5350))
+
 # 1.0.2
 
 * Bumped Bouncy Castle (bcpkix-jdk18on) from 1.84 to 1.86, fixing CVE-2026-8763 and CVE-2026-13506 (see [MOVE-5165](https://digdir.atlassian.net/browse/MOVE-5165))

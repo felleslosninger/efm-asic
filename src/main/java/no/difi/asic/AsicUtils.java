@@ -1,6 +1,7 @@
 package no.difi.asic;
 
 import com.google.common.io.ByteStreams;
+import no.difi.asic.zipbomb.MaxSizeProtectedOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -8,6 +9,7 @@ import java.io.*;
 import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 
@@ -42,6 +44,20 @@ public class AsicUtils {
      * @param inputStreams Streams for source containers.
      */
     public static void combine(OutputStream outputStream, InputStream... inputStreams) throws IOException {
+        // Manifests are buffered with the same size limit as AbstractAsicReader uses for META-INF entries.
+        combine(MaxSizeProtectedOutputStream::new, outputStream, inputStreams);
+    }
+
+    /**
+     * Combine multiple containers to one container, buffering manifests read from the source containers
+     * in streams created by the given factory (expected to be size limited to protect against zip bombs).
+     *
+     * @param manifestBufferFactory Creates the buffer for each manifest read from a source container.
+     * @param outputStream Stream for target container.
+     * @param inputStreams Streams for source containers.
+     */
+    static void combine(Supplier<? extends ByteArrayOutputStream> manifestBufferFactory, OutputStream outputStream,
+                        InputStream... inputStreams) throws IOException {
         // Statuses
         int manifestCounter = 0;
         int fileCounter = 0;
@@ -62,7 +78,7 @@ public class AsicUtils {
             while ((zipEntry = source.getNextEntry()) != null) {
                 if (PATTERN_CADES_MANIFEST.matcher(zipEntry.getName()).matches()) {
                     // Fetch content
-                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                    ByteArrayOutputStream byteArrayOutputStream = manifestBufferFactory.get();
                     ByteStreams.copy(source, byteArrayOutputStream);
 
                     // Read manifest
@@ -85,7 +101,7 @@ public class AsicUtils {
                     ByteStreams.copy(source, target);
                 } else if (zipEntry.getName().equals("META-INF/manifest.xml")) {
                     // Fetch content
-                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                    ByteArrayOutputStream byteArrayOutputStream = manifestBufferFactory.get();
                     ByteStreams.copy(source, byteArrayOutputStream);
 
                     // Copy entries

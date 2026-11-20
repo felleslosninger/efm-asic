@@ -1,6 +1,7 @@
 package no.difi.asic;
 
 import com.google.common.io.ByteStreams;
+import no.difi.asic.zipbomb.MaxSizeProtectedOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +39,9 @@ public class AsicUtils {
      *
      * OASIS OpenDocument manifest is regenerated if all source containers contains valid manifest.
      *
+     * Manifests in the source containers are read into memory, limited to the default max size of META-INF entries
+     * (see {@link MaxSizeProtectedOutputStream#getDefaultMaxSize()}) to protect against zip bombs.
+     *
      * @param outputStream Stream for target container.
      * @param inputStreams Streams for source containers.
      */
@@ -62,7 +66,7 @@ public class AsicUtils {
             while ((zipEntry = source.getNextEntry()) != null) {
                 if (PATTERN_CADES_MANIFEST.matcher(zipEntry.getName()).matches()) {
                     // Fetch content
-                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                    ByteArrayOutputStream byteArrayOutputStream = new MaxSizeProtectedOutputStream();
                     ByteStreams.copy(source, byteArrayOutputStream);
 
                     // Read manifest
@@ -85,7 +89,7 @@ public class AsicUtils {
                     ByteStreams.copy(source, target);
                 } else if (zipEntry.getName().equals("META-INF/manifest.xml")) {
                     // Fetch content
-                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                    ByteArrayOutputStream byteArrayOutputStream = new MaxSizeProtectedOutputStream();
                     ByteStreams.copy(source, byteArrayOutputStream);
 
                     // Copy entries

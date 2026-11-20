@@ -43,7 +43,18 @@ abstract class AbstractAsicReader implements Closeable {
      */
     private Map<String, Object> signingContent = new HashMap<>();
 
+    /**
+     * Max allowed decompressed size (in bytes) of each file in META-INF/ (zip bomb protection).
+     */
+    private final long maxMetadataSize;
+
     AbstractAsicReader(MessageDigestAlgorithm messageDigestAlgorithm, InputStream inputStream) throws IOException {
+        this(messageDigestAlgorithm, inputStream, MaxSizeProtectedOutputStream.getDefaultMaxSize());
+    }
+
+    AbstractAsicReader(MessageDigestAlgorithm messageDigestAlgorithm, InputStream inputStream, long maxMetadataSize) throws IOException {
+        MaxSizeProtectedOutputStream.validateMaxSize(maxMetadataSize);
+        this.maxMetadataSize = maxMetadataSize;
         this.manifestVerifier = new ManifestVerifier(messageDigestAlgorithm);
 
         try {
@@ -137,7 +148,7 @@ abstract class AbstractAsicReader implements Closeable {
         String filename = currentZipEntry.getName().substring(9).toLowerCase();
 
         // Read content in file
-        MaxSizeProtectedOutputStream contentsOfStream = new MaxSizeProtectedOutputStream();
+        MaxSizeProtectedOutputStream contentsOfStream = new MaxSizeProtectedOutputStream(maxMetadataSize);
         ByteStreams.copy(zipInputStream, contentsOfStream);
 
         if (AsicUtils.PATTERN_CADES_MANIFEST.matcher(currentZipEntry.getName()).matches()) {

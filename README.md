@@ -82,11 +82,29 @@ Newer versions are published to GitHub Packages rather than Maven Central.
 ## Important Note about ZipBomb prevention
 Starting with version 1.0.0 we have added simple protection against [ZipBomb](https://github.com/felleslosninger/efm-asic/security/advisories/GHSA-rc4q-523c-3qmm).
 
-This has been implemented with a custom `ByteArrayOutputStream` that limits decoding of files in `META-INF` to 1 GiB (see [MaxSizeProtectedOutputStream](src/main/java/no/difi/asic/zipbomb/MaxSizeProtectedOutputStream.java), was 1 MiB in v 1.0.0).
+This has been implemented with a custom `ByteArrayOutputStream` that limits decoding of each file in `META-INF` to 1 GiB by default (see [MaxSizeProtectedOutputStream](src/main/java/no/difi/asic/zipbomb/MaxSizeProtectedOutputStream.java), was 1 MiB in v 1.0.0).
 
 The only use of `MaxSizeProtectedOutputStream` is in the `handleMetadataEntry()` method in [AbstractAsicReader](src/main/java/no/difi/asic/AbstractAsicReader.java).
 
-To change the limit we can specify a more exact size in `handleMetadataEntry()` or set another default inside the `MaxSizeProtectedOutputStream` implementation.
+### Configuring the limit
+
+The limit can be lowered (or raised), which is useful when processing several ASiC files in parallel:
+
+* Per factory, takes precedence over the system property:
+  ```java
+  AsicReaderFactory.newFactory().setMaxMetadataSize(10L * 1024 * 1024);   // 10 MiB
+  AsicVerifierFactory.newFactory().setMaxMetadataSize(10L * 1024 * 1024); // 10 MiB
+  ```
+  Configure the factory before sharing it between threads.
+* Globally, using the system property `no.difi.asic.maxMetadataSize` (in bytes), read each time a container is opened:
+  ```
+  -Dno.difi.asic.maxMetadataSize=10485760
+  ```
+  An invalid value makes every `open()`/`verify()` fail with `IllegalArgumentException`.
+
+The limit must be between 1 KiB and 2147483639 bytes (just below 2 GiB, the most a byte array can hold). If nothing is configured, the default is still 1 GiB.
+
+Note that the limit applies to each `META-INF` entry separately, and it is not a bound on memory use. Reading an entry close to the limit can temporarily use several times the limit in heap, so leave room for that when sizing the JVM.
 
 ## What does it look like?
 

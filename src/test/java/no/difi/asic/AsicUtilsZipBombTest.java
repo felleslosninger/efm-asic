@@ -2,6 +2,7 @@ package no.difi.asic;
 
 import com.google.common.io.CountingInputStream;
 import no.difi.asic.zipbomb.MaxSizeProtectedOutputStream;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -20,11 +21,21 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.expectThrows;
 
+/**
+ * Zip bomb protection of manifests read by {@link AsicUtils#combine}. The limit is lowered with the system property
+ * {@value MaxSizeProtectedOutputStream#MAX_SIZE_PROPERTY}, so the tests don't need to decompress the 1 GiB default.
+ */
+@Test(singleThreaded = true)
 public class AsicUtilsZipBombTest {
 
     private static final int DECOMPRESSED_SIZE = 64 * 1024 * 1024; // 64 MiB of zeros
 
     private static final long MAX_MANIFEST_SIZE = 1024 * 1024; // 1 MiB
+
+    @AfterMethod(alwaysRun = true)
+    public void clearSystemProperty() {
+        System.clearProperty(MaxSizeProtectedOutputStream.MAX_SIZE_PROPERTY);
+    }
 
     @DataProvider
     public Object[][] manifestEntries() {
@@ -40,9 +51,11 @@ public class AsicUtilsZipBombTest {
         assertTrue(container.length > 32 * 1024, "Test container should hold a sizeable compressed manifest entry");
         assertTrue(container.length < DECOMPRESSED_SIZE / 100, "Test container should be highly compressed");
 
+        System.setProperty(MaxSizeProtectedOutputStream.MAX_SIZE_PROPERTY, String.valueOf(MAX_MANIFEST_SIZE));
+
         CountingInputStream input = new CountingInputStream(new ByteArrayInputStream(container));
-        RuntimeException e = expectThrows(RuntimeException.class, () -> AsicUtils.combine(
-                () -> new MaxSizeProtectedOutputStream(MAX_MANIFEST_SIZE), new ByteArrayOutputStream(), input));
+        RuntimeException e = expectThrows(RuntimeException.class,
+                () -> AsicUtils.combine(new ByteArrayOutputStream(), input));
         assertTrue(e.getMessage().startsWith("Output exceeds max configured size of " + MAX_MANIFEST_SIZE), e.getMessage());
 
         // Must be rejected by the size limit, not after decompressing (and consuming) the whole entry.
@@ -64,9 +77,10 @@ public class AsicUtilsZipBombTest {
             putEntry(zos, "META-INF/manifest.xml", manifest.getBytes(StandardCharsets.UTF_8));
         }
 
+        System.setProperty(MaxSizeProtectedOutputStream.MAX_SIZE_PROPERTY, String.valueOf(MAX_MANIFEST_SIZE));
+
         ByteArrayOutputStream target = new ByteArrayOutputStream();
-        AsicUtils.combine(() -> new MaxSizeProtectedOutputStream(MAX_MANIFEST_SIZE), target,
-                new ByteArrayInputStream(source.toByteArray()));
+        AsicUtils.combine(target, new ByteArrayInputStream(source.toByteArray()));
 
         // The OASIS manifest was read through the bounded buffer and regenerated in the target container.
         List<String> names = new ArrayList<>();

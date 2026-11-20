@@ -86,13 +86,13 @@ public class BouncyCastleSignatureTest {
 
         String BC = BouncyCastleProvider.PROVIDER_NAME;
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("DSA", BC);
-        keyPairGenerator.initialize(1024, new SecureRandom());
+        keyPairGenerator.initialize(2048, new SecureRandom());
         keyPair = keyPairGenerator.generateKeyPair();
 
         X500NameBuilder nameBuilder = createStdBuilder();
 
 
-        ContentSigner sigGen = new JcaContentSignerBuilder("SHA1withDSA").setProvider(BC).build(keyPair.getPrivate());
+        ContentSigner sigGen = new JcaContentSignerBuilder("SHA256withDSA").setProvider(BC).build(keyPair.getPrivate());
         JcaX509v3CertificateBuilder certGen = new JcaX509v3CertificateBuilder(
                 nameBuilder.build(),
                 BigInteger.valueOf(1),

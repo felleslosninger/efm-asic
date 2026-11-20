@@ -32,8 +32,10 @@ class AsicInputStream extends ZipInputStream {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ByteStreams.copy(ByteStreams.limit(this, MAX_MIMETYPE_SIZE + 1L), baos);
 
-            if (baos.size() > MAX_MIMETYPE_SIZE)
-                throw new IllegalStateException("Content is not ASiC-E container (mimetype entry exceeds " + MAX_MIMETYPE_SIZE + " bytes).");
+            if (baos.size() > MAX_MIMETYPE_SIZE) {
+                logger.warn("Content of mimetype exceeds {} bytes, aborted reading it.", MAX_MIMETYPE_SIZE);
+                throw new IllegalStateException("Content is not ASiC-E container.");
+            }
 
             logger.debug("Content of mimetype: {}", baos.toString());
             if (!AsicUtils.MIMETYPE_ASICE.equals(baos.toString()))

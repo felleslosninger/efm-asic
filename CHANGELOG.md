@@ -3,6 +3,11 @@
 
 # Java 21 releases
 
+# 1.0.4
+
+* The ZipBomb limit for each META-INF entry (default 1 GiB) can now be configured with `AsicReaderFactory.setMaxMetadataSize()` / `AsicVerifierFactory.setMaxMetadataSize()` or the system property `no.difi.asic.maxMetadataSize` (see [#56](https://github.com/felleslosninger/efm-asic/issues/56))
+* `AsicReaderFactory.open(Path)` and `AsicVerifierFactory.verify(Path)` now close the file if opening or verifying the container fails
+
 # 1.0.3
 
 * `AsicReader.inputStream()` now reads in bulk instead of one byte at a time, which made large entries very slow to read (see [MOVE-5350](https://digdir.atlassian.net/browse/MOVE-5350))

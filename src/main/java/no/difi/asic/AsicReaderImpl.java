@@ -13,6 +13,10 @@ class AsicReaderImpl extends AbstractAsicReader implements AsicReader {
         super(messageDigestAlgorithm, inputStream);
     }
 
+    AsicReaderImpl(MessageDigestAlgorithm messageDigestAlgorithm, InputStream inputStream, long maxMetadataSize) throws IOException {
+        super(messageDigestAlgorithm, inputStream, maxMetadataSize);
+    }
+
     /**
      * {@inheritDoc}
      */

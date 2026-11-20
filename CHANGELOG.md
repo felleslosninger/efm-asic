@@ -3,6 +3,10 @@
 
 # Java 21 releases
 
+# 1.0.4
+
+* ZipBomb protection now also covers the `mimetype` entry, which is read at most 1 KiB before failing with `IllegalStateException` (see [MOVE-5471](https://digdir.atlassian.net/browse/MOVE-5471))
+
 # 1.0.3
 
 * `AsicReader.inputStream()` now reads in bulk instead of one byte at a time, which made large entries very slow to read (see [MOVE-5350](https://digdir.atlassian.net/browse/MOVE-5350))

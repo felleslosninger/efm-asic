@@ -14,6 +14,12 @@ class AsicInputStream extends ZipInputStream {
 
     public static final Logger logger = LoggerFactory.getLogger(AsicInputStream.class);
 
+    /**
+     * Upper bound for the decompressed size of the 'mimetype' entry. A valid value is only a few dozen bytes,
+     * so this protects against a zip bomb disguised as the 'mimetype' entry.
+     */
+    static final int MAX_MIMETYPE_SIZE = 1024;
+
     public AsicInputStream(InputStream in) {
         super(in);
     }
@@ -24,7 +30,10 @@ class AsicInputStream extends ZipInputStream {
 
         if (zipEntry != null && zipEntry.getName().equals("mimetype")) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ByteStreams.copy(this, baos);
+            ByteStreams.copy(ByteStreams.limit(this, MAX_MIMETYPE_SIZE + 1L), baos);
+
+            if (baos.size() > MAX_MIMETYPE_SIZE)
+                throw new IllegalStateException("Content is not ASiC-E container (mimetype entry exceeds " + MAX_MIMETYPE_SIZE + " bytes).");
 
             logger.debug("Content of mimetype: {}", baos.toString());
             if (!AsicUtils.MIMETYPE_ASICE.equals(baos.toString()))

@@ -7,6 +7,7 @@
 
 * The ZipBomb limit for each META-INF entry (default 1 GiB) can now be configured with `AsicReaderFactory.setMaxMetadataSize()` / `AsicVerifierFactory.setMaxMetadataSize()` or the system property `no.difi.asic.maxMetadataSize` (see [#56](https://github.com/felleslosninger/efm-asic/issues/56))
 * `AsicReaderFactory.open(Path)` and `AsicVerifierFactory.verify(Path)` now close the file if opening or verifying the container fails
+* ZipBomb protection now also covers the `mimetype` entry, which is read at most 1 KiB before failing with `IllegalStateException` (see [MOVE-5471](https://digdir.atlassian.net/browse/MOVE-5471))
 
 # 1.0.3
 

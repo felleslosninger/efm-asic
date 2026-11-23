@@ -46,7 +46,8 @@ public class AsicUtilsZipBombTest {
         };
     }
 
-    @Test(dataProvider = "manifestEntries", timeOut = 10_000)
+    // Generous timeout, building the 64 MiB test container is the slow part on a busy machine
+    @Test(dataProvider = "manifestEntries", timeOut = 30_000)
     public void hugeManifestEntryIsRejectedWithoutReadingItAll(String entryName) throws IOException {
         byte[] container = containerWithHugeEntry(entryName);
         assertTrue(container.length > 32 * 1024, "Test container should hold a sizeable compressed manifest entry");

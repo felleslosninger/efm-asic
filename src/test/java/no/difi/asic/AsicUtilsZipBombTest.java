@@ -18,6 +18,7 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.expectThrows;
 
@@ -53,13 +54,51 @@ public class AsicUtilsZipBombTest {
 
         System.setProperty(MaxSizeProtectedOutputStream.MAX_SIZE_PROPERTY, String.valueOf(MAX_MANIFEST_SIZE));
 
-        CountingInputStream input = new CountingInputStream(new ByteArrayInputStream(container));
-        RuntimeException e = expectThrows(RuntimeException.class,
-                () -> AsicUtils.combine(new ByteArrayOutputStream(), input));
+        CloseTrackingInputStream source = new CloseTrackingInputStream(container);
+        CountingInputStream input = new CountingInputStream(source);
+        CloseTrackingOutputStream target = new CloseTrackingOutputStream();
+        RuntimeException e = expectThrows(RuntimeException.class, () -> AsicUtils.combine(target, input));
         assertTrue(e.getMessage().startsWith("Output exceeds max configured size of " + MAX_MANIFEST_SIZE), e.getMessage());
 
         // Must be rejected by the size limit, not after decompressing (and consuming) the whole entry.
         assertTrue(input.getCount() < 8 * 1024, "Consumed " + input.getCount() + " of " + container.length + " bytes");
+
+        // The source is closed as when combining succeeds, while the target is left as is: not closed,
+        // and not completed into what looks like a valid container (no end of central directory record).
+        assertTrue(source.closed, "Source stream should be closed");
+        assertFalse(target.closed, "Target stream should not be closed");
+        assertFalse(containsEndOfCentralDirectory(target.toByteArray()), "Target should not be a completed ZIP");
+    }
+
+    private static boolean containsEndOfCentralDirectory(byte[] bytes) {
+        for (int i = 0; i + 3 < bytes.length; i++)
+            if (bytes[i] == 'P' && bytes[i + 1] == 'K' && bytes[i + 2] == 5 && bytes[i + 3] == 6)
+                return true;
+        return false;
+    }
+
+    private static class CloseTrackingInputStream extends ByteArrayInputStream {
+        private boolean closed;
+
+        CloseTrackingInputStream(byte[] bytes) {
+            super(bytes);
+        }
+
+        @Override
+        public void close() throws IOException {
+            closed = true;
+            super.close();
+        }
+    }
+
+    private static class CloseTrackingOutputStream extends ByteArrayOutputStream {
+        private boolean closed;
+
+        @Override
+        public void close() throws IOException {
+            closed = true;
+            super.close();
+        }
     }
 
     @Test

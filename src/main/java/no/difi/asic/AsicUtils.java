@@ -54,73 +54,77 @@ public class AsicUtils {
         // Open target container
         AsicOutputStream target = new AsicOutputStream(outputStream);
 
-        // Prepare to combine OASIS OpenDocument Manifests
-        OasisManifest oasisManifest = new OasisManifest(MimeType.forString(MIMETYPE_ASICE));
+        try {
+            // Prepare to combine OASIS OpenDocument Manifests
+            OasisManifest oasisManifest = new OasisManifest(MimeType.forString(MIMETYPE_ASICE));
 
-        for (InputStream inputStream : inputStreams) {
-            // Open source container
-            AsicInputStream source = new AsicInputStream(inputStream);
+            for (InputStream inputStream : inputStreams) {
+                // Open source container, closed also if combining fails (e.g. a manifest exceeds the size limit)
+                try (AsicInputStream source = new AsicInputStream(inputStream)) {
+                    // Read entries
+                    ZipEntry zipEntry;
+                    while ((zipEntry = source.getNextEntry()) != null) {
+                        if (PATTERN_CADES_MANIFEST.matcher(zipEntry.getName()).matches()) {
+                            // Fetch content
+                            ByteArrayOutputStream byteArrayOutputStream = new MaxSizeProtectedOutputStream();
+                            ByteStreams.copy(source, byteArrayOutputStream);
 
-            // Read entries
-            ZipEntry zipEntry;
-            while ((zipEntry = source.getNextEntry()) != null) {
-                if (PATTERN_CADES_MANIFEST.matcher(zipEntry.getName()).matches()) {
-                    // Fetch content
-                    ByteArrayOutputStream byteArrayOutputStream = new MaxSizeProtectedOutputStream();
-                    ByteStreams.copy(source, byteArrayOutputStream);
+                            // Read manifest
+                            ManifestVerifier manifestVerifier = new ManifestVerifier(null);
+                            CadesAsicManifest.extractAndVerify(byteArrayOutputStream.toString(), manifestVerifier);
 
-                    // Read manifest
-                    ManifestVerifier manifestVerifier = new ManifestVerifier(null);
-                    CadesAsicManifest.extractAndVerify(byteArrayOutputStream.toString(), manifestVerifier);
+                            // Make sure only on rootfile makes it to the source container
+                            if (manifestVerifier.getAsicManifest().getRootfile() != null) {
+                                if (containsRootFile)
+                                    throw new IllegalStateException("Multiple rootfiles is not allowed when combining containers.");
+                                containsRootFile = true;
+                            }
 
-                    // Make sure only on rootfile makes it to the source container
-                    if (manifestVerifier.getAsicManifest().getRootfile() != null) {
-                        if (containsRootFile)
-                            throw new IllegalStateException("Multiple rootfiles is not allowed when combining containers.");
-                        containsRootFile = true;
+                            // Write manifest to container
+                            target.putNextEntry(new ZipEntry("META-INF/" + ASIC_MANIFEST_BASENAME + ++manifestCounter + ".xml"));
+                            ByteStreams.copy(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()), target);
+                        } else if (PATTERN_XADES_SIGNATURES.matcher(zipEntry.getName()).matches()) {
+                            // Copy content to target container
+                            target.putNextEntry(new ZipEntry(String.format("META-INF/signatures%s.xml", ++manifestCounter)));
+                            ByteStreams.copy(source, target);
+                        } else if (zipEntry.getName().equals("META-INF/manifest.xml")) {
+                            // Fetch content
+                            ByteArrayOutputStream byteArrayOutputStream = new MaxSizeProtectedOutputStream();
+                            ByteStreams.copy(source, byteArrayOutputStream);
+
+                            // Copy entries
+                            oasisManifest.append(new OasisManifest(new ByteArrayInputStream(byteArrayOutputStream.toByteArray())));
+
+                            // Nothing to write to target container
+                            target.closeEntry();
+                            continue;
+                        } else {
+                            // Copy content to target container
+                            target.putNextEntry(zipEntry);
+                            ByteStreams.copy(source, target);
+
+                            if (!zipEntry.getName().startsWith("META-INF/"))
+                                fileCounter++;
+                        }
+
+                        source.closeEntry();
+                        target.closeEntry();
                     }
-
-                    // Write manifest to container
-                    target.putNextEntry(new ZipEntry("META-INF/" + ASIC_MANIFEST_BASENAME + ++manifestCounter + ".xml"));
-                    ByteStreams.copy(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()), target);
-                } else if (PATTERN_XADES_SIGNATURES.matcher(zipEntry.getName()).matches()) {
-                    // Copy content to target container
-                    target.putNextEntry(new ZipEntry(String.format("META-INF/signatures%s.xml", ++manifestCounter)));
-                    ByteStreams.copy(source, target);
-                } else if (zipEntry.getName().equals("META-INF/manifest.xml")) {
-                    // Fetch content
-                    ByteArrayOutputStream byteArrayOutputStream = new MaxSizeProtectedOutputStream();
-                    ByteStreams.copy(source, byteArrayOutputStream);
-
-                    // Copy entries
-                    oasisManifest.append(new OasisManifest(new ByteArrayInputStream(byteArrayOutputStream.toByteArray())));
-
-                    // Nothing to write to target container
-                    target.closeEntry();
-                    continue;
-                } else {
-                    // Copy content to target container
-                    target.putNextEntry(zipEntry);
-                    ByteStreams.copy(source, target);
-
-                    if (!zipEntry.getName().startsWith("META-INF/"))
-                        fileCounter++;
                 }
-
-                source.closeEntry();
-                target.closeEntry();
             }
 
-            // Close source container
-            source.close();
+            // Add manifest if it contains the same amount of files as the container.
+            if (oasisManifest.size() == fileCounter + 1)
+                target.writeZipEntry("META-INF/manifest.xml", oasisManifest.toBytes());
+
+            // Close target container
+            target.close();
+        } catch (Throwable t) {
+            // Release the compressor without completing the target container, so a failed combine
+            // doesn't leave what looks like a valid (but partial) container in the output stream.
+            target.abort();
+            throw t;
         }
-
-        // Add manifest if it contains the same amount of files as the container.
-        if (oasisManifest.size() == fileCounter + 1)
-            target.writeZipEntry("META-INF/manifest.xml", oasisManifest.toBytes());
-
-        // Close target container
-        target.close();
     }
 
     public static MimeType detectMime(String filename) throws IOException {

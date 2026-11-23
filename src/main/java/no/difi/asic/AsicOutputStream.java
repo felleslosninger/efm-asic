@@ -53,4 +53,12 @@ class AsicOutputStream extends ZipOutputStream {
         }
     }
 
+    /**
+     * Releases the native resources of the compressor without finishing the container. Nothing more is written to,
+     * and the underlying output stream is not closed. The stream must not be used afterwards.
+     */
+    void abort() {
+        def.end();
+    }
+
 }
